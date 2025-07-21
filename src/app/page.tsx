@@ -125,7 +125,7 @@ export default function Home() {
           return (
             <Badge
               variant={product.status === 'mandatory' ? 'default' : 'secondary'}
-              className="absolute top-2 right-2 z-10 capitalize"
+              className="capitalize"
             >
               {product.status === 'mandatory' ? 'Obrigatório' : 'Recomendado'}
             </Badge>
