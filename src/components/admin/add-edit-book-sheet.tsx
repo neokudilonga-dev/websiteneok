@@ -27,7 +27,7 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import type { Product, ReadingPlanItem } from "@/lib/types";
-import { schools, bookCategories } from "@/lib/data";
+import { schools, bookCategories as initialBookCategories } from "@/lib/data";
 import { useEffect, useState, ChangeEvent } from "react";
 import { PlusCircle, Trash2, Upload } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -69,6 +69,9 @@ export function AddEditBookSheet({
   readingPlan,
 }: AddEditBookSheetProps) {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    // In a real app, you would fetch categories from your API
+    const [bookCategories, setBookCategories] = useState(initialBookCategories);
+
 
   const form = useForm<BookFormValues>({
     resolver: zodResolver(bookFormSchema),

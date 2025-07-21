@@ -9,6 +9,7 @@ import {
   Home,
   School,
   ShoppingCart,
+  Tags,
 } from "lucide-react";
 import {
   SidebarProvider,
@@ -95,6 +96,19 @@ export default function AdminLayout({
                   <Link href="/admin/schools">
                     <School />
                     <span>Escolas</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+               <SidebarMenuItem>
+                <SidebarMenuButton
+                  href="/admin/categories"
+                  asChild
+                  isActive={isActive("/admin/categories")}
+                  tooltip="Categorias"
+                >
+                  <Link href="/admin/categories">
+                    <Tags />
+                    <span>Categorias</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

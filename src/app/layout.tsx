@@ -28,8 +28,8 @@ export default function RootLayout({
           {children}
           <Toaster />
           <div className="fixed bottom-6 right-6 z-50">
-            <Button asChild size="lg" className="rounded-full bg-[#25D366] hover:bg-[#128C7E] shadow-lg">
-                <Link href="https://wa.me/244919948887" target="_blank" rel="noopener noreferrer" aria-label="Contact us on WhatsApp">
+            <Button asChild size="lg" className="rounded-full bg-[#25D366] hover:bg-[#128C7E] shadow-lg h-16 w-16">
+                <Link href="https://wa.me/244919948887" target="_blank" rel="noopener noreferrer" aria-label="Contacte-nos no WhatsApp">
                     <FaWhatsapp className="h-8 w-8" />
                 </Link>
             </Button>
