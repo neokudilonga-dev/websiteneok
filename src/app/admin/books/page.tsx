@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from "react";
@@ -27,8 +28,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { products as initialProducts, schools } from "@/lib/data";
-import type { Product } from "@/lib/types";
+import { products as initialProducts, schools, readingPlan as initialReadingPlan } from "@/lib/data";
+import type { Product, ReadingPlanItem, School } from "@/lib/types";
 import { AddEditBookSheet } from "@/components/admin/add-edit-book-sheet";
 import { Input } from "@/components/ui/input";
 
@@ -36,6 +37,8 @@ export default function BooksPage() {
   const [products, setProducts] = useState<Product[]>(
     initialProducts.filter((p) => p.type === "book")
   );
+  const [readingPlan, setReadingPlan] = useState<ReadingPlanItem[]>(initialReadingPlan);
+
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Product | undefined>(
     undefined
@@ -61,19 +64,37 @@ export default function BooksPage() {
   const handleDeleteBook = (bookId: string) => {
     // In a real app, you'd call an API here.
     setProducts(products.filter((p) => p.id !== bookId));
+    // Also remove from reading plan
+    setReadingPlan(readingPlan.filter(item => item.productId !== bookId));
   };
 
-  const handleSaveChanges = (book: Product) => {
+  const handleSaveChanges = (book: Product, newReadingPlan: {schoolId: string, grade: number}[]) => {
     // In a real app, you'd call an API here.
     if (selectedBook) {
       setProducts(products.map((p) => (p.id === book.id ? book : p)));
     } else {
-      setProducts([...products, { ...book, id: `book-${Date.now()}` }]);
+      const newBook = { ...book, id: `book-${Date.now()}` };
+      setProducts([...products, newBook ]);
+      book.id = newBook.id; // update book id for reading plan
     }
+
+    // Update reading plan
+    const otherSchoolsPlan = readingPlan.filter(item => item.productId !== book.id);
+    const thisBookPlan: ReadingPlanItem[] = newReadingPlan.map((rp, index) => ({
+      id: `rp-${book.id}-${index}-${Date.now()}`,
+      productId: book.id,
+      schoolId: rp.schoolId,
+      grade: rp.grade
+    }));
+    setReadingPlan([...otherSchoolsPlan, ...thisBookPlan]);
   };
 
   const getSchoolName = (schoolId: string) => {
     return schools.find(s => s.id === schoolId)?.name || schoolId;
+  }
+  
+  const getBookReadingPlan = (productId: string) => {
+    return readingPlan.filter(item => item.productId === productId);
   }
 
   return (
@@ -112,8 +133,7 @@ export default function BooksPage() {
                 </TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Price</TableHead>
-                <TableHead className="hidden md:table-cell">Grade</TableHead>
-                <TableHead className="hidden md:table-cell">Schools</TableHead>
+                <TableHead className="hidden md:table-cell">Reading Plan</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
                 </TableHead>
@@ -134,14 +154,15 @@ export default function BooksPage() {
                   <TableCell className="font-medium">{product.name}</TableCell>
                   <TableCell>${product.price.toFixed(2)}</TableCell>
                   <TableCell className="hidden md:table-cell">
-                    {product.grade ? `${product.grade}º Ano` : 'N/A'}
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
                     <div className="flex flex-wrap gap-1">
-                      {product.schoolIds && product.schoolIds.length > 0 ? (
-                        product.schoolIds.map(id => <Badge key={id} variant="outline">{getSchoolName(id)}</Badge>)
+                      {getBookReadingPlan(product.id).length > 0 ? (
+                        getBookReadingPlan(product.id).map(item => (
+                            <Badge key={item.id} variant="outline">
+                                {getSchoolName(item.schoolId)} - {item.grade}º Ano
+                            </Badge>
+                        ))
                       ): (
-                        <Badge variant="secondary">General</Badge>
+                        <Badge variant="secondary">Not in a plan</Badge>
                       )}
                     </div>
                   </TableCell>
@@ -182,6 +203,7 @@ export default function BooksPage() {
         setIsOpen={setSheetOpen}
         book={selectedBook}
         onSaveChanges={handleSaveChanges}
+        readingPlan={readingPlan}
       />
     </>
   );

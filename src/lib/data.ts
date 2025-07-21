@@ -1,4 +1,4 @@
-import type { School, Product } from "@/lib/types";
+import type { School, Product, ReadingPlanItem } from "@/lib/types";
 
 export const schools: School[] = [
   { id: "escola-a", name: "Escola Primária de Luanda" },
@@ -14,8 +14,6 @@ export const products: Product[] = [
     price: 15.99,
     image: "https://placehold.co/600x400.png",
     type: "book",
-    schoolIds: ["escola-a"],
-    grade: 1,
     dataAiHint: "math textbook"
   },
   {
@@ -25,8 +23,6 @@ export const products: Product[] = [
     price: 18.5,
     image: "https://placehold.co/600x400.png",
     type: "book",
-    schoolIds: ["escola-a"],
-    grade: 1,
     dataAiHint: "science textbook"
   },
   {
@@ -36,7 +32,6 @@ export const products: Product[] = [
     price: 25.0,
     image: "https://placehold.co/600x400.png",
     type: "game",
-    schoolIds: ["escola-a"],
     dataAiHint: "alphabet blocks"
   },
   {
@@ -46,8 +41,6 @@ export const products: Product[] = [
     price: 35.0,
     image: "https://placehold.co/600x400.png",
     type: "book",
-    schoolIds: ["escola-c"],
-    grade: 12,
     dataAiHint: "chemistry textbook"
   },
   {
@@ -57,8 +50,6 @@ export const products: Product[] = [
     price: 22.99,
     image: "https://placehold.co/600x400.png",
     type: "book",
-    schoolIds: ["escola-b", "escola-c"],
-    grade: 8,
     dataAiHint: "history book"
   },
   {
@@ -68,7 +59,6 @@ export const products: Product[] = [
     price: 45.0,
     image: "https://placehold.co/600x400.png",
     type: "game",
-    schoolIds: ["escola-c"],
     dataAiHint: "coding game"
   },
   {
@@ -78,8 +68,6 @@ export const products: Product[] = [
     price: 19.99,
     image: "https://placehold.co/600x400.png",
     type: "book",
-    schoolIds: ["escola-b"],
-    grade: 7,
     dataAiHint: "language book"
   },
   {
@@ -89,8 +77,6 @@ export const products: Product[] = [
     price: 29.95,
     image: "https://placehold.co/600x400.png",
     type: "book",
-    schoolIds: [], // This book is not part of any specific school plan
-    grade: 7,
     dataAiHint: "atlas book"
   },
    {
@@ -100,7 +86,6 @@ export const products: Product[] = [
     price: 14.50,
     image: "https://placehold.co/600x400.png",
     type: "game",
-    schoolIds: ["escola-b"],
     dataAiHint: "math game"
   },
    {
@@ -110,7 +95,7 @@ export const products: Product[] = [
     price: 39.99,
     image: "https://placehold.co/600x400.png",
     type: "game",
-    dataAiHint: "board game" // No schoolId
+    dataAiHint: "board game"
   },
   {
     id: "book-7",
@@ -119,8 +104,6 @@ export const products: Product[] = [
     price: 32.0,
     image: "https://placehold.co/600x400.png",
     type: "book",
-    schoolIds: ["escola-c"],
-    grade: 11,
     dataAiHint: "physics textbook"
   },
   {
@@ -130,7 +113,16 @@ export const products: Product[] = [
     price: 24.50,
     image: "https://placehold.co/600x400.png",
     type: "book",
-    grade: 12,
     dataAiHint: "literature book"
   }
+];
+
+export const readingPlan: ReadingPlanItem[] = [
+    { id: 'rp-1', productId: 'book-1', schoolId: 'escola-a', grade: 1 },
+    { id: 'rp-2', productId: 'book-2', schoolId: 'escola-a', grade: 1 },
+    { id: 'rp-3', productId: 'book-3', schoolId: 'escola-c', grade: 12 },
+    { id: 'rp-4', productId: 'book-4', schoolId: 'escola-b', grade: 8 },
+    { id: 'rp-5', productId: 'book-4', schoolId: 'escola-c', grade: 9 }, // Same book, different grade
+    { id: 'rp-6', productId: 'book-5', schoolId: 'escola-b', grade: 7 },
+    { id: 'rp-7', productId: 'book-7', schoolId: 'escola-c', grade: 11 },
 ];

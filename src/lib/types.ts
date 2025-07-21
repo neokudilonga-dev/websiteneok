@@ -5,9 +5,15 @@ export interface Product {
   price: number;
   image: string;
   type: "book" | "game";
-  schoolIds?: string[]; // Changed from schoolId: string
-  grade?: number;
+  // grade and schoolIds are no longer here
   dataAiHint?: string;
+}
+
+export interface ReadingPlanItem {
+  id: string;
+  productId: string;
+  schoolId: string;
+  grade: number;
 }
 
 export interface School {

@@ -2,8 +2,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import type { School, Product } from "@/lib/types";
-import { schools, products as allProducts } from "@/lib/data";
+import type { School, Product, ReadingPlanItem } from "@/lib/types";
+import { schools, products as allProducts, readingPlan } from "@/lib/data";
 import Header from "@/components/header";
 import ProductGrid from "@/components/product-grid";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -26,23 +26,31 @@ export default function Home() {
     setSelectedSchool(school);
     setShowIndividual(null); // Reset when school changes
   };
+  
+  const productsById = useMemo(() => {
+    return allProducts.reduce((acc, product) => {
+      acc[product.id] = product;
+      return acc;
+    }, {} as Record<string, Product>);
+  }, []);
 
-  const schoolProducts = useMemo(() => selectedSchool
-    ? allProducts.filter((p) => p.schoolIds?.includes(selectedSchool.id))
+  const schoolReadingPlan = useMemo(() => selectedSchool
+    ? readingPlan.filter((item) => item.schoolId === selectedSchool.id)
     : [], [selectedSchool]);
 
   const productsByGrade = useMemo(() => {
     const grades: { [key: number]: Product[] } = {};
-    schoolProducts.forEach(product => {
-      if (product.type === 'book' && product.grade) {
-        if (!grades[product.grade]) {
-          grades[product.grade] = [];
+    schoolReadingPlan.forEach(item => {
+      const product = productsById[item.productId];
+      if (product) {
+         if (!grades[item.grade]) {
+          grades[item.grade] = [];
         }
-        grades[product.grade].push(product);
+        grades[item.grade].push(product);
       }
     });
     return grades;
-  }, [schoolProducts]);
+  }, [schoolReadingPlan, productsById]);
 
   const allBooks = allProducts.filter((p) => p.type === "book");
   const allGames = allProducts.filter((p) => p.type === "game");
