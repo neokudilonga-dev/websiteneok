@@ -3,16 +3,19 @@
 
 import { useState, useMemo } from "react";
 import type { School, Product, ReadingPlanItem } from "@/lib/types";
-import { schools, products as allProducts, readingPlan } from "@/lib/data";
+import { schools, products as allProducts, readingPlan, bookCategories } from "@/lib/data";
 import Header from "@/components/header";
 import ProductGrid from "@/components/product-grid";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SchoolSelector from "@/components/school-selector";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, ShoppingCart } from "lucide-react";
+import { ChevronRight, ShoppingCart, Search } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 
 interface GradeProducts {
   mandatory: Product[];
@@ -27,6 +30,9 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("planos");
   const [showIndividual, setShowIndividual] = useState<string | null>(null);
   const { addKitToCart } = useCart();
+  
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   const handleSchoolChange = (schoolId: string) => {
     const school = schools.find((s) => s.id === schoolId);
@@ -49,7 +55,7 @@ export default function Home() {
     const grades: { [key: number]: GradeProducts } = {};
     schoolReadingPlan.forEach(item => {
       const product = productsById[item.productId];
-      if (product) {
+      if (product && product.stockStatus !== 'sold_out') {
          if (!grades[item.grade]) {
           grades[item.grade] = { mandatory: [], recommended: [], all: [] };
         }
@@ -63,9 +69,18 @@ export default function Home() {
     });
     return grades;
   }, [schoolReadingPlan, productsById]);
+  
+  const allGames = allProducts.filter((p) => p.type === "game" && p.stockStatus !== 'sold_out');
 
-  const allBooks = allProducts.filter((p) => p.type === "book");
-  const allGames = allProducts.filter((p) => p.type === "game");
+  const filteredBooks = useMemo(() => {
+    return allProducts.filter(p => 
+        p.type === 'book' && 
+        p.stockStatus !== 'sold_out' &&
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        (selectedCategory === 'all' || p.category === selectedCategory)
+    )
+  }, [searchQuery, selectedCategory]);
+
 
   const renderTitle = () => {
     switch (activeTab) {
@@ -121,7 +136,7 @@ export default function Home() {
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
         <div className="mx-auto w-full max-w-7xl">
           <Tabs defaultValue="planos" className="w-full" onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-3 md:w-[400px]">
+            <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 sm:w-full">
               <TabsTrigger value="planos">Planos de Leitura</TabsTrigger>
               <TabsTrigger value="catalogo">Todos os Livros</TabsTrigger>
               <TabsTrigger value="jogos">Jogos e Outros</TabsTrigger>
@@ -203,8 +218,31 @@ export default function Home() {
                 )}
             </TabsContent>
 
-            <TabsContent value="catalogo" className="mt-6">
-              <ProductGrid products={allBooks} />
+            <TabsContent value="catalogo" className="mt-6 space-y-6">
+               <div className="flex flex-col gap-4 sm:flex-row">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            type="search"
+                            placeholder="Pesquisar por nome do livro..."
+                            className="w-full rounded-lg bg-background pl-8"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                        <SelectTrigger className="w-full sm:w-[280px]">
+                            <SelectValue placeholder="Filtrar por categoria" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Todas as Categorias</SelectItem>
+                            {bookCategories.map(category => (
+                                <SelectItem key={category} value={category}>{category}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+              <ProductGrid products={filteredBooks} />
             </TabsContent>
 
             <TabsContent value="jogos" className="mt-6">

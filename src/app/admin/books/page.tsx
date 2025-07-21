@@ -10,7 +10,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, MoreHorizontal, Search } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Search, Filter } from "lucide-react";
 import {
   Table,
   TableHeader,
@@ -25,10 +25,11 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
+  DropdownMenuCheckboxItem
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { products as initialProducts, schools, readingPlan as initialReadingPlan } from "@/lib/data";
+import { products as initialProducts, schools, readingPlan as initialReadingPlan, bookCategories } from "@/lib/data";
 import type { Product, ReadingPlanItem, School } from "@/lib/types";
 import { AddEditBookSheet } from "@/components/admin/add-edit-book-sheet";
 import { Input } from "@/components/ui/input";
@@ -44,12 +45,15 @@ export default function BooksPage() {
     undefined
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const [showSoldOut, setShowSoldOut] = useState(false);
 
   const filteredProducts = useMemo(() => {
-    return products.filter((product) =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [products, searchQuery]);
+    return products.filter((product) => {
+      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStock = showSoldOut || product.stockStatus !== 'sold_out';
+      return matchesSearch && matchesStock;
+    });
+  }, [products, searchQuery, showSoldOut]);
 
   const handleAddBook = () => {
     setSelectedBook(undefined);
@@ -119,6 +123,23 @@ export default function BooksPage() {
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
+                 <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="shrink-0">
+                      <Filter className="mr-2" />
+                      Filtrar
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
+                    <DropdownMenuCheckboxItem
+                      checked={showSoldOut}
+                      onCheckedChange={setShowSoldOut}
+                    >
+                      Mostrar Esgotados
+                    </DropdownMenuCheckboxItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 <Button onClick={handleAddBook} className="shrink-0">
                     <PlusCircle className="mr-2" />
                     Adicionar Novo Livro
@@ -133,6 +154,7 @@ export default function BooksPage() {
                   <span className="sr-only">Imagem</span>
                 </TableHead>
                 <TableHead>Nome</TableHead>
+                <TableHead>Estado</TableHead>
                 <TableHead>Preço</TableHead>
                 <TableHead className="hidden md:table-cell">Plano de Leitura</TableHead>
                 <TableHead>
@@ -153,6 +175,15 @@ export default function BooksPage() {
                     />
                   </TableCell>
                   <TableCell className="font-medium">{product.name}</TableCell>
+                   <TableCell>
+                      <Badge 
+                        variant={product.stockStatus === 'sold_out' ? 'destructive' : product.stockStatus === 'out_of_stock' ? 'secondary' : 'default'}
+                      >
+                         {product.stockStatus === 'sold_out' && 'Esgotado'}
+                         {product.stockStatus === 'in_stock' && 'Em Stock'}
+                         {product.stockStatus === 'out_of_stock' && 'Atraso na Entrega'}
+                      </Badge>
+                   </TableCell>
                   <TableCell>{product.price.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}</TableCell>
                   <TableCell className="hidden md:table-cell">
                     <div className="flex flex-wrap gap-1">

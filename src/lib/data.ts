@@ -6,6 +6,8 @@ export const schools: School[] = [
   { id: "escola-c", name: "Liceu Angolano de Luanda" },
 ];
 
+export const bookCategories = ["Manual Escolar", "Ficção", "Não-Ficção", "Ciência", "História", "Literatura"];
+
 export const products: Product[] = [
   {
     id: "book-1",
@@ -15,7 +17,9 @@ export const products: Product[] = [
     image: "https://placehold.co/600x400.png",
     images: [],
     type: "book",
-    dataAiHint: "math textbook"
+    dataAiHint: "math textbook",
+    category: "Manual Escolar",
+    stockStatus: "in_stock",
   },
   {
     id: "book-2",
@@ -25,7 +29,9 @@ export const products: Product[] = [
     image: "https://placehold.co/600x400.png",
     images: [],
     type: "book",
-    dataAiHint: "science textbook"
+    dataAiHint: "science textbook",
+    category: "Ciência",
+    stockStatus: "in_stock",
   },
   {
     id: "game-1",
@@ -45,7 +51,9 @@ export const products: Product[] = [
     image: "https://placehold.co/600x400.png",
     images: [],
     type: "book",
-    dataAiHint: "chemistry textbook"
+    dataAiHint: "chemistry textbook",
+    category: "Ciência",
+    stockStatus: "out_of_stock",
   },
   {
     id: "book-4",
@@ -55,7 +63,9 @@ export const products: Product[] = [
     image: "https://placehold.co/600x400.png",
     images: [],
     type: "book",
-    dataAiHint: "history book"
+    dataAiHint: "history book",
+    category: "História",
+    stockStatus: "in_stock",
   },
   {
     id: "game-2",
@@ -75,7 +85,9 @@ export const products: Product[] = [
     image: "https://placehold.co/600x400.png",
     images: [],
     type: "book",
-    dataAiHint: "language book"
+    dataAiHint: "language book",
+    category: "Manual Escolar",
+    stockStatus: "in_stock",
   },
   {
     id: "book-6",
@@ -85,7 +97,9 @@ export const products: Product[] = [
     image: "https://placehold.co/600x400.png",
     images: [],
     type: "book",
-    dataAiHint: "atlas book"
+    dataAiHint: "atlas book",
+    category: "Não-Ficção",
+    stockStatus: "sold_out",
   },
    {
     id: "game-3",
@@ -115,7 +129,9 @@ export const products: Product[] = [
     image: "https://placehold.co/600x400.png",
     images: [],
     type: "book",
-    dataAiHint: "physics textbook"
+    dataAiHint: "physics textbook",
+    category: "Ciência",
+    stockStatus: "in_stock",
   },
   {
     id: "book-8",
@@ -125,7 +141,9 @@ export const products: Product[] = [
     image: "https://placehold.co/600x400.png",
     images: [],
     type: "book",
-    dataAiHint: "literature book"
+    dataAiHint: "literature book",
+    category: "Literatura",
+    stockStatus: "in_stock",
   }
 ];
 

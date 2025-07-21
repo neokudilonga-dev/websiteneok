@@ -27,7 +27,7 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import type { Product, ReadingPlanItem } from "@/lib/types";
-import { schools } from "@/lib/data";
+import { schools, bookCategories } from "@/lib/data";
 import { useEffect, useState, ChangeEvent } from "react";
 import { PlusCircle, Trash2, Upload } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -54,6 +54,8 @@ const bookFormSchema = z.object({
   description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
   price: z.coerce.number().min(0, "O preço deve ser um número positivo."),
   image: z.string().min(1, "A imagem é obrigatória."),
+  category: z.string().min(1, "A categoria é obrigatória."),
+  stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out']),
   readingPlan: z.array(readingPlanItemSchema).optional(),
 });
 
@@ -75,6 +77,8 @@ export function AddEditBookSheet({
       description: "",
       price: 0,
       image: "",
+      category: "",
+      stockStatus: 'in_stock',
       readingPlan: [],
     },
   });
@@ -96,6 +100,8 @@ export function AddEditBookSheet({
           description: book.description,
           price: book.price,
           image: book.image,
+          category: book.category,
+          stockStatus: book.stockStatus || 'in_stock',
           readingPlan: bookReadingPlan
         });
         setImagePreview(book.image);
@@ -105,6 +111,8 @@ export function AddEditBookSheet({
           description: "",
           price: 0,
           image: "",
+          category: "",
+          stockStatus: "in_stock",
           readingPlan: [],
         });
         setImagePreview(null);
@@ -122,6 +130,8 @@ export function AddEditBookSheet({
         price: data.price,
         image: data.image,
         images: [],
+        category: data.category,
+        stockStatus: data.stockStatus
     }, data.readingPlan || []);
     setIsOpen(false);
   };
@@ -237,19 +247,79 @@ export function AddEditBookSheet({
                   </FormItem>
                 )}
               />
-               <FormField
-                  control={form.control}
-                  name="price"
-                  render={({ field }) => (
-                  <FormItem>
-                      <FormLabel>Preço</FormLabel>
-                      <FormControl>
-                      <Input type="number" step="0.01" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                  </FormItem>
-                  )}
-              />
+                <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                        control={form.control}
+                        name="price"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Preço</FormLabel>
+                            <FormControl>
+                            <Input type="number" step="0.01" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                     <FormField
+                        control={form.control}
+                        name="category"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Categoria</FormLabel>
+                             <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Selecione uma categoria" />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {bookCategories.map(cat => (
+                                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                </div>
+                 <FormField
+                    control={form.control}
+                    name="stockStatus"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>Estado do Stock</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center space-x-4"
+                            >
+                            <FormItem className="flex items-center space-x-2 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="in_stock" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Em Stock</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-2 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="out_of_stock" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Atraso na Entrega</FormLabel>
+                            </FormItem>
+                             <FormItem className="flex items-center space-x-2 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="sold_out" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Esgotado</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
               <div>
                 <Label>Plano de Leitura</Label>

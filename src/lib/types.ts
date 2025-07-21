@@ -7,6 +7,8 @@ export interface Product {
   images: string[]; // For games
   type: "book" | "game";
   dataAiHint?: string;
+  category?: string; // e.g., 'Ficção', 'Manual Escolar', 'Ciência'
+  stockStatus?: 'in_stock' | 'out_of_stock' | 'sold_out';
 }
 
 export interface ReadingPlanItem {

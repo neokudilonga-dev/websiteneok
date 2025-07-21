@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -23,6 +24,7 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
   const displayImage = product.type === 'book' ? product.image : (product.images?.[0] || 'https://placehold.co/600x400.png');
+  const isOutOfStock = product.stockStatus === 'out_of_stock';
 
   return (
     <Card className="flex h-full flex-col overflow-hidden transition-all hover:shadow-lg">
@@ -64,12 +66,15 @@ export default function ProductCard({ product }: ProductCardProps) {
             />
           </div>
         )}
-        <Badge
-          className="absolute right-2 top-2 capitalize"
-          variant={product.type === "book" ? "secondary" : "default"}
-        >
-          {product.type === 'book' ? 'Livro' : 'Jogo'}
-        </Badge>
+        <div className="absolute top-2 flex w-full justify-end gap-2 pr-2">
+            {isOutOfStock && <Badge variant="secondary" className="bg-yellow-500/80 text-black">Atraso na Entrega</Badge>}
+            <Badge
+                className="capitalize"
+                variant={product.type === "book" ? "secondary" : "default"}
+                >
+                {product.type === 'book' ? 'Livro' : 'Jogo'}
+            </Badge>
+        </div>
       </CardHeader>
       <CardContent className="flex-1 p-4">
         <CardTitle className="font-headline text-lg">{product.name}</CardTitle>
