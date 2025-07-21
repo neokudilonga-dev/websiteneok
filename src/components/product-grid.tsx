@@ -3,9 +3,10 @@ import ProductCard from "./product-card";
 
 interface ProductGridProps {
   products: Product[];
+  renderBadge?: (product: Product) => React.ReactNode;
 }
 
-export default function ProductGrid({ products }: ProductGridProps) {
+export default function ProductGrid({ products, renderBadge }: ProductGridProps) {
   if (products.length === 0) {
     return (
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/20 p-12 text-center">
@@ -17,7 +18,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
   return (
     <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+        <ProductCard key={product.id} product={product} renderBadge={renderBadge} />
       ))}
     </div>
   );

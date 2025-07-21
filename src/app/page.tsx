@@ -15,6 +15,7 @@ import { useCart } from "@/context/cart-context";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import ProductCard from "@/components/product-card";
 
 
 interface GradeProducts {
@@ -112,23 +113,29 @@ export default function Home() {
 
   const renderProductGridWithBadges = (products: Product[], grade: string) => {
     const gradePlan = schoolReadingPlan.filter(p => p.grade === Number(grade));
-    
+
     const productsWithStatus = products.map(p => {
-        const planItem = gradePlan.find(gp => gp.productId === p.id);
-        return {...p, status: planItem?.status}
+      const planItem = gradePlan.find(gp => gp.productId === p.id);
+      return { ...p, status: planItem?.status };
     });
 
     return (
-         <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-            {productsWithStatus.map((p) => (
-                <div key={p.id} className="relative">
-                    <ProductGrid products={[p]} />
-                     {p.status && <Badge variant={p.status === 'mandatory' ? 'default' : 'secondary'} className="absolute top-6 right-6 z-10 capitalize">{p.status === 'mandatory' ? 'Obrigatório' : 'Recomendado'}</Badge>}
-                </div>
-            ))}
-        </div>
-    )
-  }
+      <ProductGrid products={productsWithStatus} renderBadge={(product) => {
+        if (product.status) {
+          return (
+            <Badge
+              variant={product.status === 'mandatory' ? 'default' : 'secondary'}
+              className="absolute top-2 right-2 z-10 capitalize"
+            >
+              {product.status === 'mandatory' ? 'Obrigatório' : 'Recomendado'}
+            </Badge>
+          );
+        }
+        return null;
+      }} />
+    );
+  };
+
 
   return (
     <div className="flex min-h-screen w-full flex-col">

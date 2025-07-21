@@ -18,9 +18,10 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 
 interface ProductCardProps {
   product: Product;
+  renderBadge?: (product: Product) => React.ReactNode;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, renderBadge }: ProductCardProps) {
   const { addToCart } = useCart();
   const displayImage = product.type === 'book' ? product.image : (product.images?.[0] || 'https://placehold.co/600x400.png');
   const isOutOfStock = product.stockStatus === 'out_of_stock';
@@ -66,6 +67,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
         <div className="absolute top-2 flex w-full justify-end gap-2 pr-2">
+            {renderBadge ? renderBadge(product) : null}
             {isOutOfStock && <Badge variant="secondary" className="bg-yellow-500/80 text-black">Atraso na Entrega</Badge>}
             <Badge
                 className="capitalize"
