@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -8,7 +9,6 @@ import {
   Home,
   School,
   ShoppingCart,
-  BookOpen,
 } from "lucide-react";
 import {
   SidebarProvider,
@@ -21,6 +21,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from "@/components/ui/sidebar";
+import { NeokudilongaLogo } from "@/components/logo";
 
 export default function AdminLayout({
   children,
@@ -40,7 +41,7 @@ export default function AdminLayout({
                 href="/"
                 className="mb-2 flex items-center gap-2 rounded-lg px-2 py-1.5 text-xl font-semibold outline-none ring-primary focus-visible:ring-2"
               >
-                <BookOpen className="size-6 text-primary" />
+                <NeokudilongaLogo className="size-8" />
                 <span className="font-headline">Neokudilonga</span>
               </Link>
             </SidebarHeader>
