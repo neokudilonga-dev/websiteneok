@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Product } from "@/lib/types";
 import { useCart } from "@/context/cart-context";
-import { PlusCircle } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 interface ProductCardProps {
@@ -83,11 +82,11 @@ export default function ProductCard({ product }: ProductCardProps) {
         </CardDescription>
       </CardContent>
       <CardFooter className="flex items-center justify-between p-4 pt-0">
-        <p className="text-base font-semibold">
-          {product.price.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}
+        <p className="text-sm font-semibold">
+          {product.price.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
         </p>
         <Button onClick={() => addToCart(product)} size="sm">
-          <PlusCircle className="mr-2 h-4 w-4" /> Adicionar
+          Adicionar
         </Button>
       </CardFooter>
     </Card>
