@@ -44,16 +44,16 @@ interface AddEditBookSheetProps {
 }
 
 const readingPlanItemSchema = z.object({
-  schoolId: z.string().min(1, "School is required."),
-  grade: z.coerce.number().min(1, "Grade is required.").max(12),
+  schoolId: z.string().min(1, "A escola é obrigatória."),
+  grade: z.coerce.number().min(1, "O ano é obrigatório.").max(12),
   status: z.enum(["mandatory", "recommended"]),
 });
 
 const bookFormSchema = z.object({
-  name: z.string().min(3, "Name must be at least 3 characters."),
-  description: z.string().min(10, "Description must be at least 10 characters."),
-  price: z.coerce.number().min(0, "Price must be a positive number."),
-  image: z.string().min(1, "Image is required."),
+  name: z.string().min(3, "O nome deve ter pelo menos 3 caracteres."),
+  description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
+  price: z.coerce.number().min(0, "O preço deve ser um número positivo."),
+  image: z.string().min(1, "A imagem é obrigatória."),
   readingPlan: z.array(readingPlanItemSchema).optional(),
 });
 
@@ -121,6 +121,7 @@ export function AddEditBookSheet({
         description: data.description,
         price: data.price,
         image: data.image,
+        images: [],
     }, data.readingPlan || []);
     setIsOpen(false);
   };
@@ -163,11 +164,11 @@ export function AddEditBookSheet({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex h-full flex-col">
             <SheetHeader>
-              <SheetTitle>{book ? "Edit Book" : "Add New Book"}</SheetTitle>
+              <SheetTitle>{book ? "Editar Livro" : "Adicionar Novo Livro"}</SheetTitle>
               <SheetDescription>
                 {book
-                  ? "Update the details of this book."
-                  : "Fill in the details for the new book."}
+                  ? "Atualize os detalhes deste livro."
+                  : "Preencha os detalhes para o novo livro."}
               </SheetDescription>
             </SheetHeader>
             <div className="flex-1 space-y-4 overflow-y-auto py-4 pr-6">
@@ -176,9 +177,9 @@ export function AddEditBookSheet({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>Nome</FormLabel>
                     <FormControl>
-                      <Input placeholder="E.g. Math Journey Grade 1" {...field} />
+                      <Input placeholder="Ex: Jornada da Matemática 1º Ano" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -189,9 +190,9 @@ export function AddEditBookSheet({
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>Descrição</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="A brief description of the book." {...field} />
+                      <Textarea placeholder="Uma breve descrição do livro." {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -202,25 +203,25 @@ export function AddEditBookSheet({
                 name="image"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Book Cover Image</FormLabel>
+                    <FormLabel>Imagem da Capa do Livro</FormLabel>
                     <FormControl>
                         <div 
                             className="relative flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input bg-background/50 p-4 text-center transition-colors hover:border-primary"
                             onPaste={handlePaste}
                         >
                             {imagePreview ? (
-                                <Image src={imagePreview} alt="Book cover preview" width={200} height={200} className="mb-2 max-h-48 w-auto rounded-md object-contain" />
+                                <Image src={imagePreview} alt="Pré-visualização da capa do livro" width={200} height={200} className="mb-2 max-h-48 w-auto rounded-md object-contain" />
                             ) : (
                                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
                                     <Upload className="h-8 w-8" />
-                                    <p className="font-semibold">Paste an image</p>
-                                    <p className="text-xs">or</p>
+                                    <p className="font-semibold">Cole uma imagem</p>
+                                    <p className="text-xs">ou</p>
                                 </div>
                             )}
                             
                              <Button type="button" variant="outline" size="sm" onClick={() => document.getElementById('image-upload')?.click()}>
                                 <Upload className="mr-2" />
-                                Upload an Image
+                                Carregar uma Imagem
                             </Button>
 
                             <Input 
@@ -241,7 +242,7 @@ export function AddEditBookSheet({
                   name="price"
                   render={({ field }) => (
                   <FormItem>
-                      <FormLabel>Price</FormLabel>
+                      <FormLabel>Preço</FormLabel>
                       <FormControl>
                       <Input type="number" step="0.01" {...field} />
                       </FormControl>
@@ -251,9 +252,9 @@ export function AddEditBookSheet({
               />
 
               <div>
-                <Label>Reading Plan</Label>
+                <Label>Plano de Leitura</Label>
                  <FormDescription className="mb-2">
-                    Add this book to school reading plans.
+                    Adicione este livro aos planos de leitura das escolas.
                 </FormDescription>
                 <div className="space-y-4">
                   {fields.map((field, index) => (
@@ -264,11 +265,11 @@ export function AddEditBookSheet({
                                 name={`readingPlan.${index}.schoolId`}
                                 render={({ field }) => (
                                 <FormItem className="flex-1">
-                                    <FormLabel>School</FormLabel>
+                                    <FormLabel>Escola</FormLabel>
                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                         <SelectTrigger>
-                                        <SelectValue placeholder="Select a school" />
+                                        <SelectValue placeholder="Selecione uma escola" />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
@@ -286,7 +287,7 @@ export function AddEditBookSheet({
                                 name={`readingPlan.${index}.grade`}
                                 render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Grade</FormLabel>
+                                    <FormLabel>Ano</FormLabel>
                                     <FormControl>
                                     <Input type="number" className="w-24" {...field} />
                                     </FormControl>
@@ -303,7 +304,7 @@ export function AddEditBookSheet({
                             name={`readingPlan.${index}.status`}
                             render={({ field }) => (
                                 <FormItem className="space-y-3">
-                                <FormLabel>Status</FormLabel>
+                                <FormLabel>Estado</FormLabel>
                                 <FormControl>
                                     <RadioGroup
                                     onValueChange={field.onChange}
@@ -314,13 +315,13 @@ export function AddEditBookSheet({
                                         <FormControl>
                                         <RadioGroupItem value="mandatory" />
                                         </FormControl>
-                                        <FormLabel className="font-normal">Mandatory</FormLabel>
+                                        <FormLabel className="font-normal">Obrigatório</FormLabel>
                                     </FormItem>
                                     <FormItem className="flex items-center space-x-2 space-y-0">
                                         <FormControl>
                                         <RadioGroupItem value="recommended" />
                                         </FormControl>
-                                        <FormLabel className="font-normal">Recommended</FormLabel>
+                                        <FormLabel className="font-normal">Recomendado</FormLabel>
                                     </FormItem>
                                     </RadioGroup>
                                 </FormControl>
@@ -337,7 +338,7 @@ export function AddEditBookSheet({
                     onClick={() => append({ schoolId: '', grade: 1, status: 'mandatory' })}
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    Add to Reading Plan
+                    Adicionar ao Plano de Leitura
                   </Button>
                 </div>
               </div>
@@ -347,10 +348,10 @@ export function AddEditBookSheet({
             <SheetFooter className="mt-auto pt-4">
               <SheetClose asChild>
                 <Button type="button" variant="outline">
-                  Cancel
+                  Cancelar
                 </Button>
               </SheetClose>
-              <Button type="submit">Save Changes</Button>
+              <Button type="submit">Guardar Alterações</Button>
             </SheetFooter>
           </form>
         </Form>

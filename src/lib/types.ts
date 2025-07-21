@@ -3,7 +3,8 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  image: string;
+  image: string; // For books
+  images: string[]; // For games
   type: "book" | "game";
   dataAiHint?: string;
 }

@@ -23,7 +23,7 @@ export default function SchoolSelector({
   return (
     <Select onValueChange={onSchoolChange} value={selectedSchool?.id}>
       <SelectTrigger className="w-full md:w-[280px]">
-        <SelectValue placeholder="Select your school" />
+        <SelectValue placeholder="Selecione a sua escola" />
       </SelectTrigger>
       <SelectContent>
         {schools.map((school) => (

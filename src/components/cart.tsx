@@ -33,7 +33,7 @@ export default function Cart() {
       </SheetTrigger>
       <SheetContent className="flex w-full flex-col pr-0 sm:max-w-lg">
         <SheetHeader className="px-6">
-          <SheetTitle className="font-headline">Shopping Cart ({cartCount})</SheetTitle>
+          <SheetTitle className="font-headline">Carrinho de Compras ({cartCount})</SheetTitle>
         </SheetHeader>
         {cartCount > 0 ? (
           <>
@@ -48,11 +48,11 @@ export default function Cart() {
               <Separator />
               <div className="flex items-center justify-between text-lg font-semibold">
                 <p>Total</p>
-                <p>${cartTotal.toFixed(2)}</p>
+                <p>{cartTotal.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}</p>
               </div>
               <SheetClose asChild>
                 <Button size="lg" className="w-full">
-                  Proceed to Checkout
+                  Finalizar Compra
                 </Button>
               </SheetClose>
             </SheetFooter>
@@ -61,10 +61,10 @@ export default function Cart() {
           <div className="flex h-full flex-col items-center justify-center gap-2">
             <ShoppingCart className="h-16 w-16 text-muted-foreground/50" />
             <p className="text-xl font-semibold text-muted-foreground">
-              Your cart is empty
+              O seu carrinho está vazio
             </p>
             <SheetClose asChild>
-              <Button variant="link">Start Shopping</Button>
+              <Button variant="link">Começar a comprar</Button>
             </SheetClose>
           </div>
         )}

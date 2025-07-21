@@ -4,8 +4,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { CartProvider } from "@/context/cart-context";
 
 export const metadata: Metadata = {
-  title: "BiblioAngola",
-  description: "Your source for school books and games.",
+  title: "Neokudilonga",
+  description: "A sua fonte de livros e jogos escolares.",
 };
 
 export default function RootLayout({
@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="pt" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

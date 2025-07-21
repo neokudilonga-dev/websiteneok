@@ -34,8 +34,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       return [...prevItems, { ...product, quantity: 1 }];
     });
     toast({
-      title: "Added to cart",
-      description: `${product.name} has been added to your cart.`,
+      title: "Adicionado ao carrinho",
+      description: `${product.name} foi adicionado ao seu carrinho.`,
     });
   };
 
@@ -53,8 +53,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       return newItems;
     });
     toast({
-      title: "Kit added to cart",
-      description: `The complete kit has been added to your cart.`,
+      title: "Kit adicionado ao carrinho",
+      description: `O kit completo foi adicionado ao seu carrinho.`,
     });
   };
 
@@ -63,8 +63,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       prevItems.filter((item) => item.id !== productId)
     );
      toast({
-      title: "Removed from cart",
-      description: `Item has been removed from your cart.`,
+      title: "Removido do carrinho",
+      description: `O item foi removido do seu carrinho.`,
       variant: 'destructive'
     });
   };
@@ -113,7 +113,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 export const useCart = () => {
   const context = useContext(CartContext);
   if (context === undefined) {
-    throw new Error("useCart must be used within a CartProvider");
+    throw new Error("useCart deve ser usado dentro de um CartProvider");
   }
   return context;
 };

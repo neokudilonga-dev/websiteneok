@@ -33,8 +33,8 @@ interface AddEditSchoolSheetProps {
 }
 
 const schoolFormSchema = z.object({
-  name: z.string().min(3, "School name must be at least 3 characters."),
-  id: z.string().min(3, "ID must be at least 3 characters.").regex(/^[a-z0-9-]+$/, "ID can only contain lowercase letters, numbers, and hyphens."),
+  name: z.string().min(3, "O nome da escola deve ter pelo menos 3 caracteres."),
+  id: z.string().min(3, "O ID deve ter pelo menos 3 caracteres.").regex(/^[a-z0-9-]+$/, "O ID só pode conter letras minúsculas, números e hífenes."),
 });
 
 type SchoolFormValues = z.infer<typeof schoolFormSchema>;
@@ -78,11 +78,11 @@ export function AddEditSchoolSheet({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex h-full flex-col">
             <SheetHeader>
-              <SheetTitle>{school ? "Edit School" : "Add New School"}</SheetTitle>
+              <SheetTitle>{school ? "Editar Escola" : "Adicionar Nova Escola"}</SheetTitle>
               <SheetDescription>
                 {school
-                  ? "Update the details of this school."
-                  : "Fill in the details for the new school."}
+                  ? "Atualize os detalhes desta escola."
+                  : "Preencha os detalhes para a nova escola."}
               </SheetDescription>
             </SheetHeader>
             <div className="flex-1 space-y-4 overflow-y-auto py-4">
@@ -91,9 +91,9 @@ export function AddEditSchoolSheet({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>School Name</FormLabel>
+                    <FormLabel>Nome da Escola</FormLabel>
                     <FormControl>
-                      <Input placeholder="E.g. Escola Primária de Luanda" {...field} />
+                      <Input placeholder="Ex: Escola Primária de Luanda" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -104,9 +104,9 @@ export function AddEditSchoolSheet({
                 name="id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>School ID</FormLabel>
+                    <FormLabel>ID da Escola</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. escola-primaria-luanda" {...field} disabled={!!school} />
+                      <Input placeholder="ex: escola-primaria-luanda" {...field} disabled={!!school} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -116,10 +116,10 @@ export function AddEditSchoolSheet({
             <SheetFooter className="mt-auto pt-4">
               <SheetClose asChild>
                 <Button type="button" variant="outline">
-                  Cancel
+                  Cancelar
                 </Button>
               </SheetClose>
-              <Button type="submit">Save Changes</Button>
+              <Button type="submit">Guardar Alterações</Button>
             </SheetFooter>
           </form>
         </Form>

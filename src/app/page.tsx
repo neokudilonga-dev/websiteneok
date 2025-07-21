@@ -78,7 +78,7 @@ export default function Home() {
       case "jogos":
         return "Jogos e Outros Itens";
       default:
-        return "BiblioAngola";
+        return "Neokudilonga";
     }
   };
 
@@ -91,7 +91,7 @@ export default function Home() {
       case 'jogos':
         return 'Descubra a nossa seleção de jogos educativos e outros itens.';
       default:
-        return 'Sua fonte de livros e jogos escolares.';
+        return 'A sua fonte de livros e jogos escolares.';
     }
   };
 
@@ -108,7 +108,7 @@ export default function Home() {
             {productsWithStatus.map((p) => (
                 <div key={p.id} className="relative">
                     <ProductGrid products={[p]} />
-                     {p.status && <Badge variant={p.status === 'mandatory' ? 'default' : 'secondary'} className="absolute top-6 right-6 z-10 capitalize">{p.status}</Badge>}
+                     {p.status && <Badge variant={p.status === 'mandatory' ? 'default' : 'secondary'} className="absolute top-6 right-6 z-10 capitalize">{p.status === 'mandatory' ? 'Obrigatório' : 'Recomendado'}</Badge>}
                 </div>
             ))}
         </div>
@@ -192,7 +192,7 @@ export default function Home() {
                    ) : (
                      <div className="mx-auto flex max-w-7xl flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/20 p-12 text-center">
                         <h3 className="font-headline text-2xl font-semibold tracking-tight">Nenhum livro encontrado</h3>
-                        <p className="text-muted-foreground">Não há livros do plano de leitura para esta escola ainda.</p>
+                        <p className="text-muted-foreground">Ainda não há livros do plano de leitura para esta escola.</p>
                     </div>
                    )
                 ) : (

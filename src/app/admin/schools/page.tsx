@@ -66,24 +66,24 @@ export default function SchoolsPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-4">
           <div>
-            <CardTitle>Schools</CardTitle>
+            <CardTitle>Escolas</CardTitle>
             <CardDescription>
-              Manage the schools your store supports.
+              Faça a gestão das escolas que a sua loja suporta.
             </CardDescription>
           </div>
           <Button onClick={handleAddSchool}>
             <PlusCircle className="mr-2" />
-            Add New School
+            Adicionar Nova Escola
           </Button>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>School Name</TableHead>
+                <TableHead>Nome da Escola</TableHead>
                 <TableHead>ID</TableHead>
                 <TableHead>
-                  <span className="sr-only">Actions</span>
+                  <span className="sr-only">Ações</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -101,21 +101,21 @@ export default function SchoolsPage() {
                           variant="ghost"
                         >
                           <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
+                          <span className="sr-only">Alternar menu</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
                         <DropdownMenuItem
                           onClick={() => handleEditSchool(school)}
                         >
-                          Edit
+                          Editar
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive"
                           onClick={() => handleDeleteSchool(school.id)}
                         >
-                          Delete
+                          Eliminar
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

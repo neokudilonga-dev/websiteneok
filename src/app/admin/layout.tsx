@@ -41,7 +41,7 @@ export default function AdminLayout({
                 className="mb-2 flex items-center gap-2 rounded-lg px-2 py-1.5 text-xl font-semibold outline-none ring-primary focus-visible:ring-2"
               >
                 <BookOpen className="size-6 text-primary" />
-                <span className="font-headline">BiblioAngola</span>
+                <span className="font-headline">Neokudilonga</span>
               </Link>
             </SidebarHeader>
             <SidebarMenu>
@@ -50,11 +50,11 @@ export default function AdminLayout({
                   href="/admin"
                   asChild
                   isActive={isActive("/admin")}
-                  tooltip="Dashboard"
+                  tooltip="Painel de Controlo"
                 >
                   <Link href="/admin">
                     <Home />
-                    <span>Dashboard</span>
+                    <span>Painel de Controlo</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -63,11 +63,11 @@ export default function AdminLayout({
                   href="/admin/books"
                   asChild
                   isActive={isActive("/admin/books")}
-                  tooltip="Books"
+                  tooltip="Livros"
                 >
                   <Link href="/admin/books">
                     <Book />
-                    <span>Books</span>
+                    <span>Livros</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -76,11 +76,11 @@ export default function AdminLayout({
                   href="/admin/games"
                   asChild
                   isActive={isActive("/admin/games")}
-                  tooltip="Games"
+                  tooltip="Jogos"
                 >
                   <Link href="/admin/games">
                     <Gamepad2 />
-                    <span>Games</span>
+                    <span>Jogos</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -89,11 +89,11 @@ export default function AdminLayout({
                   href="/admin/schools"
                   asChild
                   isActive={isActive("/admin/schools")}
-                  tooltip="Schools"
+                  tooltip="Escolas"
                 >
                   <Link href="/admin/schools">
                     <School />
-                    <span>Schools</span>
+                    <span>Escolas</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -102,11 +102,11 @@ export default function AdminLayout({
                   href="/admin/orders"
                   asChild
                   isActive={isActive("/admin/orders")}
-                  tooltip="Orders"
+                  tooltip="Encomendas"
                 >
                   <Link href="/admin/orders">
                     <ShoppingCart />
-                    <span>Orders</span>
+                    <span>Encomendas</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -116,7 +116,7 @@ export default function AdminLayout({
         <SidebarInset>
           <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
             <SidebarTrigger className="sm:hidden" />
-            <h1 className="font-headline text-2xl font-semibold">Admin Dashboard</h1>
+            <h1 className="font-headline text-2xl font-semibold">Painel de Administração</h1>
           </header>
           <main className="flex-1 p-4 sm:p-6">{children}</main>
         </SidebarInset>

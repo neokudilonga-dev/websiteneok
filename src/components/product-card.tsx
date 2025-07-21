@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import type { Product } from "@/lib/types";
 import { useCart } from "@/context/cart-context";
 import { PlusCircle } from "lucide-react";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 interface ProductCardProps {
   product: Product;
@@ -21,25 +22,53 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
+  const displayImage = product.type === 'book' ? product.image : (product.images?.[0] || 'https://placehold.co/600x400.png');
 
   return (
     <Card className="flex h-full flex-col overflow-hidden transition-all hover:shadow-lg">
       <CardHeader className="relative p-0">
-        <div className="aspect-video overflow-hidden">
-          <Image
-            alt={product.name}
-            className="h-full w-full object-cover"
-            height="400"
-            src={product.image}
-            width="600"
-            data-ai-hint={product.dataAiHint}
-          />
-        </div>
+        {product.type === 'game' && product.images && product.images.length > 1 ? (
+          <Carousel className="w-full">
+            <CarouselContent>
+              {product.images.map((img, index) => (
+                 <CarouselItem key={index}>
+                    <div className="aspect-video overflow-hidden">
+                      <Image
+                        alt={`${product.name} image ${index + 1}`}
+                        className="h-full w-full object-cover"
+                        height="400"
+                        src={img}
+                        width="600"
+                        data-ai-hint={product.dataAiHint}
+                      />
+                    </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            {product.images.length > 1 && (
+                <>
+                    <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2" />
+                    <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2" />
+                </>
+            )}
+          </Carousel>
+        ) : (
+           <div className="aspect-video overflow-hidden">
+            <Image
+              alt={product.name}
+              className="h-full w-full object-cover"
+              height="400"
+              src={displayImage}
+              width="600"
+              data-ai-hint={product.dataAiHint}
+            />
+          </div>
+        )}
         <Badge
           className="absolute right-2 top-2 capitalize"
           variant={product.type === "book" ? "secondary" : "default"}
         >
-          {product.type}
+          {product.type === 'book' ? 'Livro' : 'Jogo'}
         </Badge>
       </CardHeader>
       <CardContent className="flex-1 p-4">
@@ -50,10 +79,10 @@ export default function ProductCard({ product }: ProductCardProps) {
       </CardContent>
       <CardFooter className="flex items-center justify-between p-4 pt-0">
         <p className="text-lg font-semibold">
-          ${product.price.toFixed(2)}
+          {product.price.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}
         </p>
         <Button onClick={() => addToCart(product)}>
-          <PlusCircle className="mr-2 h-4 w-4" /> Add to Cart
+          <PlusCircle className="mr-2 h-4 w-4" /> Adicionar
         </Button>
       </CardFooter>
     </Card>

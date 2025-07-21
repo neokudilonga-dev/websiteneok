@@ -4,10 +4,10 @@ export default function OrdersPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Orders</CardTitle>
+        <CardTitle>Encomendas</CardTitle>
       </CardHeader>
       <CardContent>
-        <p>Manage your orders here.</p>
+        <p>Faça a gestão das suas encomendas aqui.</p>
       </CardContent>
     </Card>
   );

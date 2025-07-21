@@ -9,8 +9,8 @@ export default function ProductGrid({ products }: ProductGridProps) {
   if (products.length === 0) {
     return (
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/20 p-12 text-center">
-            <h3 className="font-headline text-2xl font-semibold tracking-tight">No items found</h3>
-            <p className="text-muted-foreground">There are no books or games available for the selected school yet.</p>
+            <h3 className="font-headline text-2xl font-semibold tracking-tight">Nenhum item encontrado</h3>
+            <p className="text-muted-foreground">Ainda não há livros ou jogos disponíveis.</p>
         </div>
     )
   }

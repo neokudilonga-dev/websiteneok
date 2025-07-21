@@ -103,9 +103,9 @@ export default function BooksPage() {
       <Card>
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <CardTitle>Books</CardTitle>
+                <CardTitle>Livros</CardTitle>
                 <CardDescription>
-                Manage your store's book catalog.
+                Faça a gestão do catálogo de livros da sua loja.
                 </CardDescription>
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
@@ -113,7 +113,7 @@ export default function BooksPage() {
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                         type="search"
-                        placeholder="Search books..."
+                        placeholder="Pesquisar livros..."
                         className="w-full rounded-lg bg-background pl-8 sm:w-[200px] lg:w-[300px]"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -121,7 +121,7 @@ export default function BooksPage() {
                 </div>
                 <Button onClick={handleAddBook} className="shrink-0">
                     <PlusCircle className="mr-2" />
-                    Add New Book
+                    Adicionar Novo Livro
                 </Button>
             </div>
         </CardHeader>
@@ -130,13 +130,13 @@ export default function BooksPage() {
             <TableHeader>
               <TableRow>
                 <TableHead className="hidden w-[100px] sm:table-cell">
-                  <span className="sr-only">Image</span>
+                  <span className="sr-only">Imagem</span>
                 </TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead className="hidden md:table-cell">Reading Plan</TableHead>
+                <TableHead>Nome</TableHead>
+                <TableHead>Preço</TableHead>
+                <TableHead className="hidden md:table-cell">Plano de Leitura</TableHead>
                 <TableHead>
-                  <span className="sr-only">Actions</span>
+                  <span className="sr-only">Ações</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -148,22 +148,22 @@ export default function BooksPage() {
                       alt={product.name}
                       className="aspect-square rounded-md object-cover"
                       height="64"
-                      src={product.image}
+                      src={product.image || 'https://placehold.co/64x64.png'}
                       width="64"
                     />
                   </TableCell>
                   <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>${product.price.toFixed(2)}</TableCell>
+                  <TableCell>{product.price.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}</TableCell>
                   <TableCell className="hidden md:table-cell">
                     <div className="flex flex-wrap gap-1">
                       {getBookReadingPlan(product.id).length > 0 ? (
                         getBookReadingPlan(product.id).map(item => (
                             <Badge key={item.id} variant={item.status === 'mandatory' ? 'default' : 'secondary'}>
-                                {getSchoolName(item.schoolId)} - {item.grade}º Ano ({item.status})
+                                {getSchoolName(item.schoolId)} - {item.grade}º Ano ({item.status === 'mandatory' ? 'Obrigatório' : 'Recomendado'})
                             </Badge>
                         ))
                       ): (
-                        <Badge variant="outline">Not in a plan</Badge>
+                        <Badge variant="outline">Fora do plano</Badge>
                       )}
                     </div>
                   </TableCell>
@@ -176,19 +176,19 @@ export default function BooksPage() {
                           variant="ghost"
                         >
                           <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
+                          <span className="sr-only">Alternar menu</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => handleEditBook(product)}>
-                          Edit
+                          Editar
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive"
                           onClick={() => handleDeleteBook(product.id)}
                         >
-                          Delete
+                          Eliminar
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
