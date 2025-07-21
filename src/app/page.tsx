@@ -28,7 +28,7 @@ export default function Home() {
   };
 
   const schoolProducts = useMemo(() => selectedSchool
-    ? allProducts.filter((p) => p.schoolId === selectedSchool.id)
+    ? allProducts.filter((p) => p.schoolIds?.includes(selectedSchool.id))
     : [], [selectedSchool]);
 
   const productsByGrade = useMemo(() => {

@@ -5,7 +5,7 @@ export interface Product {
   price: number;
   image: string;
   type: "book" | "game";
-  schoolId: string;
+  schoolIds?: string[]; // Changed from schoolId: string
   grade?: number;
   dataAiHint?: string;
 }

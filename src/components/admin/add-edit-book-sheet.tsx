@@ -13,13 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -30,6 +24,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import type { Product } from "@/lib/types";
 import { schools } from "@/lib/data";
@@ -46,8 +41,8 @@ const bookFormSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters."),
   description: z.string().min(10, "Description must be at least 10 characters."),
   price: z.coerce.number().min(0, "Price must be a positive number."),
-  grade: z.coerce.number().min(1, "Grade is required.").max(12),
-  schoolId: z.string({ required_error: "Please select a school." }),
+  grade: z.coerce.number().min(1, "Grade is required.").max(12).optional(),
+  schoolIds: z.array(z.string()).optional(),
   image: z.string().url("Please enter a valid URL."),
 });
 
@@ -65,24 +60,32 @@ export function AddEditBookSheet({
       name: "",
       description: "",
       price: 0,
-      grade: 1,
-      schoolId: "",
+      schoolIds: [],
       image: "",
     },
   });
 
   useEffect(() => {
-    if (book) {
-      form.reset({
-        name: book.name,
-        description: book.description,
-        price: book.price,
-        grade: book.grade,
-        schoolId: book.schoolId,
-        image: book.image,
-      });
-    } else {
-      form.reset();
+    if (isOpen) {
+      if (book) {
+        form.reset({
+          name: book.name,
+          description: book.description,
+          price: book.price,
+          grade: book.grade,
+          schoolIds: book.schoolIds || [],
+          image: book.image,
+        });
+      } else {
+        form.reset({
+          name: "",
+          description: "",
+          price: 0,
+          grade: undefined,
+          schoolIds: [],
+          image: "",
+        });
+      }
     }
   }, [book, form, isOpen]);
 
@@ -177,30 +180,57 @@ export function AddEditBookSheet({
                     )}
                 />
               </div>
-                <FormField
-                    control={form.control}
-                    name="schoolId"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>School</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select a school" />
-                            </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                            {schools.map((school) => (
-                                <SelectItem key={school.id} value={school.id}>
+               <FormField
+                control={form.control}
+                name="schoolIds"
+                render={() => (
+                  <FormItem>
+                    <div className="mb-4">
+                      <FormLabel className="text-base">Schools</FormLabel>
+                      <FormDescription>
+                        Select the schools this book is associated with.
+                      </FormDescription>
+                    </div>
+                    {schools.map((school) => (
+                      <FormField
+                        key={school.id}
+                        control={form.control}
+                        name="schoolIds"
+                        render={({ field }) => {
+                          return (
+                            <FormItem
+                              key={school.id}
+                              className="flex flex-row items-start space-x-3 space-y-0"
+                            >
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(school.id)}
+                                  onCheckedChange={(checked) => {
+                                    return checked
+                                      ? field.onChange([
+                                          ...(field.value || []),
+                                          school.id,
+                                        ])
+                                      : field.onChange(
+                                          field.value?.filter(
+                                            (value) => value !== school.id
+                                          )
+                                        );
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="font-normal">
                                 {school.name}
-                                </SelectItem>
-                            ))}
-                            </SelectContent>
-                        </Select>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                              </FormLabel>
+                            </FormItem>
+                          );
+                        }}
+                      />
+                    ))}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
             <SheetFooter className="mt-auto pt-4">
               <SheetClose asChild>

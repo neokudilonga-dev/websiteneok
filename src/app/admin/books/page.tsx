@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Card,
   CardHeader,
@@ -9,7 +9,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, MoreHorizontal } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Search } from "lucide-react";
 import {
   Table,
   TableHeader,
@@ -27,9 +27,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { products as initialProducts } from "@/lib/data";
+import { products as initialProducts, schools } from "@/lib/data";
 import type { Product } from "@/lib/types";
 import { AddEditBookSheet } from "@/components/admin/add-edit-book-sheet";
+import { Input } from "@/components/ui/input";
 
 export default function BooksPage() {
   const [products, setProducts] = useState<Product[]>(
@@ -39,6 +40,13 @@ export default function BooksPage() {
   const [selectedBook, setSelectedBook] = useState<Product | undefined>(
     undefined
   );
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) =>
+      product.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [products, searchQuery]);
 
   const handleAddBook = () => {
     setSelectedBook(undefined);
@@ -64,20 +72,36 @@ export default function BooksPage() {
     }
   };
 
+  const getSchoolName = (schoolId: string) => {
+    return schools.find(s => s.id === schoolId)?.name || schoolId;
+  }
+
   return (
     <>
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between gap-4">
-          <div>
-            <CardTitle>Books</CardTitle>
-            <CardDescription>
-              Manage your store's book catalog.
-            </CardDescription>
-          </div>
-          <Button onClick={handleAddBook}>
-            <PlusCircle className="mr-2" />
-            Add New Book
-          </Button>
+        <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <CardTitle>Books</CardTitle>
+                <CardDescription>
+                Manage your store's book catalog.
+                </CardDescription>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                <div className="relative">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        type="search"
+                        placeholder="Search books..."
+                        className="w-full rounded-lg bg-background pl-8 sm:w-[200px] lg:w-[300px]"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+                <Button onClick={handleAddBook} className="shrink-0">
+                    <PlusCircle className="mr-2" />
+                    Add New Book
+                </Button>
+            </div>
         </CardHeader>
         <CardContent>
           <Table>
@@ -89,14 +113,14 @@ export default function BooksPage() {
                 <TableHead>Name</TableHead>
                 <TableHead>Price</TableHead>
                 <TableHead className="hidden md:table-cell">Grade</TableHead>
-                <TableHead className="hidden md:table-cell">School</TableHead>
+                <TableHead className="hidden md:table-cell">Schools</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.map((product) => (
+              {filteredProducts.map((product) => (
                 <TableRow key={product.id}>
                   <TableCell className="hidden sm:table-cell">
                     <Image
@@ -110,10 +134,16 @@ export default function BooksPage() {
                   <TableCell className="font-medium">{product.name}</TableCell>
                   <TableCell>${product.price.toFixed(2)}</TableCell>
                   <TableCell className="hidden md:table-cell">
-                    {product.grade}º Ano
+                    {product.grade ? `${product.grade}º Ano` : 'N/A'}
                   </TableCell>
                   <TableCell className="hidden md:table-cell">
-                    <Badge variant="outline">{product.schoolId}</Badge>
+                    <div className="flex flex-wrap gap-1">
+                      {product.schoolIds && product.schoolIds.length > 0 ? (
+                        product.schoolIds.map(id => <Badge key={id} variant="outline">{getSchoolName(id)}</Badge>)
+                      ): (
+                        <Badge variant="secondary">General</Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
