@@ -136,10 +136,10 @@ export default function Home() {
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
         <div className="mx-auto w-full max-w-7xl">
           <Tabs defaultValue="planos" className="w-full" onValueChange={setActiveTab}>
-            <TabsList className="grid h-auto w-full grid-cols-1 sm:grid-cols-3 sm:w-full">
-              <TabsTrigger value="planos" className="py-2 text-base font-semibold">Planos de Leitura</TabsTrigger>
-              <TabsTrigger value="catalogo" className="py-2 text-base font-semibold">Todos os Livros</TabsTrigger>
-              <TabsTrigger value="jogos" className="py-2 text-base font-semibold">Jogos e Outros</TabsTrigger>
+            <TabsList className="grid h-auto w-full grid-cols-1 bg-primary sm:grid-cols-3">
+              <TabsTrigger value="planos" className="py-3 text-lg font-semibold text-primary-foreground/70 data-[state=active]:bg-background/90 data-[state=active]:text-primary">Planos de Leitura</TabsTrigger>
+              <TabsTrigger value="catalogo" className="py-3 text-lg font-semibold text-primary-foreground/70 data-[state=active]:bg-background/90 data-[state=active]:text-primary">Todos os Livros</TabsTrigger>
+              <TabsTrigger value="jogos" className="py-3 text-lg font-semibold text-primary-foreground/70 data-[state=active]:bg-background/90 data-[state=active]:text-primary">Jogos e Outros</TabsTrigger>
             </TabsList>
 
              <div className="mt-6">
