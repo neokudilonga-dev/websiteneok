@@ -185,8 +185,16 @@ export function AddEditGameSheet({
                 name="images"
                 render={() => (
                   <FormItem>
-                    <FormLabel>Imagens do Jogo</FormLabel>
-                    <FormDescription>Adicione uma ou mais imagens para o jogo.</FormDescription>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <FormLabel>Imagens do Jogo</FormLabel>
+                        <FormDescription>Adicione uma ou mais imagens para o jogo.</FormDescription>
+                      </div>
+                       <Button type="button" variant="outline" size="sm" onClick={() => document.getElementById('image-upload-multiple')?.click()}>
+                            <Upload className="mr-2" />
+                            Carregar Imagens
+                        </Button>
+                    </div>
                      <div 
                         className="relative rounded-lg border-2 border-dashed border-input bg-background/50 p-4 transition-colors hover:border-primary"
                         onPaste={handlePaste}
@@ -194,7 +202,7 @@ export function AddEditGameSheet({
                         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                         {fields.map((field, index) => (
                             <div key={field.id} className="relative aspect-square">
-                            <Image src={field.value} alt={`Pré-visualização da imagem ${index+1}`} layout="fill" className="rounded-md object-cover" />
+                            {field.value && <Image src={field.value} alt={`Pré-visualização da imagem ${index+1}`} layout="fill" className="rounded-md object-cover" />}
                             <Button type="button" variant="destructive" size="icon" className="absolute -right-2 -top-2 h-6 w-6 rounded-full" onClick={() => remove(index)}>
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
