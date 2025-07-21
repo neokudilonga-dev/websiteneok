@@ -74,7 +74,7 @@ export default function Home() {
           ? `Plano de Leitura: ${selectedSchool.name}`
           : "Selecione uma escola";
       case "catalogo":
-        return "Catálogo Completo de Livros";
+        return "Todos os Livros";
       case "jogos":
         return "Jogos e Outros Itens";
       default:
@@ -123,7 +123,7 @@ export default function Home() {
           <Tabs defaultValue="planos" className="w-full" onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-3 md:w-[400px]">
               <TabsTrigger value="planos">Planos de Leitura</TabsTrigger>
-              <TabsTrigger value="catalogo">Catálogo Completo</TabsTrigger>
+              <TabsTrigger value="catalogo">Todos os Livros</TabsTrigger>
               <TabsTrigger value="jogos">Jogos e Outros</TabsTrigger>
             </TabsList>
 
