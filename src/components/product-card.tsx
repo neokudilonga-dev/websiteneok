@@ -83,10 +83,10 @@ export default function ProductCard({ product }: ProductCardProps) {
         </CardDescription>
       </CardContent>
       <CardFooter className="flex items-center justify-between p-4 pt-0">
-        <p className="text-lg font-semibold">
+        <p className="text-base font-semibold">
           {product.price.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}
         </p>
-        <Button onClick={() => addToCart(product)}>
+        <Button onClick={() => addToCart(product)} size="sm">
           <PlusCircle className="mr-2 h-4 w-4" /> Adicionar
         </Button>
       </CardFooter>
