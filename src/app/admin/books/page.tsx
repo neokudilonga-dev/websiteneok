@@ -68,7 +68,7 @@ export default function BooksPage() {
     setReadingPlan(readingPlan.filter(item => item.productId !== bookId));
   };
 
-  const handleSaveChanges = (book: Product, newReadingPlan: {schoolId: string, grade: number}[]) => {
+  const handleSaveChanges = (book: Product, newReadingPlan: {schoolId: string, grade: number, status: 'mandatory' | 'recommended'}[]) => {
     // In a real app, you'd call an API here.
     if (selectedBook) {
       setProducts(products.map((p) => (p.id === book.id ? book : p)));
@@ -84,7 +84,8 @@ export default function BooksPage() {
       id: `rp-${book.id}-${index}-${Date.now()}`,
       productId: book.id,
       schoolId: rp.schoolId,
-      grade: rp.grade
+      grade: rp.grade,
+      status: rp.status,
     }));
     setReadingPlan([...otherSchoolsPlan, ...thisBookPlan]);
   };
@@ -157,12 +158,12 @@ export default function BooksPage() {
                     <div className="flex flex-wrap gap-1">
                       {getBookReadingPlan(product.id).length > 0 ? (
                         getBookReadingPlan(product.id).map(item => (
-                            <Badge key={item.id} variant="outline">
-                                {getSchoolName(item.schoolId)} - {item.grade}º Ano
+                            <Badge key={item.id} variant={item.status === 'mandatory' ? 'default' : 'secondary'}>
+                                {getSchoolName(item.schoolId)} - {item.grade}º Ano ({item.status})
                             </Badge>
                         ))
                       ): (
-                        <Badge variant="secondary">Not in a plan</Badge>
+                        <Badge variant="outline">Not in a plan</Badge>
                       )}
                     </div>
                   </TableCell>

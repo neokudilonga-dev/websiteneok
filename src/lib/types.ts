@@ -5,7 +5,6 @@ export interface Product {
   price: number;
   image: string;
   type: "book" | "game";
-  // grade and schoolIds are no longer here
   dataAiHint?: string;
 }
 
@@ -14,6 +13,7 @@ export interface ReadingPlanItem {
   productId: string;
   schoolId: string;
   grade: number;
+  status: "mandatory" | "recommended";
 }
 
 export interface School {

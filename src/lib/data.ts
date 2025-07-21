@@ -118,11 +118,11 @@ export const products: Product[] = [
 ];
 
 export const readingPlan: ReadingPlanItem[] = [
-    { id: 'rp-1', productId: 'book-1', schoolId: 'escola-a', grade: 1 },
-    { id: 'rp-2', productId: 'book-2', schoolId: 'escola-a', grade: 1 },
-    { id: 'rp-3', productId: 'book-3', schoolId: 'escola-c', grade: 12 },
-    { id: 'rp-4', productId: 'book-4', schoolId: 'escola-b', grade: 8 },
-    { id: 'rp-5', productId: 'book-4', schoolId: 'escola-c', grade: 9 }, // Same book, different grade
-    { id: 'rp-6', productId: 'book-5', schoolId: 'escola-b', grade: 7 },
-    { id: 'rp-7', productId: 'book-7', schoolId: 'escola-c', grade: 11 },
+    { id: 'rp-1', productId: 'book-1', schoolId: 'escola-a', grade: 1, status: 'mandatory' },
+    { id: 'rp-2', productId: 'book-2', schoolId: 'escola-a', grade: 1, status: 'recommended' },
+    { id: 'rp-3', productId: 'book-3', schoolId: 'escola-c', grade: 12, status: 'mandatory' },
+    { id: 'rp-4', productId: 'book-4', schoolId: 'escola-b', grade: 8, status: 'mandatory' },
+    { id: 'rp-5', productId: 'book-4', schoolId: 'escola-c', grade: 9, status: 'mandatory' },
+    { id: 'rp-6', productId: 'book-5', schoolId: 'escola-b', grade: 7, status: 'mandatory' },
+    { id: 'rp-7', productId: 'book-7', schoolId: 'escola-c', grade: 11, status: 'mandatory' },
 ];

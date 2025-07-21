@@ -12,6 +12,13 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ShoppingCart } from "lucide-react";
 import { useCart } from "@/context/cart-context";
+import { Badge } from "@/components/ui/badge";
+
+interface GradeProducts {
+  mandatory: Product[];
+  recommended: Product[];
+  all: Product[];
+}
 
 export default function Home() {
   const [selectedSchool, setSelectedSchool] = useState<School | undefined>(
@@ -39,14 +46,19 @@ export default function Home() {
     : [], [selectedSchool]);
 
   const productsByGrade = useMemo(() => {
-    const grades: { [key: number]: Product[] } = {};
+    const grades: { [key: number]: GradeProducts } = {};
     schoolReadingPlan.forEach(item => {
       const product = productsById[item.productId];
       if (product) {
          if (!grades[item.grade]) {
-          grades[item.grade] = [];
+          grades[item.grade] = { mandatory: [], recommended: [], all: [] };
         }
-        grades[item.grade].push(product);
+        if (item.status === 'mandatory') {
+            grades[item.grade].mandatory.push(product);
+        } else {
+            grades[item.grade].recommended.push(product);
+        }
+        grades[item.grade].all.push(product);
       }
     });
     return grades;
@@ -83,6 +95,26 @@ export default function Home() {
     }
   };
 
+  const renderProductGridWithBadges = (products: Product[], grade: string) => {
+    const gradePlan = schoolReadingPlan.filter(p => p.grade === Number(grade));
+    
+    const productsWithStatus = products.map(p => {
+        const planItem = gradePlan.find(gp => gp.productId === p.id);
+        return {...p, status: planItem?.status}
+    });
+
+    return (
+         <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {productsWithStatus.map((p) => (
+                <div key={p.id} className="relative">
+                    <ProductGrid products={[p]} />
+                     {p.status && <Badge variant={p.status === 'mandatory' ? 'default' : 'secondary'} className="absolute top-6 right-6 z-10 capitalize">{p.status}</Badge>}
+                </div>
+            ))}
+        </div>
+    )
+  }
+
   return (
     <div className="flex min-h-screen w-full flex-col">
       <Header />
@@ -115,23 +147,35 @@ export default function Home() {
                 {selectedSchool ? (
                    Object.keys(productsByGrade).length > 0 ? (
                     <Accordion type="single" collapsible className="w-full" defaultValue={`item-${Object.keys(productsByGrade)[0]}`} onValueChange={() => setShowIndividual(null)}>
-                      {Object.entries(productsByGrade).sort(([a], [b]) => Number(a) - Number(b)).map(([grade, products]) => (
+                      {Object.entries(productsByGrade).sort(([a], [b]) => Number(a) - Number(b)).map(([grade, gradeProducts]) => (
                         <AccordionItem value={`item-${grade}`} key={grade}>
                           <AccordionTrigger className="text-xl font-semibold">
                             {`${grade}º Ano`}
                           </AccordionTrigger>
                           <AccordionContent>
                             <div className="space-y-6">
-                                <div className="rounded-lg border bg-card p-6">
-                                    <h3 className="font-headline text-2xl font-semibold">Kit Completo do {grade}º Ano</h3>
-                                    <p className="mt-2 text-muted-foreground">Compre todos os livros para o ano letivo com um único clique.</p>
-                                    <Button size="lg" className="mt-4" onClick={() => addKitToCart(products)}>
-                                        <ShoppingCart className="mr-2 h-5 w-5" /> Adicionar Kit Completo ao Carrinho
-                                    </Button>
+                                <div className="grid gap-6 lg:grid-cols-2">
+                                     <div className="rounded-lg border bg-card p-6">
+                                        <h3 className="font-headline text-2xl font-semibold">Kit Obrigatório do {grade}º Ano</h3>
+                                        <p className="mt-2 text-muted-foreground">Compre todos os livros obrigatórios para o ano letivo.</p>
+                                        <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.mandatory)}>
+                                            <ShoppingCart className="mr-2 h-5 w-5" /> Adicionar Kit Obrigatório
+                                        </Button>
+                                    </div>
+                                    {gradeProducts.recommended.length > 0 && (
+                                        <div className="rounded-lg border bg-card p-6">
+                                            <h3 className="font-headline text-2xl font-semibold">Kit Completo do {grade}º Ano</h3>
+                                            <p className="mt-2 text-muted-foreground">Inclui livros obrigatórios e recomendados.</p>
+                                            <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.all)}>
+                                                <ShoppingCart className="mr-2 h-5 w-5" /> Adicionar Kit Completo
+                                            </Button>
+                                        </div>
+                                    )}
                                 </div>
 
+
                                 {showIndividual === grade ? (
-                                    <ProductGrid products={products} />
+                                    renderProductGridWithBadges(gradeProducts.all, grade)
                                 ) : (
                                     <div className="text-center">
                                         <Button variant="outline" onClick={() => setShowIndividual(grade)}>
