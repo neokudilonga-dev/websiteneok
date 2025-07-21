@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -118,6 +119,23 @@ export function AddEditGameSheet({
     }
   };
 
+  const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf("image") !== -1) {
+            const file = items[i].getAsFile();
+            if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const base64String = reader.result as string;
+                    append(base64String);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+  };
+
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetContent className="sm:max-w-2xl">
@@ -129,9 +147,7 @@ export function AddEditGameSheet({
             <SheetHeader>
               <SheetTitle>{game ? "Editar Jogo" : "Adicionar Novo Jogo"}</SheetTitle>
               <SheetDescription>
-                {game
-                  ? "Atualize os detalhes deste jogo."
-                  : "Preencha os detalhes para o novo jogo."}
+                Preencha os detalhes para o novo jogo.
               </SheetDescription>
             </SheetHeader>
             <div className="flex-1 space-y-4 overflow-y-auto py-4 pr-6">
@@ -171,26 +187,35 @@ export function AddEditGameSheet({
                   <FormItem>
                     <FormLabel>Imagens do Jogo</FormLabel>
                     <FormDescription>Adicione uma ou mais imagens para o jogo.</FormDescription>
-                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                      {fields.map((field, index) => (
-                        <div key={field.id} className="relative aspect-square">
-                           <Image src={field.value} alt={`Pré-visualização da imagem ${index+1}`} layout="fill" className="rounded-md object-cover" />
-                           <Button type="button" variant="destructive" size="icon" className="absolute -right-2 -top-2 h-6 w-6 rounded-full" onClick={() => remove(index)}>
-                                <Trash2 className="h-4 w-4" />
-                            </Button>
+                     <div 
+                        className="relative rounded-lg border-2 border-dashed border-input bg-background/50 p-4 transition-colors hover:border-primary"
+                        onPaste={handlePaste}
+                    >
+                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                        {fields.map((field, index) => (
+                            <div key={field.id} className="relative aspect-square">
+                            <Image src={field.value} alt={`Pré-visualização da imagem ${index+1}`} layout="fill" className="rounded-md object-cover" />
+                            <Button type="button" variant="destructive" size="icon" className="absolute -right-2 -top-2 h-6 w-6 rounded-full" onClick={() => remove(index)}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        ))}
+                        <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-input bg-background/50 text-center transition-colors hover:border-primary">
+                            <Upload className="h-8 w-8 text-muted-foreground" />
+                            <span className="text-sm text-muted-foreground">Carregar</span>
+                            <Input 
+                                id="image-upload-multiple"
+                                type="file" 
+                                className="sr-only" 
+                                accept="image/*"
+                                multiple
+                                onChange={(e) => handleImageChange(e)}
+                                />
+                        </label>
                         </div>
-                      ))}
-                       <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input bg-background/50 text-center transition-colors hover:border-primary">
-                          <Upload className="h-8 w-8 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">Carregar</span>
-                          <Input 
-                              type="file" 
-                              className="sr-only" 
-                              accept="image/*"
-                              multiple
-                              onChange={(e) => handleImageChange(e)}
-                            />
-                       </label>
+                         <div className="mt-4 text-center text-sm text-muted-foreground">
+                            Pode colar imagens aqui
+                        </div>
                     </div>
                     <FormMessage />
                   </FormItem>
