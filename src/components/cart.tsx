@@ -16,15 +16,28 @@ import { Separator } from "@/components/ui/separator";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import CartItem from "./cart-item";
+import type { CartItem as CartItemType } from "@/lib/types";
 
 export default function Cart() {
   const { cartItems, cartCount, cartTotal } = useCart();
+
+  const individualItems = cartItems.filter(item => !item.kitId);
+  const kitItems: Record<string, CartItemType[]> = cartItems.reduce((acc, item) => {
+    if (item.kitId) {
+      if (!acc[item.kitId]) {
+        acc[item.kitId] = [];
+      }
+      acc[item.kitId].push(item);
+    }
+    return acc;
+  }, {} as Record<string, CartItemType[]>);
+
 
   return (
     <Sheet>
       <SheetTrigger asChild>
         <Button variant="default" size="lg" className="relative shrink-0">
-          <ShoppingCart className="h-5 w-5" />
+          <ShoppingCart className="mr-2 h-5 w-5" />
           <span className="hidden sm:inline">Carrinho</span>
           {cartCount > 0 && (
             <Badge className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full p-0">
@@ -41,7 +54,17 @@ export default function Cart() {
           <>
             <div className="flex-1 overflow-y-auto px-6">
               <div className="flex flex-col gap-4">
-                {cartItems.map((item) => (
+                 {Object.entries(kitItems).map(([kitId, items]) => (
+                    <div key={kitId} className="space-y-4 rounded-lg border bg-muted/30 p-4">
+                      <h4 className="font-semibold text-center">{items[0].kitName}</h4>
+                      <div className="flex flex-col gap-4">
+                        {items.map((item) => (
+                          <CartItem key={`${item.id}-${kitId}`} item={item} isKitItem={true} />
+                        ))}
+                      </div>
+                    </div>
+                ))}
+                {individualItems.map((item) => (
                   <CartItem key={item.id} item={item} />
                 ))}
               </div>

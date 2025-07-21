@@ -1,3 +1,4 @@
+
 export interface Product {
   id: string;
   name: string;
@@ -27,4 +28,6 @@ export interface School {
 
 export interface CartItem extends Product {
   quantity: number;
+  kitId?: string;
+  kitName?: string;
 }

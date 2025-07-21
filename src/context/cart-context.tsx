@@ -4,6 +4,8 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import type { CartItem, Product } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { v4 as uuidv4 } from 'uuid';
+
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -13,7 +15,7 @@ interface CartContextType {
   clearCart: () => void;
   cartCount: number;
   cartTotal: number;
-  addKitToCart: (products: Product[]) => void;
+  addKitToCart: (products: Product[], kitName: string) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -24,10 +26,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const addToCart = (product: Product) => {
     setCartItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item.id === product.id);
+      const existingItem = prevItems.find((item) => item.id === product.id && !item.kitId);
       if (existingItem) {
         return prevItems.map((item) =>
-          item.id === product.id
+          item.id === product.id && !item.kitId
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
@@ -40,16 +42,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const addKitToCart = (products: Product[]) => {
+  const addKitToCart = (products: Product[], kitName: string) => {
+     const kitId = uuidv4();
     setCartItems((prevItems) => {
       const newItems = [...prevItems];
       products.forEach(product => {
-        const existingItemIndex = newItems.findIndex(item => item.id === product.id);
-        if (existingItemIndex > -1) {
-          newItems[existingItemIndex].quantity += 1;
-        } else {
-          newItems.push({ ...product, quantity: 1 });
-        }
+        // For kits, we add them as new line items even if they exist individually.
+        newItems.push({ ...product, quantity: 1, kitId, kitName });
       });
       return newItems;
     });
@@ -57,7 +56,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     const productNames = products.map(p => p.name).join(', ');
     toast({
       title: "Kit adicionado ao carrinho",
-      description: `Os seguintes itens foram adicionados: ${productNames}.`,
+      description: (
+        <div>
+            <p className="font-semibold">{kitName}</p>
+            <p>Os seguintes itens foram adicionados: {productNames}.</p>
+        </div>
+      )
     });
   };
 

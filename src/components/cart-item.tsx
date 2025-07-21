@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -9,12 +10,15 @@ import { Minus, Plus, X } from "lucide-react";
 
 interface CartItemProps {
   item: CartItemType;
+  isKitItem?: boolean;
 }
 
-export default function CartItem({ item }: CartItemProps) {
+export default function CartItem({ item, isKitItem = false }: CartItemProps) {
   const { updateQuantity, removeFromCart } = useCart();
 
   const handleQuantityChange = (change: number) => {
+    // For kit items, we don't allow quantity change from the cart view
+    if (isKitItem) return;
     updateQuantity(item.id, item.quantity + change);
   };
   
@@ -39,15 +43,21 @@ export default function CartItem({ item }: CartItemProps) {
         </div>
         <p className="text-sm text-muted-foreground">{item.price.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })} cada</p>
         <div className="mt-2 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleQuantityChange(-1)}>
-                    <Minus className="h-4 w-4" />
-                </Button>
-                <span className="w-8 text-center font-medium">{item.quantity}</span>
-                 <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleQuantityChange(1)}>
-                    <Plus className="h-4 w-4" />
-                </Button>
-            </div>
+            {isKitItem ? (
+                 <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">Quantidade: {item.quantity}</span>
+                 </div>
+            ) : (
+                <div className="flex items-center gap-2">
+                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleQuantityChange(-1)}>
+                        <Minus className="h-4 w-4" />
+                    </Button>
+                    <span className="w-8 text-center font-medium">{item.quantity}</span>
+                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleQuantityChange(1)}>
+                        <Plus className="h-4 w-4" />
+                    </Button>
+                </div>
+            )}
              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive" onClick={() => removeFromCart(item.id)}>
                 <X className="h-4 w-4" />
             </Button>
