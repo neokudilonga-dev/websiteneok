@@ -28,10 +28,11 @@ import {
 } from "@/components/ui/form";
 import type { Product, ReadingPlanItem } from "@/lib/types";
 import { schools } from "@/lib/data";
-import { useEffect } from "react";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { useEffect, useState, ChangeEvent } from "react";
+import { PlusCircle, Trash2, Upload } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import Image from "next/image";
 
 
 interface AddEditBookSheetProps {
@@ -52,7 +53,7 @@ const bookFormSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters."),
   description: z.string().min(10, "Description must be at least 10 characters."),
   price: z.coerce.number().min(0, "Price must be a positive number."),
-  image: z.string().url("Please enter a valid URL."),
+  image: z.string().min(1, "Image is required."),
   readingPlan: z.array(readingPlanItemSchema).optional(),
 });
 
@@ -65,6 +66,8 @@ export function AddEditBookSheet({
   onSaveChanges,
   readingPlan,
 }: AddEditBookSheetProps) {
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+
   const form = useForm<BookFormValues>({
     resolver: zodResolver(bookFormSchema),
     defaultValues: {
@@ -95,6 +98,7 @@ export function AddEditBookSheet({
           image: book.image,
           readingPlan: bookReadingPlan
         });
+        setImagePreview(book.image);
       } else {
         form.reset({
           name: "",
@@ -103,6 +107,7 @@ export function AddEditBookSheet({
           image: "",
           readingPlan: [],
         });
+        setImagePreview(null);
       }
     }
   }, [book, form, isOpen, readingPlan]);
@@ -119,6 +124,38 @@ export function AddEditBookSheet({
     }, data.readingPlan || []);
     setIsOpen(false);
   };
+  
+    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result as string;
+                form.setValue("image", base64String);
+                setImagePreview(base64String);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+        const items = e.clipboardData.items;
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf("image") !== -1) {
+                const file = items[i].getAsFile();
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const base64String = reader.result as string;
+                        form.setValue("image", base64String);
+                        setImagePreview(base64String);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+    };
+
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -165,9 +202,30 @@ export function AddEditBookSheet({
                 name="image"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Image URL</FormLabel>
+                    <FormLabel>Book Cover Image</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://placehold.co/600x400.png" {...field} />
+                        <div 
+                            className="relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-input bg-background/50 p-4 text-center transition-colors hover:border-primary"
+                            onPaste={handlePaste}
+                            onClick={() => document.getElementById('image-upload')?.click()}
+                        >
+                            {imagePreview ? (
+                                <Image src={imagePreview} alt="Book cover preview" width={200} height={200} className="mb-4 max-h-48 w-auto rounded-md object-contain" />
+                            ) : (
+                                <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                                    <Upload className="h-8 w-8" />
+                                    <p className="font-semibold">Click to upload, or paste an image</p>
+                                    <p className="text-xs">PNG, JPG, WEBP recommended</p>
+                                </div>
+                            )}
+                            <Input 
+                                id="image-upload" 
+                                type="file" 
+                                className="sr-only" 
+                                accept="image/*"
+                                onChange={handleImageChange}
+                             />
+                        </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -295,3 +353,5 @@ export function AddEditBookSheet({
     </Sheet>
   );
 }
+
+    
