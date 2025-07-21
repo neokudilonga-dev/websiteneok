@@ -202,26 +202,27 @@ export function AddEditBookSheet({
                 name="image"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel
-                      className="cursor-pointer"
-                      onClick={() => document.getElementById('image-upload')?.click()}
-                    >
-                      Book Cover Image
-                    </FormLabel>
+                    <FormLabel>Book Cover Image</FormLabel>
                     <FormControl>
                         <div 
-                            className="relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-input bg-background/50 p-4 text-center transition-colors hover:border-primary"
+                            className="relative flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input bg-background/50 p-4 text-center transition-colors hover:border-primary"
                             onPaste={handlePaste}
                         >
                             {imagePreview ? (
-                                <Image src={imagePreview} alt="Book cover preview" width={200} height={200} className="mb-4 max-h-48 w-auto rounded-md object-contain" />
+                                <Image src={imagePreview} alt="Book cover preview" width={200} height={200} className="mb-2 max-h-48 w-auto rounded-md object-contain" />
                             ) : (
                                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
                                     <Upload className="h-8 w-8" />
-                                    <p className="font-semibold">Click to upload, or paste an image</p>
-                                    <p className="text-xs">PNG, JPG, WEBP recommended</p>
+                                    <p className="font-semibold">Paste an image</p>
+                                    <p className="text-xs">or</p>
                                 </div>
                             )}
+                            
+                             <Button type="button" variant="outline" size="sm" onClick={() => document.getElementById('image-upload')?.click()}>
+                                <Upload className="mr-2" />
+                                Upload an Image
+                            </Button>
+
                             <Input 
                                 id="image-upload" 
                                 type="file" 
