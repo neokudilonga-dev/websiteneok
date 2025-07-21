@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -6,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-  CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, MoreHorizontal } from "lucide-react";
@@ -65,12 +65,7 @@ export default function SchoolsPage() {
     <>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-4">
-          <div>
-            <CardTitle>Escolas</CardTitle>
-            <CardDescription>
-              Faça a gestão das escolas que a sua loja suporta.
-            </CardDescription>
-          </div>
+          <CardTitle>Escolas</CardTitle>
           <Button onClick={handleAddSchool}>
             <PlusCircle className="mr-2" />
             Adicionar Nova Escola

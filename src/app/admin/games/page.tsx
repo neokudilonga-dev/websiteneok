@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-  CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, MoreHorizontal, Search } from "lucide-react";
@@ -76,12 +75,7 @@ export default function GamesPage() {
     <>
       <Card>
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <CardTitle>Jogos</CardTitle>
-            <CardDescription>
-              Faça a gestão do catálogo de jogos da sua loja.
-            </CardDescription>
-          </div>
+          <CardTitle>Jogos</CardTitle>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
