@@ -60,12 +60,12 @@ export default function AdminLayout({
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  href="#"
+                  href="/admin/books"
                   asChild
                   isActive={isActive("/admin/books")}
                   tooltip="Books"
                 >
-                  <Link href="#">
+                  <Link href="/admin/books">
                     <Book />
                     <span>Books</span>
                   </Link>
@@ -73,12 +73,12 @@ export default function AdminLayout({
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  href="#"
+                  href="/admin/games"
                   asChild
                   isActive={isActive("/admin/games")}
                   tooltip="Games"
                 >
-                  <Link href="#">
+                  <Link href="/admin/games">
                     <Gamepad2 />
                     <span>Games</span>
                   </Link>
@@ -86,12 +86,12 @@ export default function AdminLayout({
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  href="#"
+                  href="/admin/schools"
                   asChild
                   isActive={isActive("/admin/schools")}
                   tooltip="Schools"
                 >
-                  <Link href="#">
+                  <Link href="/admin/schools">
                     <School />
                     <span>Schools</span>
                   </Link>
@@ -99,12 +99,12 @@ export default function AdminLayout({
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  href="#"
+                  href="/admin/orders"
                   asChild
                   isActive={isActive("/admin/orders")}
                   tooltip="Orders"
                 >
-                  <Link href="#">
+                  <Link href="/admin/orders">
                     <ShoppingCart />
                     <span>Orders</span>
                   </Link>
