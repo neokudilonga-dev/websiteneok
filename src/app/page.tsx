@@ -120,14 +120,15 @@ export default function Home() {
     });
 
     return (
-      <ProductGrid products={productsWithStatus} renderBadge={(product) => {
-        if (product.status) {
+      <ProductGrid products={products} renderBadge={(product) => {
+        const planItem = gradePlan.find(p => p.grade === Number(grade) && p.productId === product.id);
+        if (planItem) {
           return (
             <Badge
-              variant={product.status === 'mandatory' ? 'default' : 'secondary'}
+              variant={planItem.status === 'mandatory' ? 'default' : 'secondary'}
               className="capitalize"
             >
-              {product.status === 'mandatory' ? 'Obrigatório' : 'Recomendado'}
+              {planItem.status === 'mandatory' ? 'Obrigatório' : 'Recomendado'}
             </Badge>
           );
         }
@@ -143,7 +144,7 @@ export default function Home() {
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
         <div className="mx-auto w-full max-w-7xl">
           <Tabs defaultValue="planos" className="w-full" onValueChange={setActiveTab}>
-            <TabsList className="grid h-auto w-full grid-cols-1 bg-primary sm:grid-cols-3">
+            <TabsList className="grid h-auto w-full grid-cols-1 sm:grid-cols-3">
               <TabsTrigger value="planos" className="py-3 text-lg font-semibold text-primary-foreground/70 data-[state=active]:bg-background/90 data-[state=active]:text-primary">Planos de Leitura</TabsTrigger>
               <TabsTrigger value="catalogo" className="py-3 text-lg font-semibold text-primary-foreground/70 data-[state=active]:bg-background/90 data-[state=active]:text-primary">Todos os Livros</TabsTrigger>
               <TabsTrigger value="jogos" className="py-3 text-lg font-semibold text-primary-foreground/70 data-[state=active]:bg-background/90 data-[state=active]:text-primary">Jogos e Outros</TabsTrigger>
@@ -180,7 +181,7 @@ export default function Home() {
                                      <div className="rounded-lg border bg-card p-6">
                                         <h3 className="font-headline text-2xl font-semibold">Kit Obrigatório do {grade}º Ano</h3>
                                         <p className="mt-2 text-muted-foreground">Compre todos os livros obrigatórios para o ano letivo.</p>
-                                        <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.mandatory, `Kit Obrigatório do ${grade}º Ano`)}>
+                                        <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.mandatory, `Kit Obrigatório do ${grade}º Ano - ${selectedSchool.name}`)}>
                                             <ShoppingCart className="mr-2 h-5 w-5" /> Adicionar Kit Obrigatório
                                         </Button>
                                     </div>
@@ -188,7 +189,7 @@ export default function Home() {
                                         <div className="rounded-lg border bg-card p-6">
                                             <h3 className="font-headline text-2xl font-semibold">Kit Completo do {grade}º Ano</h3>
                                             <p className="mt-2 text-muted-foreground">Inclui livros obrigatórios e recomendados.</p>
-                                            <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.all, `Kit Completo do ${grade}º Ano`)}>
+                                            <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.all, `Kit Completo do ${grade}º Ano - ${selectedSchool.name}`)}>
                                                 <ShoppingCart className="mr-2 h-5 w-5" /> Adicionar Kit Completo
                                             </Button>
                                         </div>
@@ -197,20 +198,7 @@ export default function Home() {
 
 
                                 {showIndividual === grade ? (
-                                    <ProductGrid products={gradeProducts.all} renderBadge={(product) => {
-                                        const planItem = schoolReadingPlan.find(p => p.grade === Number(grade) && p.productId === product.id);
-                                        if (planItem) {
-                                            return (
-                                                <Badge
-                                                variant={planItem.status === 'mandatory' ? 'default' : 'secondary'}
-                                                className="capitalize"
-                                                >
-                                                {planItem.status === 'mandatory' ? 'Obrigatório' : 'Recomendado'}
-                                                </Badge>
-                                            );
-                                        }
-                                        return null;
-                                    }} />
+                                    renderProductGridWithBadges(gradeProducts.all, grade)
                                 ) : (
                                     <div className="text-center">
                                         <Button variant="outline" onClick={() => setShowIndividual(grade)}>
