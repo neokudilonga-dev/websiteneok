@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -27,13 +28,15 @@ export default function RootLayout({
         <CartProvider>
           {children}
           <Toaster />
-          <div className="fixed bottom-6 right-6 z-50">
-            <Button asChild size="lg" className="h-16 w-16 rounded-full bg-[#25D366] shadow-lg hover:bg-[#128C7E] [&_svg]:size-9">
-                <Link href="https://wa.me/244919948887" target="_blank" rel="noopener noreferrer" aria-label="Contacte-nos no WhatsApp">
-                    <FaWhatsapp />
-                </Link>
-            </Button>
-          </div>
+          <Link 
+            href="https://wa.me/244919948887" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            aria-label="Contacte-nos no WhatsApp"
+            className="fixed bottom-6 right-6 z-50 text-[#25D366] drop-shadow-lg transition-transform hover:scale-110"
+          >
+            <FaWhatsapp className="h-16 w-16" />
+          </Link>
         </CartProvider>
       </body>
     </html>
