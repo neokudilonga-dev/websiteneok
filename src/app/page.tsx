@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SchoolSelector from "@/components/school-selector";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart } from "lucide-react";
+import { ChevronRight, ShoppingCart } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 
 export default function Home() {
@@ -18,11 +18,13 @@ export default function Home() {
     schools[0]
   );
   const [activeTab, setActiveTab] = useState("planos");
+  const [showIndividual, setShowIndividual] = useState<string | null>(null);
   const { addKitToCart } = useCart();
 
   const handleSchoolChange = (schoolId: string) => {
     const school = schools.find((s) => s.id === schoolId);
     setSelectedSchool(school);
+    setShowIndividual(null); // Reset when school changes
   };
 
   const schoolProducts = useMemo(() => selectedSchool
@@ -104,19 +106,33 @@ export default function Home() {
                 </div>
                 {selectedSchool ? (
                    Object.keys(productsByGrade).length > 0 ? (
-                    <Accordion type="single" collapsible className="w-full" defaultValue={`item-${Object.keys(productsByGrade)[0]}`}>
+                    <Accordion type="single" collapsible className="w-full" defaultValue={`item-${Object.keys(productsByGrade)[0]}`} onValueChange={() => setShowIndividual(null)}>
                       {Object.entries(productsByGrade).sort(([a], [b]) => Number(a) - Number(b)).map(([grade, products]) => (
                         <AccordionItem value={`item-${grade}`} key={grade}>
                           <AccordionTrigger className="text-xl font-semibold">
                             {`${grade}º Ano`}
                           </AccordionTrigger>
                           <AccordionContent>
-                             <div className="flex justify-end mb-4">
-                                <Button onClick={() => addKitToCart(products)}>
-                                    <ShoppingCart className="mr-2 h-4 w-4" /> Comprar Kit Completo
-                                </Button>
+                            <div className="space-y-6">
+                                <div className="rounded-lg border bg-card p-6">
+                                    <h3 className="font-headline text-2xl font-semibold">Kit Completo do {grade}º Ano</h3>
+                                    <p className="mt-2 text-muted-foreground">Compre todos os livros para o ano letivo com um único clique.</p>
+                                    <Button size="lg" className="mt-4" onClick={() => addKitToCart(products)}>
+                                        <ShoppingCart className="mr-2 h-5 w-5" /> Adicionar Kit Completo ao Carrinho
+                                    </Button>
+                                </div>
+
+                                {showIndividual === grade ? (
+                                    <ProductGrid products={products} />
+                                ) : (
+                                    <div className="text-center">
+                                        <Button variant="outline" onClick={() => setShowIndividual(grade)}>
+                                            Comprar em separado
+                                            <ChevronRight className="ml-2 h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
-                            <ProductGrid products={products} />
                           </AccordionContent>
                         </AccordionItem>
                       ))}
