@@ -15,16 +15,18 @@ export const products: Product[] = [
     image: "https://placehold.co/600x400.png",
     type: "book",
     schoolId: "escola-a",
+    grade: 1,
     dataAiHint: "math textbook"
   },
   {
     id: "book-2",
-    name: "Science Explorer",
+    name: "Science Explorer Grade 1",
     description: "Discover the world around you with fun experiments.",
     price: 18.5,
     image: "https://placehold.co/600x400.png",
     type: "book",
     schoolId: "escola-a",
+    grade: 1,
     dataAiHint: "science textbook"
   },
   {
@@ -45,6 +47,7 @@ export const products: Product[] = [
     image: "https://placehold.co/600x400.png",
     type: "book",
     schoolId: "escola-c",
+    grade: 12,
     dataAiHint: "chemistry textbook"
   },
   {
@@ -55,6 +58,7 @@ export const products: Product[] = [
     image: "https://placehold.co/600x400.png",
     type: "book",
     schoolId: "escola-b",
+    grade: 8,
     dataAiHint: "history book"
   },
   {
@@ -75,6 +79,7 @@ export const products: Product[] = [
     image: "https://placehold.co/600x400.png",
     type: "book",
     schoolId: "escola-b",
+    grade: 7,
     dataAiHint: "language book"
   },
   {
@@ -85,6 +90,7 @@ export const products: Product[] = [
     image: "https://placehold.co/600x400.png",
     type: "book",
     schoolId: "escola-b",
+    grade: 7,
     dataAiHint: "atlas book"
   },
    {
@@ -107,4 +113,26 @@ export const products: Product[] = [
     schoolId: "escola-c",
     dataAiHint: "board game"
   },
+  {
+    id: "book-7",
+    name: "Physics for Beginners",
+    description: "Introduction to the fundamental concepts of physics.",
+    price: 32.0,
+    image: "https://placehold.co/600x400.png",
+    type: "book",
+    schoolId: "escola-c",
+    grade: 11,
+    dataAiHint: "physics textbook"
+  },
+  {
+    id: "book-8",
+    name: "Literature Classics",
+    description: "A collection of classic literary works.",
+    price: 24.50,
+    image: "https://placehold.co/600x400.png",
+    type: "book",
+    schoolId: "escola-c",
+    grade: 12,
+    dataAiHint: "literature book"
+  }
 ];

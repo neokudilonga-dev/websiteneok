@@ -12,6 +12,7 @@ interface CartContextType {
   clearCart: () => void;
   cartCount: number;
   cartTotal: number;
+  addKitToCart: (products: Product[]) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -35,6 +36,25 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     toast({
       title: "Added to cart",
       description: `${product.name} has been added to your cart.`,
+    });
+  };
+
+  const addKitToCart = (products: Product[]) => {
+    setCartItems((prevItems) => {
+      const newItems = [...prevItems];
+      products.forEach(product => {
+        const existingItemIndex = newItems.findIndex(item => item.id === product.id);
+        if (existingItemIndex > -1) {
+          newItems[existingItemIndex].quantity += 1;
+        } else {
+          newItems.push({ ...product, quantity: 1 });
+        }
+      });
+      return newItems;
+    });
+    toast({
+      title: "Kit added to cart",
+      description: `The complete kit has been added to your cart.`,
     });
   };
 
@@ -82,6 +102,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         clearCart,
         cartCount,
         cartTotal,
+        addKitToCart
       }}
     >
       {children}

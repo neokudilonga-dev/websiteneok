@@ -6,6 +6,7 @@ export interface Product {
   image: string;
   type: "book" | "game";
   schoolId: string;
+  grade?: number;
   dataAiHint?: string;
 }
 
