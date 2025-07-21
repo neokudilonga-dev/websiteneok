@@ -1,3 +1,4 @@
+
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
@@ -52,9 +53,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       });
       return newItems;
     });
+
+    const productNames = products.map(p => p.name).join(', ');
     toast({
       title: "Kit adicionado ao carrinho",
-      description: `O kit completo foi adicionado ao seu carrinho.`,
+      description: `Os seguintes itens foram adicionados: ${productNames}.`,
     });
   };
 
