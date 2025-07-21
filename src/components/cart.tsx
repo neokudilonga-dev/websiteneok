@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -22,10 +23,11 @@ export default function Cart() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon" className="relative">
+        <Button variant="default" size="lg" className="relative shrink-0">
           <ShoppingCart className="h-5 w-5" />
+          <span className="hidden sm:inline">Carrinho</span>
           {cartCount > 0 && (
-            <Badge className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full p-0">
+            <Badge className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full p-0">
               {cartCount}
             </Badge>
           )}
