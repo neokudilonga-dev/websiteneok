@@ -37,14 +37,14 @@ export default function CheckoutPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {cartItems.map((item) => (
-                      <div key={item.id} className="flex items-center gap-4">
+                    {cartItems.map((item, index) => (
+                      <div key={`${item.id}-${item.kitId || ''}-${index}`} className="flex items-center gap-4">
                         <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border">
                           <Image
                             src={
                               item.type === "book"
-                                ? item.image
-                                : item.images?.[0] || ""
+                                ? item.image || "https://placehold.co/64x64.png"
+                                : item.images?.[0] || "https://placehold.co/64x64.png"
                             }
                             alt={item.name}
                             fill
