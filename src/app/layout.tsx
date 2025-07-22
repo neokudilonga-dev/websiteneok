@@ -3,9 +3,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { CartProvider } from "@/context/cart-context";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { FaWhatsapp } from "react-icons/fa";
+import { WhatsAppButton } from "@/components/whatsapp-button";
+
 
 export const metadata: Metadata = {
   title: "Neokudilonga",
@@ -28,15 +27,7 @@ export default function RootLayout({
         <CartProvider>
           {children}
           <Toaster />
-          <Link 
-            href="https://wa.me/244919948887" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            aria-label="Contacte-nos no WhatsApp"
-            className="fixed bottom-6 right-6 z-50 text-[#25D366] drop-shadow-lg transition-transform hover:scale-110"
-          >
-            <FaWhatsapp className="h-16 w-16" />
-          </Link>
+          <WhatsAppButton />
         </CartProvider>
       </body>
     </html>
