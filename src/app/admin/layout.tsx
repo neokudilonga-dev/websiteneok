@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Book,
+  Building,
   Gamepad2,
   Home,
   School,
@@ -109,6 +110,19 @@ export default function AdminLayout({
                   <Link href="/admin/categories">
                     <Tags />
                     <span>Categorias</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  href="/admin/publishers"
+                  asChild
+                  isActive={isActive("/admin/publishers")}
+                  tooltip="Editoras"
+                >
+                  <Link href="/admin/publishers">
+                    <Building />
+                    <span>Editoras</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
