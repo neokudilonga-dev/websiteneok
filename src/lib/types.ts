@@ -11,6 +11,7 @@ export interface Product {
   type: "book" | "game";
   dataAiHint?: string;
   category?: string; // e.g., 'Ficção', 'Manual Escolar', 'Ciência'
+  publisher?: string;
   stockStatus?: 'in_stock' | 'out_of_stock' | 'sold_out';
   status?: "mandatory" | "recommended"; // used for reading plan view
 }

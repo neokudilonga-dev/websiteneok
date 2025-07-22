@@ -8,7 +8,10 @@ export const schools: School[] = [
   { id: "cat", name: "Colégio Angolano de Talatona", allowPickup: true, allowPickupAtLocation: true },
 ];
 
-export const bookCategories = ["Manual Escolar", "Ficção", "Não-Ficção", "Ciência", "História", "Literatura"];
+export const bookCategories = ["Manual Escolar", "Ficção", "Não-Ficção", "Ciência", "História", "Literatura", "Obrigatórios/ Leitura Orientada", "Sugeridos/ Leitura Recomendada"];
+
+export const publishers = ["Editora Angola", "Livros & Cia", "Saber Mais", "Plural Editores", "Mayamba Editora", "Texto Editores", "ASA"];
+
 
 export const products: Product[] = [
   {
@@ -23,6 +26,7 @@ export const products: Product[] = [
     dataAiHint: "math textbook",
     category: "Manual Escolar",
     stockStatus: "in_stock",
+    publisher: "Saber Mais",
   },
   {
     id: "book-2",
@@ -36,6 +40,7 @@ export const products: Product[] = [
     dataAiHint: "science textbook",
     category: "Ciência",
     stockStatus: "in_stock",
+    publisher: "Editora Angola",
   },
   {
     id: "game-1",
@@ -61,6 +66,7 @@ export const products: Product[] = [
     dataAiHint: "chemistry textbook",
     category: "Ciência",
     stockStatus: "out_of_stock",
+    publisher: "Livros & Cia",
   },
   {
     id: "book-4",
@@ -74,6 +80,7 @@ export const products: Product[] = [
     dataAiHint: "history book",
     category: "História",
     stockStatus: "in_stock",
+    publisher: "Mayamba Editora",
   },
   {
     id: "game-2",
@@ -99,6 +106,7 @@ export const products: Product[] = [
     dataAiHint: "language book",
     category: "Manual Escolar",
     stockStatus: "in_stock",
+    publisher: "Texto Editores",
   },
   {
     id: "book-6",
@@ -112,6 +120,7 @@ export const products: Product[] = [
     dataAiHint: "atlas book",
     category: "Não-Ficção",
     stockStatus: "sold_out",
+    publisher: "Plural Editores",
   },
    {
     id: "game-3",
@@ -149,6 +158,7 @@ export const products: Product[] = [
     dataAiHint: "physics textbook",
     category: "Ciência",
     stockStatus: "in_stock",
+    publisher: "Saber Mais",
   },
   {
     id: "book-8",
@@ -162,10 +172,11 @@ export const products: Product[] = [
     dataAiHint: "literature book",
     category: "Literatura",
     stockStatus: "in_stock",
+    publisher: "ASA",
   },
-  { id: 'cat-1-1', name: 'A Viagem do Pai Natal', price: 5500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)' },
-  { id: 'cat-1-2', name: 'Estrofes da Bicharada', price: 5000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)' },
-  { id: 'cat-1-3', name: 'A Aventura do vento e outros Contos', price: 8500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)' },
+  { id: 'cat-1-1', name: 'A Viagem do Pai Natal', price: 5500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada)', publisher: "Mayamba Editora" },
+  { id: 'cat-1-2', name: 'Estrofes da Bicharada', price: 5000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada)', publisher: "Plural Editores" },
+  { id: 'cat-1-3', name: 'A Aventura do vento e outros Contos', price: 8500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada)', publisher: "Texto Editores" },
 ];
 
 export const readingPlan: ReadingPlanItem[] = [
@@ -193,9 +204,9 @@ export const orders: Order[] = [
     deliveryAddress: 'Condomínio Flores',
     paymentMethod: 'numerario',
     items: [
-      { id: 'cat-1-1', name: 'A Viagem do Pai Natal', price: 5500, quantity: 1, type: 'book', stock: 100, image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)' },
-      { id: 'cat-1-2', name: 'Estrofes da Bicharada', price: 5000, quantity: 1, type: 'book', stock: 100, image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)' },
-      { id: 'cat-1-3', name: 'A Aventura do vento e outros Contos', price: 6500, quantity: 1, type: 'book', stock: 100, image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)' },
+      { id: 'cat-1-1', name: 'A Viagem do Pai Natal', price: 5500, quantity: 1, type: 'book', stock: 100, image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada)', publisher: "Mayamba Editora" },
+      { id: 'cat-1-2', name: 'Estrofes da Bicharada', price: 5000, quantity: 1, type: 'book', stock: 100, image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada)', publisher: "Plural Editores" },
+      { id: 'cat-1-3', name: 'A Aventura do vento e outros Contos', price: 6500, quantity: 1, type: 'book', stock: 100, image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada)', publisher: "Texto Editores" },
     ],
     deliveryFee: 2000,
     total: 19000,
@@ -212,7 +223,7 @@ export const orders: Order[] = [
     deliveryAddress: '',
     paymentMethod: 'transferencia',
     items: [
-      { id: 'book-1', name: 'Jornada da Matemática 1º Ano', price: 1599, quantity: 1, type: 'book', stock: 50, image: "https://placehold.co/600x400.png", images: [], description: 'Um livro de matemática interativo para a primeira classe.' },
+      { id: 'book-1', name: 'Jornada da Matemática 1º Ano', price: 1599, quantity: 1, type: 'book', stock: 50, image: "https://placehold.co/600x400.png", images: [], description: 'Um livro de matemática interativo para a primeira classe.', category: "Manual Escolar", publisher: "Saber Mais" },
     ],
     deliveryFee: 0,
     total: 1599,

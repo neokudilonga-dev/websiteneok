@@ -27,7 +27,7 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import type { Product, ReadingPlanItem } from "@/lib/types";
-import { schools, bookCategories as initialBookCategories } from "@/lib/data";
+import { schools, bookCategories as initialBookCategories, publishers } from "@/lib/data";
 import { useEffect, useState, ChangeEvent } from "react";
 import { PlusCircle, Trash2, Upload } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -56,6 +56,7 @@ const bookFormSchema = z.object({
   stock: z.coerce.number().min(0, "O stock deve ser um número positivo."),
   image: z.string().min(1, "A imagem é obrigatória."),
   category: z.string().min(1, "A categoria é obrigatória."),
+  publisher: z.string().optional(),
   stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out']),
   readingPlan: z.array(readingPlanItemSchema).optional(),
 });
@@ -83,6 +84,7 @@ export function AddEditBookSheet({
       stock: 0,
       image: "",
       category: "",
+      publisher: "",
       stockStatus: 'in_stock',
       readingPlan: [],
     },
@@ -107,6 +109,7 @@ export function AddEditBookSheet({
           stock: book.stock,
           image: book.image,
           category: book.category,
+          publisher: book.publisher,
           stockStatus: book.stockStatus || 'in_stock',
           readingPlan: bookReadingPlan
         });
@@ -119,6 +122,7 @@ export function AddEditBookSheet({
           stock: 0,
           image: "",
           category: "",
+          publisher: "",
           stockStatus: "in_stock",
           readingPlan: [],
         });
@@ -139,6 +143,7 @@ export function AddEditBookSheet({
         image: data.image,
         images: [],
         category: data.category,
+        publisher: data.publisher,
         stockStatus: data.stockStatus
     }, data.readingPlan || []);
     setIsOpen(false);
@@ -283,28 +288,52 @@ export function AddEditBookSheet({
                         )}
                     />
                 </div>
-                <FormField
-                    control={form.control}
-                    name="category"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Categoria</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Selecione uma categoria" />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                {bookCategories.map(cat => (
-                                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
+                 <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                        control={form.control}
+                        name="category"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Categoria</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Selecione uma categoria" />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {bookCategories.map(cat => (
+                                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                     <FormField
+                        control={form.control}
+                        name="publisher"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Editora</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Selecione uma editora" />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {publishers.map(pub => (
+                                    <SelectItem key={pub} value={pub}>{pub}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                </div>
                  <FormField
                     control={form.control}
                     name="stockStatus"

@@ -24,11 +24,14 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-  DropdownMenuCheckboxItem
+  DropdownMenuCheckboxItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { products as initialProducts, schools, readingPlan as initialReadingPlan, bookCategories } from "@/lib/data";
+import { products as initialProducts, schools, readingPlan as initialReadingPlan, bookCategories, publishers } from "@/lib/data";
 import type { Product, ReadingPlanItem, School } from "@/lib/types";
 import { AddEditBookSheet } from "@/components/admin/add-edit-book-sheet";
 import { Input } from "@/components/ui/input";
@@ -44,15 +47,17 @@ export default function BooksPage() {
     undefined
   );
   const [searchQuery, setSearchQuery] = useState("");
-  const [showSoldOut, setShowSoldOut] = useState(false);
+  const [stockFilter, setStockFilter] = useState("all");
+  const [publisherFilter, setPublisherFilter] = useState("all");
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStock = showSoldOut || product.stockStatus !== 'sold_out';
-      return matchesSearch && matchesStock;
+      const matchesStock = stockFilter === 'all' || product.stockStatus === stockFilter;
+      const matchesPublisher = publisherFilter === 'all' || product.publisher === publisherFilter;
+      return matchesSearch && matchesStock && matchesPublisher;
     });
-  }, [products, searchQuery, showSoldOut]);
+  }, [products, searchQuery, stockFilter, publisherFilter]);
 
   const handleAddBook = () => {
     setSelectedBook(undefined);
@@ -124,14 +129,22 @@ export default function BooksPage() {
                       Filtrar
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
-                    <DropdownMenuCheckboxItem
-                      checked={showSoldOut}
-                      onCheckedChange={setShowSoldOut}
-                    >
-                      Mostrar Esgotados
-                    </DropdownMenuCheckboxItem>
+                  <DropdownMenuContent align="end" className="w-[200px]">
+                    <DropdownMenuLabel>Filtrar por Stock</DropdownMenuLabel>
+                    <DropdownMenuRadioGroup value={stockFilter} onValueChange={setStockFilter}>
+                        <DropdownMenuRadioItem value="all">Todos</DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="in_stock">Em Stock</DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="out_of_stock">Atraso na Entrega</DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="sold_out">Esgotado</DropdownMenuRadioItem>
+                    </DropdownMenuRadioGroup>
+                    <DropdownMenuSeparator />
+                     <DropdownMenuLabel>Filtrar por Editora</DropdownMenuLabel>
+                     <DropdownMenuRadioGroup value={publisherFilter} onValueChange={setPublisherFilter}>
+                        <DropdownMenuRadioItem value="all">Todas</DropdownMenuRadioItem>
+                        {publishers.map(publisher => (
+                            <DropdownMenuRadioItem key={publisher} value={publisher}>{publisher}</DropdownMenuRadioItem>
+                        ))}
+                    </DropdownMenuRadioGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <Button onClick={handleAddBook} className="shrink-0">
@@ -148,6 +161,7 @@ export default function BooksPage() {
                   <span className="sr-only">Imagem</span>
                 </TableHead>
                 <TableHead>Nome</TableHead>
+                <TableHead>Editora</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>Stock</TableHead>
                 <TableHead>Preço</TableHead>
@@ -170,6 +184,7 @@ export default function BooksPage() {
                     />
                   </TableCell>
                   <TableCell className="font-medium">{product.name}</TableCell>
+                   <TableCell className="text-muted-foreground">{product.publisher || 'N/A'}</TableCell>
                    <TableCell>
                       <Badge 
                         variant={product.stockStatus === 'sold_out' ? 'destructive' : product.stockStatus === 'out_of_stock' ? 'secondary' : 'default'}
