@@ -9,7 +9,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, MoreHorizontal, Search } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Search, Filter } from "lucide-react";
 import {
   Table,
   TableHeader,
@@ -24,6 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
@@ -41,12 +42,16 @@ export default function GamesPage() {
     undefined
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const [showSoldOut, setShowSoldOut] = useState(false);
+
 
   const filteredProducts = useMemo(() => {
-    return products.filter((product) =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [products, searchQuery]);
+    return products.filter((product) => {
+      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStock = showSoldOut || product.stockStatus !== 'sold_out';
+      return matchesSearch && matchesStock;
+    });
+  }, [products, searchQuery, showSoldOut]);
 
   const handleAddGame = () => {
     setSelectedGame(undefined);
@@ -87,6 +92,23 @@ export default function GamesPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
+             <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="shrink-0">
+                  <Filter className="mr-2" />
+                  Filtrar
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
+                <DropdownMenuCheckboxItem
+                  checked={showSoldOut}
+                  onCheckedChange={setShowSoldOut}
+                >
+                  Mostrar Esgotados
+                </DropdownMenuCheckboxItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button onClick={handleAddGame} className="shrink-0">
               <PlusCircle className="mr-2" />
               Adicionar Novo Jogo
@@ -101,6 +123,8 @@ export default function GamesPage() {
                   <span className="sr-only">Imagem</span>
                 </TableHead>
                 <TableHead>Nome</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead>Stock</TableHead>
                 <TableHead>Preço</TableHead>
                 <TableHead className="hidden md:table-cell">Nº Imagens</TableHead>
                 <TableHead>
@@ -121,6 +145,18 @@ export default function GamesPage() {
                     />
                   </TableCell>
                   <TableCell className="font-medium">{product.name}</TableCell>
+                  <TableCell>
+                      <Badge 
+                        variant={product.stockStatus === 'sold_out' ? 'destructive' : product.stockStatus === 'out_of_stock' ? 'secondary' : 'default'}
+                      >
+                         {product.stockStatus === 'sold_out' && 'Esgotado'}
+                         {product.stockStatus === 'in_stock' && 'Em Stock'}
+                         {product.stockStatus === 'out_of_stock' && 'Atraso na Entrega'}
+                      </Badge>
+                   </TableCell>
+                   <TableCell>
+                    {product.stock}
+                   </TableCell>
                   <TableCell>
                     {product.price.toLocaleString("pt-PT", {
                       style: "currency",

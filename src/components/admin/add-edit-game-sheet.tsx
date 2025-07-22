@@ -29,6 +29,7 @@ import {
 import type { Product } from "@/lib/types";
 import { useEffect, useState, ChangeEvent } from "react";
 import { PlusCircle, Trash2, Upload } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Image from "next/image";
 
 interface AddEditGameSheetProps {
@@ -42,7 +43,9 @@ const gameFormSchema = z.object({
   name: z.string().min(3, "O nome deve ter pelo menos 3 caracteres."),
   description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
   price: z.coerce.number().min(0, "O preço deve ser um número positivo."),
+  stock: z.coerce.number().min(0, "O stock deve ser um número positivo."),
   images: z.array(z.string()).min(1, "Pelo menos uma imagem é obrigatória."),
+  stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out']),
 });
 
 type GameFormValues = z.infer<typeof gameFormSchema>;
@@ -59,7 +62,9 @@ export function AddEditGameSheet({
       name: "",
       description: "",
       price: 0,
+      stock: 0,
       images: [],
+      stockStatus: "in_stock",
     },
   });
 
@@ -75,14 +80,18 @@ export function AddEditGameSheet({
           name: game.name,
           description: game.description,
           price: game.price,
+          stock: game.stock,
           images: game.images || [],
+          stockStatus: game.stockStatus || 'in_stock',
         });
       } else {
         form.reset({
           name: "",
           description: "",
           price: 0,
+          stock: 0,
           images: [],
+          stockStatus: "in_stock",
         });
       }
     }
@@ -95,7 +104,9 @@ export function AddEditGameSheet({
       name: data.name,
       description: data.description,
       price: data.price,
+      stock: data.stock,
       images: data.images,
+      stockStatus: data.stockStatus,
       image: "",
     });
     setIsOpen(false);
@@ -230,19 +241,72 @@ export function AddEditGameSheet({
                 )}
               />
 
-              <FormField
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                    control={form.control}
+                    name="price"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Preço</FormLabel>
+                        <FormControl>
+                        <Input type="number" step="0.01" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="stock"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Stock</FormLabel>
+                        <FormControl>
+                        <Input type="number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+              </div>
+
+               <FormField
                 control={form.control}
-                name="price"
+                name="stockStatus"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Preço</FormLabel>
+                    <FormItem className="space-y-3">
+                    <FormLabel>Estado do Stock</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" {...field} />
+                        <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex items-center space-x-4"
+                        >
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                            <FormControl>
+                            <RadioGroupItem value="in_stock" />
+                            </FormControl>
+                            <FormLabel className="font-normal">Em Stock</FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                            <FormControl>
+                            <RadioGroupItem value="out_of_stock" />
+                            </FormControl>
+                            <FormLabel className="font-normal">Atraso na Entrega</FormLabel>
+                        </FormItem>
+                            <FormItem className="flex items-center space-x-2 space-y-0">
+                            <FormControl>
+                            <RadioGroupItem value="sold_out" />
+                            </FormControl>
+                            <FormLabel className="font-normal">Esgotado</FormLabel>
+                        </FormItem>
+                        </RadioGroup>
                     </FormControl>
                     <FormMessage />
-                  </FormItem>
+                    </FormItem>
                 )}
-              />
+                />
+
             </div>
             <SheetFooter className="mt-auto pt-4">
               <SheetClose asChild>

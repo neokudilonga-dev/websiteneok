@@ -46,7 +46,8 @@ export const products: Product[] = [
     image: "",
     images: ["https://placehold.co/600x400.png", "https://placehold.co/600x400.png"],
     type: "game",
-    dataAiHint: "alphabet blocks"
+    dataAiHint: "alphabet blocks",
+    stockStatus: "in_stock",
   },
   {
     id: "book-3",
@@ -83,7 +84,8 @@ export const products: Product[] = [
     image: "",
     images: ["https://placehold.co/600x400.png"],
     type: "game",
-    dataAiHint: "coding game"
+    dataAiHint: "coding game",
+    stockStatus: "in_stock",
   },
   {
     id: "book-5",
@@ -120,7 +122,8 @@ export const products: Product[] = [
     image: "",
     images: ["https://placehold.co/600x400.png"],
     type: "game",
-    dataAiHint: "math game"
+    dataAiHint: "math game",
+    stockStatus: "in_stock",
   },
    {
     id: "game-4",
@@ -131,7 +134,8 @@ export const products: Product[] = [
     image: "",
     images: ["https://placehold.co/600x400.png"],
     type: "game",
-    dataAiHint: "board game"
+    dataAiHint: "board game",
+    stockStatus: "out_of_stock",
   },
   {
     id: "book-7",
