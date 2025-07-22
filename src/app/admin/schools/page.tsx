@@ -61,6 +61,14 @@ export default function SchoolsPage() {
     }
   };
 
+  const renderCheck = (value: boolean | undefined) => {
+     return value ? (
+        <CheckCircle className="h-5 w-5 text-green-500" />
+    ) : (
+        <XCircle className="h-5 w-5 text-destructive" />
+    )
+  }
+
   return (
     <>
       <Card>
@@ -77,7 +85,8 @@ export default function SchoolsPage() {
               <TableRow>
                 <TableHead>Nome da Escola</TableHead>
                 <TableHead>ID</TableHead>
-                <TableHead>Permite Levantamento</TableHead>
+                <TableHead>Levant. no Colégio</TableHead>
+                <TableHead>Levant. no Local</TableHead>
                 <TableHead className="text-right">
                   <span className="sr-only">Ações</span>
                 </TableHead>
@@ -89,11 +98,10 @@ export default function SchoolsPage() {
                   <TableCell className="font-medium">{school.name}</TableCell>
                   <TableCell className="font-mono text-sm text-muted-foreground">{school.id}</TableCell>
                   <TableCell>
-                    {school.allowPickup ? (
-                        <CheckCircle className="h-5 w-5 text-green-500" />
-                    ) : (
-                        <XCircle className="h-5 w-5 text-destructive" />
-                    )}
+                    {renderCheck(school.allowPickup)}
+                  </TableCell>
+                   <TableCell>
+                    {renderCheck(school.allowPickupAtLocation)}
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>

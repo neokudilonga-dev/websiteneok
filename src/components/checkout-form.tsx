@@ -35,6 +35,7 @@ const checkoutSchema = z.object({
     "fora-tala",
     "outras",
     "levantamento",
+    "levantamento-local",
   ]),
   deliveryAddress: z.string().optional(),
   paymentMethod: z.enum(["numerario", "multicaixa", "transferencia"]),
@@ -62,9 +63,13 @@ export default function CheckoutForm() {
         return schools.filter(school => schoolIds.has(school.id));
     }, [readingPlanProductIdsInCart]);
 
-    const allowPickup = useMemo(() => {
+    const allowPickupAtSchool = useMemo(() => {
         return requiresStudentInfo && schoolsInCart.some(school => school.allowPickup);
     }, [requiresStudentInfo, schoolsInCart]);
+
+    const allowPickupAtLocation = useMemo(() => {
+        return schoolsInCart.some(school => school.allowPickupAtLocation);
+    }, [schoolsInCart]);
 
 
     const conditionalCheckoutSchema = checkoutSchema.refine(data => {
@@ -76,7 +81,7 @@ export default function CheckoutForm() {
         message: "O nome do aluno e a classe são obrigatórios para itens do plano de leitura.",
         path: ["studentName"], // You can choose which field to show the error on
     }).refine(data => {
-        if (data.deliveryOption !== 'levantamento' && !data.deliveryAddress) {
+        if (data.deliveryOption !== 'levantamento' && data.deliveryOption !== 'levantamento-local' && !data.deliveryAddress) {
             return false;
         }
         return true;
@@ -237,10 +242,16 @@ export default function CheckoutForm() {
                                             <FormControl><RadioGroupItem value="outras" /></FormControl>
                                             <FormLabel className="font-normal">Sim - fora das Zonas acima referidas - acresce 4000 AKZ</FormLabel>
                                         </FormItem>
-                                        {allowPickup && (
+                                        {allowPickupAtSchool && (
                                             <FormItem className="flex items-center space-x-3 space-y-0">
                                                 <FormControl><RadioGroupItem value="levantamento" /></FormControl>
                                                 <FormLabel className="font-normal">Não - levantamento no Colégio em data a confirmar</FormLabel>
+                                            </FormItem>
+                                        )}
+                                        {allowPickupAtLocation && (
+                                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                                <FormControl><RadioGroupItem value="levantamento-local" /></FormControl>
+                                                <FormLabel className="font-normal">Não - levantamento no Condomínio BCI 6 Casas, Casa No. 6 (Sujeito a marcação prévia)</FormLabel>
                                             </FormItem>
                                         )}
                                     </RadioGroup>
@@ -249,7 +260,7 @@ export default function CheckoutForm() {
                             </FormItem>
                         )}
                     />
-                    {deliveryOption !== 'levantamento' && (
+                    {deliveryOption !== 'levantamento' && deliveryOption !== 'levantamento-local' && (
                          <FormField
                             control={form.control}
                             name="deliveryAddress"
@@ -277,7 +288,7 @@ export default function CheckoutForm() {
                                             <FormControl><RadioGroupItem value="numerario" /></FormControl>
                                             <FormLabel className="font-normal">Pagamento em numerário</FormLabel>
                                         </FormItem>
-                                        {requiresStudentInfo && deliveryOption === 'levantamento' && (
+                                        { (deliveryOption === 'levantamento' || deliveryOption === 'levantamento-local') && (
                                             <FormItem className="flex items-center space-x-3 space-y-0">
                                                 <FormControl><RadioGroupItem value="multicaixa" /></FormControl>
                                                 <FormLabel className="font-normal">Pagamento com Multicaixa (não disponível para entregas)</FormLabel>

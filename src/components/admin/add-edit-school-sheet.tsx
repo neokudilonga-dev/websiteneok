@@ -21,6 +21,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import type { School } from "@/lib/types";
 import { useEffect } from "react";
@@ -37,6 +38,7 @@ const schoolFormSchema = z.object({
   name: z.string().min(3, "O nome da escola deve ter pelo menos 3 caracteres."),
   id: z.string().min(3, "O ID deve ter pelo menos 3 caracteres.").regex(/^[a-z0-9-]+$/, "O ID só pode conter letras minúsculas, números e hífenes."),
   allowPickup: z.boolean().default(false),
+  allowPickupAtLocation: z.boolean().default(false),
 });
 
 type SchoolFormValues = z.infer<typeof schoolFormSchema>;
@@ -53,6 +55,7 @@ export function AddEditSchoolSheet({
       name: "",
       id: "",
       allowPickup: false,
+      allowPickupAtLocation: false,
     },
   });
 
@@ -63,9 +66,10 @@ export function AddEditSchoolSheet({
             name: school.name,
             id: school.id,
             allowPickup: school.allowPickup || false,
+            allowPickupAtLocation: school.allowPickupAtLocation || false,
         });
         } else {
-        form.reset({ name: "", id: "", allowPickup: false });
+        form.reset({ name: "", id: "", allowPickup: false, allowPickupAtLocation: false });
         }
     }
   }, [school, form, isOpen]);
@@ -123,6 +127,27 @@ export function AddEditSchoolSheet({
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                     <div className="space-y-0.5">
                       <FormLabel>Permitir Levantamento no Colégio</FormLabel>
+                       <FormMessage />
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="allowPickupAtLocation"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel>Permitir Levantamento no Local</FormLabel>
+                      <FormDescription>
+                        Condomínio BCI 6 Casas, Casa No. 6
+                      </FormDescription>
                        <FormMessage />
                     </div>
                     <FormControl>

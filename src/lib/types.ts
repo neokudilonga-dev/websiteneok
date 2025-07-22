@@ -27,6 +27,7 @@ export interface School {
   id: string;
   name: string;
   allowPickup?: boolean;
+  allowPickupAtLocation?: boolean;
 }
 
 export interface CartItem extends Product {
