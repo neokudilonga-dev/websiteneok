@@ -14,6 +14,8 @@ export default function Header() {
           <Link href="/" className="flex items-center space-x-2">
             <BiblioAngolaLogo className="h-16 w-auto" />
           </Link>
+        </div>
+        <div className="flex items-center justify-end space-x-4">
           <nav className="hidden items-center gap-6 md:flex">
              <Link href="/quem-somos" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
                 Quem Somos
@@ -22,14 +24,12 @@ export default function Header() {
                 Contactos
              </Link>
           </nav>
-        </div>
-        <div className="flex items-center justify-end space-x-4">
-          <nav className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2">
             <Cart />
             <Link href="/admin">
               <Button variant="ghost" size="sm">Admin</Button>
             </Link>
-          </nav>
+          </div>
         </div>
       </div>
     </header>
