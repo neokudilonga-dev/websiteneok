@@ -5,6 +5,7 @@ export interface Product {
   name: string;
   description: string;
   price: number;
+  stock?: number;
   image: string; // For books
   images: string[]; // For games
   type: "book" | "game";
@@ -36,7 +37,7 @@ export interface CartItem extends Product {
 export interface Order {
   reference: string;
   date: string;
-  studentName: string;
+  studentName?: string;
   guardianName: string;
   phone: string;
   email: string;

@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 
 import {
   Form,
@@ -21,10 +22,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { useCart } from "@/context/cart-context";
 import { useToast } from "@/hooks/use-toast";
+import { readingPlan } from "@/lib/data";
 
 const checkoutSchema = z.object({
-  studentName: z.string().min(1, "O nome do aluno é obrigatório."),
-  classAndGrade: z.string().min(1, "A classe e turma são obrigatórias."),
+  studentName: z.string().optional(),
+  classAndGrade: z.string().optional(),
   phone: z.string().min(9, "O número de telefone é obrigatório."),
   guardianName: z.string().min(1, "O nome do responsável é obrigatório."),
   email: z.string().email("Por favor, insira um email válido."),
@@ -36,25 +38,41 @@ const checkoutSchema = z.object({
   ]),
   deliveryAddress: z.string().optional(),
   paymentMethod: z.enum(["numerario", "multicaixa", "transferencia"]),
-}).refine(data => {
-    if (data.deliveryOption !== 'levantamento' && !data.deliveryAddress) {
-        return false;
-    }
-    return true;
-}, {
-    message: "A morada é obrigatória para entrega ao domicílio.",
-    path: ["deliveryAddress"],
 });
 
-type CheckoutFormValues = z.infer<typeof checkoutSchema>;
 
 export default function CheckoutForm() {
     const router = useRouter();
     const { toast } = useToast();
     const { cartItems, cartTotal, clearCart } = useCart();
+
+    const requiresStudentInfo = useMemo(() => {
+        const readingPlanProductIds = new Set(readingPlan.map(item => item.productId));
+        return cartItems.some(item => readingPlanProductIds.has(item.id));
+    }, [cartItems]);
     
+    const conditionalCheckoutSchema = checkoutSchema.refine(data => {
+        if (requiresStudentInfo) {
+            return !!data.studentName && !!data.classAndGrade;
+        }
+        return true;
+    }, {
+        message: "O nome do aluno e a classe são obrigatórios para itens do plano de leitura.",
+        path: ["studentName"], // You can choose which field to show the error on
+    }).refine(data => {
+        if (data.deliveryOption !== 'levantamento' && !data.deliveryAddress) {
+            return false;
+        }
+        return true;
+    }, {
+        message: "A morada é obrigatória para entrega ao domicílio.",
+        path: ["deliveryAddress"],
+    });
+
+    type CheckoutFormValues = z.infer<typeof conditionalCheckoutSchema>;
+
     const form = useForm<CheckoutFormValues>({
-        resolver: zodResolver(checkoutSchema),
+        resolver: zodResolver(conditionalCheckoutSchema),
         defaultValues: {
             studentName: "",
             classAndGrade: "",
@@ -119,29 +137,33 @@ export default function CheckoutForm() {
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 <div className="space-y-4 rounded-lg border bg-card p-6">
-                     <h3 className="text-xl font-semibold">Detalhes do Aluno e Responsável</h3>
-                    <FormField
-                        control={form.control}
-                        name="studentName"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Nome da/o Aluna/o</FormLabel>
-                                <FormControl><Input {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="classAndGrade"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Classe e Turma</FormLabel>
-                                <FormControl><Input {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                     <h3 className="text-xl font-semibold">Detalhes de Contacto</h3>
+                     { requiresStudentInfo && (
+                        <>
+                             <FormField
+                                control={form.control}
+                                name="studentName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Nome da/o Aluna/o</FormLabel>
+                                        <FormControl><Input {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="classAndGrade"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Classe e Turma</FormLabel>
+                                        <FormControl><Input {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </>
+                     )}
                      <FormField
                         control={form.control}
                         name="guardianName"

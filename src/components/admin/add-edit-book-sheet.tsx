@@ -53,6 +53,7 @@ const bookFormSchema = z.object({
   name: z.string().min(3, "O nome deve ter pelo menos 3 caracteres."),
   description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
   price: z.coerce.number().min(0, "O preço deve ser um número positivo."),
+  stock: z.coerce.number().min(0, "O stock deve ser um número positivo."),
   image: z.string().min(1, "A imagem é obrigatória."),
   category: z.string().min(1, "A categoria é obrigatória."),
   stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out']),
@@ -79,6 +80,7 @@ export function AddEditBookSheet({
       name: "",
       description: "",
       price: 0,
+      stock: 0,
       image: "",
       category: "",
       stockStatus: 'in_stock',
@@ -102,6 +104,7 @@ export function AddEditBookSheet({
           name: book.name,
           description: book.description,
           price: book.price,
+          stock: book.stock,
           image: book.image,
           category: book.category,
           stockStatus: book.stockStatus || 'in_stock',
@@ -113,6 +116,7 @@ export function AddEditBookSheet({
           name: "",
           description: "",
           price: 0,
+          stock: 0,
           image: "",
           category: "",
           stockStatus: "in_stock",
@@ -131,6 +135,7 @@ export function AddEditBookSheet({
         name: data.name,
         description: data.description,
         price: data.price,
+        stock: data.stock,
         image: data.image,
         images: [],
         category: data.category,
@@ -264,29 +269,42 @@ export function AddEditBookSheet({
                         </FormItem>
                         )}
                     />
-                     <FormField
+                    <FormField
                         control={form.control}
-                        name="category"
+                        name="stock"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Categoria</FormLabel>
-                             <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Selecione uma categoria" />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    {bookCategories.map(cat => (
-                                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <FormLabel>Stock</FormLabel>
+                            <FormControl>
+                            <Input type="number" {...field} />
+                            </FormControl>
                             <FormMessage />
                         </FormItem>
                         )}
                     />
                 </div>
+                <FormField
+                    control={form.control}
+                    name="category"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Categoria</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Selecione uma categoria" />
+                                </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                                {bookCategories.map(cat => (
+                                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
                  <FormField
                     control={form.control}
                     name="stockStatus"

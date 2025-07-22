@@ -149,6 +149,7 @@ export default function BooksPage() {
                 </TableHead>
                 <TableHead>Nome</TableHead>
                 <TableHead>Estado</TableHead>
+                <TableHead>Stock</TableHead>
                 <TableHead>Preço</TableHead>
                 <TableHead className="hidden md:table-cell">Plano de Leitura</TableHead>
                 <TableHead>
@@ -177,6 +178,9 @@ export default function BooksPage() {
                          {product.stockStatus === 'in_stock' && 'Em Stock'}
                          {product.stockStatus === 'out_of_stock' && 'Atraso na Entrega'}
                       </Badge>
+                   </TableCell>
+                   <TableCell>
+                    {product.stock}
                    </TableCell>
                   <TableCell>{product.price.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}</TableCell>
                   <TableCell className="hidden md:table-cell">

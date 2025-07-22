@@ -131,6 +131,10 @@ export default function Home() {
       }} />
     );
   };
+  
+  const calculateKitPrice = (products: Product[]) => {
+    return products.reduce((acc, product) => acc + product.price, 0);
+  }
 
 
   return (
@@ -174,18 +178,20 @@ export default function Home() {
                             <div className="space-y-6">
                                 <div className="grid gap-6 lg:grid-cols-2">
                                      <div className="rounded-lg border bg-card p-6">
-                                        <h3 className="font-headline text-2xl font-semibold">Kit Obrigatório do {grade}º Ano</h3>
+                                        <h3 className="font-headline text-2xl font-semibold">Kit Obrigatório ({gradeProducts.mandatory.length} livros)</h3>
                                         <p className="mt-2 text-muted-foreground">Compre todos os livros obrigatórios para o ano letivo.</p>
                                         <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.mandatory, `Kit Obrigatório do ${grade}º Ano - ${selectedSchool.name}`)}>
-                                            <ShoppingCart className="mr-2 h-5 w-5" /> Adicionar Kit Obrigatório
+                                            <ShoppingCart className="mr-2 h-5 w-5" /> 
+                                            Adicionar por {calculateKitPrice(gradeProducts.mandatory).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}
                                         </Button>
                                     </div>
                                     {gradeProducts.recommended.length > 0 && (
                                         <div className="rounded-lg border bg-card p-6">
-                                            <h3 className="font-headline text-2xl font-semibold">Kit Completo do {grade}º Ano</h3>
+                                            <h3 className="font-headline text-2xl font-semibold">Kit Completo ({gradeProducts.all.length} livros)</h3>
                                             <p className="mt-2 text-muted-foreground">Inclui livros obrigatórios e recomendados.</p>
                                             <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.all, `Kit Completo do ${grade}º Ano - ${selectedSchool.name}`)}>
-                                                <ShoppingCart className="mr-2 h-5 w-5" /> Adicionar Kit Completo
+                                                <ShoppingCart className="mr-2 h-5 w-5" /> 
+                                                Adicionar por {calculateKitPrice(gradeProducts.all).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}
                                             </Button>
                                         </div>
                                     )}

@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { orders as initialOrders } from "@/lib/data";
+import { orders as initialOrders, products as initialProducts } from "@/lib/data";
 import {
   Card,
   CardHeader,
@@ -18,19 +18,52 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { OrderReceiptSheet } from "@/components/admin/order-receipt";
-import type { Order } from "@/lib/types";
+import type { Order, Product } from "@/lib/types";
+import { ChevronDown } from "lucide-react";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState(initialOrders);
+  const [products, setProducts] = useState(initialProducts);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isReceiptOpen, setReceiptOpen] = useState(false);
 
   const viewReceipt = (order: Order) => {
     setSelectedOrder(order);
     setReceiptOpen(true);
+  };
+  
+  const handleStatusChange = (orderReference: string, newStatus: "pending" | "completed") => {
+    const originalStatus = orders.find(o => o.reference === orderReference)?.status;
+    
+    setOrders(prevOrders => prevOrders.map(order => 
+      order.reference === orderReference ? { ...order, status: newStatus } : order
+    ));
+
+    // Only deduct stock if status changes to completed from something else
+    if (newStatus === 'completed' && originalStatus !== 'completed') {
+      const order = orders.find(o => o.reference === orderReference);
+      if (order) {
+        setProducts(prevProducts => {
+          const newProducts = [...prevProducts];
+          order.items.forEach(item => {
+            const productIndex = newProducts.findIndex(p => p.id === item.id);
+            if (productIndex > -1 && newProducts[productIndex].stock !== undefined) {
+              newProducts[productIndex].stock! -= item.quantity;
+            }
+          });
+          return newProducts;
+        });
+      }
+    }
   };
 
   return (
@@ -61,7 +94,7 @@ export default function OrdersPage() {
                 <TableRow key={order.reference}>
                   <TableCell className="font-mono text-xs">{order.reference}</TableCell>
                   <TableCell className="font-medium">
-                    {order.studentName}
+                    {order.studentName || "N/A"}
                   </TableCell>
                   <TableCell>
                     {new Date(order.date).toLocaleDateString("pt-PT")}
@@ -73,20 +106,22 @@ export default function OrdersPage() {
                     })}
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={
-                        order.status === "pending" ? "secondary" : "default"
-                      }
-                      className={
-                        order.status === "completed"
-                          ? "bg-green-600 text-white"
-                          : ""
-                      }
-                    >
-                      {order.status === "pending"
-                        ? "Pendente"
-                        : "Concluída"}
-                    </Badge>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="capitalize">
+                                {order.status === 'pending' ? 'Pendente' : 'Concluída'}
+                                <ChevronDown className="ml-2 h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => handleStatusChange(order.reference, 'pending')}>
+                                Pendente
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleStatusChange(order.reference, 'completed')}>
+                                Concluída
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                   <TableCell className="text-right">
                     <Button
