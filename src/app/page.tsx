@@ -114,14 +114,9 @@ export default function Home() {
   const renderProductGridWithBadges = (products: Product[], grade: string) => {
     const gradePlan = schoolReadingPlan.filter(p => p.grade === Number(grade));
 
-    const productsWithStatus = products.map(p => {
-      const planItem = gradePlan.find(gp => gp.productId === p.id);
-      return { ...p, status: planItem?.status };
-    });
-
     return (
       <ProductGrid products={products} renderBadge={(product) => {
-        const planItem = gradePlan.find(p => p.grade === Number(grade) && p.productId === product.id);
+        const planItem = gradePlan.find(gp => gp.productId === product.id);
         if (planItem) {
           return (
             <Badge
@@ -145,9 +140,9 @@ export default function Home() {
         <div className="mx-auto w-full max-w-7xl">
           <Tabs defaultValue="planos" className="w-full" onValueChange={setActiveTab}>
             <TabsList className="grid h-auto w-full grid-cols-1 sm:grid-cols-3">
-              <TabsTrigger value="planos" className="py-3 text-lg font-semibold text-primary-foreground/70 data-[state=active]:bg-background/90 data-[state=active]:text-primary">Planos de Leitura</TabsTrigger>
-              <TabsTrigger value="catalogo" className="py-3 text-lg font-semibold text-primary-foreground/70 data-[state=active]:bg-background/90 data-[state=active]:text-primary">Todos os Livros</TabsTrigger>
-              <TabsTrigger value="jogos" className="py-3 text-lg font-semibold text-primary-foreground/70 data-[state=active]:bg-background/90 data-[state=active]:text-primary">Jogos e Outros</TabsTrigger>
+              <TabsTrigger value="planos" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">Planos de Leitura</TabsTrigger>
+              <TabsTrigger value="catalogo" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">Todos os Livros</TabsTrigger>
+              <TabsTrigger value="jogos" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">Jogos e Outros</TabsTrigger>
             </TabsList>
 
              <div className="mt-6">

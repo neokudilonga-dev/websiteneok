@@ -17,6 +17,7 @@ import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import CartItem from "./cart-item";
 import type { CartItem as CartItemType } from "@/lib/types";
+import Link from "next/link";
 
 export default function Cart() {
   const { cartItems, cartCount, cartTotal } = useCart();
@@ -76,9 +77,11 @@ export default function Cart() {
                 <p>{cartTotal.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}</p>
               </div>
               <SheetClose asChild>
-                <Button size="lg" className="w-full">
-                  Finalizar Compra
-                </Button>
+                 <Link href="/checkout" className="w-full">
+                    <Button size="lg" className="w-full">
+                        Finalizar Compra
+                    </Button>
+                </Link>
               </SheetClose>
             </SheetFooter>
           </>
