@@ -2,10 +2,10 @@
 import type { School, Product, ReadingPlanItem, Order } from "@/lib/types";
 
 export const schools: School[] = [
-  { id: "escola-a", name: "Escola Primária de Luanda" },
-  { id: "escola-b", name: "Colégio Pitruca" },
-  { id: "escola-c", name: "Liceu Angolano de Luanda" },
-  { id: "cat", name: "Colégio Angolano de Talatona" },
+  { id: "escola-a", name: "Escola Primária de Luanda", allowPickup: false },
+  { id: "escola-b", name: "Colégio Pitruca", allowPickup: false },
+  { id: "escola-c", name: "Liceu Angolano de Luanda", allowPickup: false },
+  { id: "cat", name: "Colégio Angolano de Talatona", allowPickup: true },
 ];
 
 export const bookCategories = ["Manual Escolar", "Ficção", "Não-Ficção", "Ciência", "História", "Literatura"];

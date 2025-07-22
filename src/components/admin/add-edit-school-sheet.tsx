@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/form";
 import type { School } from "@/lib/types";
 import { useEffect } from "react";
+import { Switch } from "../ui/switch";
 
 interface AddEditSchoolSheetProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ interface AddEditSchoolSheetProps {
 const schoolFormSchema = z.object({
   name: z.string().min(3, "O nome da escola deve ter pelo menos 3 caracteres."),
   id: z.string().min(3, "O ID deve ter pelo menos 3 caracteres.").regex(/^[a-z0-9-]+$/, "O ID só pode conter letras minúsculas, números e hífenes."),
+  allowPickup: z.boolean().default(false),
 });
 
 type SchoolFormValues = z.infer<typeof schoolFormSchema>;
@@ -50,6 +52,7 @@ export function AddEditSchoolSheet({
     defaultValues: {
       name: "",
       id: "",
+      allowPickup: false,
     },
   });
 
@@ -59,9 +62,10 @@ export function AddEditSchoolSheet({
         form.reset({
             name: school.name,
             id: school.id,
+            allowPickup: school.allowPickup || false,
         });
         } else {
-        form.reset({ name: "", id: "" });
+        form.reset({ name: "", id: "", allowPickup: false });
         }
     }
   }, [school, form, isOpen]);
@@ -109,6 +113,24 @@ export function AddEditSchoolSheet({
                       <Input placeholder="ex: escola-primaria-luanda" {...field} disabled={!!school} />
                     </FormControl>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="allowPickup"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel>Permitir Levantamento no Colégio</FormLabel>
+                       <FormMessage />
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
                   </FormItem>
                 )}
               />

@@ -26,6 +26,7 @@ export interface ReadingPlanItem {
 export interface School {
   id: string;
   name: string;
+  allowPickup?: boolean;
 }
 
 export interface CartItem extends Product {

@@ -9,7 +9,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, MoreHorizontal } from "lucide-react";
+import { PlusCircle, MoreHorizontal, CheckCircle, XCircle } from "lucide-react";
 import {
   Table,
   TableHeader,
@@ -77,7 +77,8 @@ export default function SchoolsPage() {
               <TableRow>
                 <TableHead>Nome da Escola</TableHead>
                 <TableHead>ID</TableHead>
-                <TableHead>
+                <TableHead>Permite Levantamento</TableHead>
+                <TableHead className="text-right">
                   <span className="sr-only">Ações</span>
                 </TableHead>
               </TableRow>
@@ -88,6 +89,13 @@ export default function SchoolsPage() {
                   <TableCell className="font-medium">{school.name}</TableCell>
                   <TableCell className="font-mono text-sm text-muted-foreground">{school.id}</TableCell>
                   <TableCell>
+                    {school.allowPickup ? (
+                        <CheckCircle className="h-5 w-5 text-green-500" />
+                    ) : (
+                        <XCircle className="h-5 w-5 text-destructive" />
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button

@@ -22,7 +22,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { useCart } from "@/context/cart-context";
 import { useToast } from "@/hooks/use-toast";
-import { readingPlan } from "@/lib/data";
+import { readingPlan, schools } from "@/lib/data";
 
 const checkoutSchema = z.object({
   studentName: z.string().optional(),
@@ -46,11 +46,27 @@ export default function CheckoutForm() {
     const { toast } = useToast();
     const { cartItems, cartTotal, clearCart } = useCart();
 
-    const requiresStudentInfo = useMemo(() => {
+    const readingPlanProductIdsInCart = useMemo(() => {
         const readingPlanProductIds = new Set(readingPlan.map(item => item.productId));
-        return cartItems.some(item => readingPlanProductIds.has(item.id));
+        return cartItems.filter(item => readingPlanProductIds.has(item.id));
     }, [cartItems]);
+
+    const requiresStudentInfo = readingPlanProductIdsInCart.length > 0;
     
+    const schoolsInCart = useMemo(() => {
+        const schoolIds = new Set(readingPlanProductIdsInCart.map(item => {
+            const rpItem = readingPlan.find(rp => rp.productId === item.id);
+            return rpItem?.schoolId;
+        }).filter(Boolean));
+
+        return schools.filter(school => schoolIds.has(school.id));
+    }, [readingPlanProductIdsInCart]);
+
+    const allowPickup = useMemo(() => {
+        return requiresStudentInfo && schoolsInCart.some(school => school.allowPickup);
+    }, [requiresStudentInfo, schoolsInCart]);
+
+
     const conditionalCheckoutSchema = checkoutSchema.refine(data => {
         if (requiresStudentInfo) {
             return !!data.studentName && !!data.classAndGrade;
@@ -79,13 +95,14 @@ export default function CheckoutForm() {
             phone: "",
             guardianName: "",
             email: "",
-            deliveryOption: "levantamento",
+            deliveryOption: "tala-morro",
             deliveryAddress: "",
             paymentMethod: "numerario",
         },
     });
 
     const deliveryOption = form.watch("deliveryOption");
+    const paymentMethod = form.watch("paymentMethod");
 
     const getDeliveryFee = () => {
         switch (deliveryOption) {
@@ -220,10 +237,12 @@ export default function CheckoutForm() {
                                             <FormControl><RadioGroupItem value="outras" /></FormControl>
                                             <FormLabel className="font-normal">Sim - fora das Zonas acima referidas - acresce 4000 AKZ</FormLabel>
                                         </FormItem>
-                                        <FormItem className="flex items-center space-x-3 space-y-0">
-                                            <FormControl><RadioGroupItem value="levantamento" /></FormControl>
-                                            <FormLabel className="font-normal">Não - levantamento no Colégio em data a confirmar</FormLabel>
-                                        </FormItem>
+                                        {allowPickup && (
+                                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                                <FormControl><RadioGroupItem value="levantamento" /></FormControl>
+                                                <FormLabel className="font-normal">Não - levantamento no Colégio em data a confirmar</FormLabel>
+                                            </FormItem>
+                                        )}
                                     </RadioGroup>
                                 </FormControl>
                                 <FormMessage />
@@ -258,10 +277,12 @@ export default function CheckoutForm() {
                                             <FormControl><RadioGroupItem value="numerario" /></FormControl>
                                             <FormLabel className="font-normal">Pagamento em numerário</FormLabel>
                                         </FormItem>
-                                        <FormItem className="flex items-center space-x-3 space-y-0">
-                                            <FormControl><RadioGroupItem value="multicaixa" /></FormControl>
-                                            <FormLabel className="font-normal">Pagamento com Multicaixa (não disponível para entregas)</FormLabel>
-                                        </FormItem>
+                                        {requiresStudentInfo && deliveryOption === 'levantamento' && (
+                                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                                <FormControl><RadioGroupItem value="multicaixa" /></FormControl>
+                                                <FormLabel className="font-normal">Pagamento com Multicaixa (não disponível para entregas)</FormLabel>
+                                            </FormItem>
+                                        )}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl><RadioGroupItem value="transferencia" /></FormControl>
                                             <FormLabel className="font-normal">Pagamento por transferência bancária ou depósito</FormLabel>
