@@ -12,7 +12,7 @@ export default function Header() {
       <div className="container flex h-20 items-center justify-between">
         <div className="flex items-center gap-6 md:gap-10">
           <Link href="/" className="flex items-center space-x-2">
-            <BiblioAngolaLogo className="h-12 w-auto" />
+            <BiblioAngolaLogo className="h-16 w-auto" />
           </Link>
           <nav className="hidden items-center gap-6 md:flex">
              <Link href="/quem-somos" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
