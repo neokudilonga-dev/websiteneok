@@ -23,7 +23,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from "@/components/ui/sidebar";
-import { NeokudilongaLogo } from "@/components/logo";
+import { BiblioAngolaLogoAbbr } from "@/components/logo";
 
 export default function AdminLayout({
   children,
@@ -41,10 +41,9 @@ export default function AdminLayout({
             <SidebarHeader>
               <Link
                 href="/"
-                className="mb-2 flex items-center gap-2 rounded-lg px-2 py-1.5 text-xl font-semibold outline-none ring-primary focus-visible:ring-2"
+                className="mb-2 flex items-center justify-center gap-2 rounded-lg px-2 py-1.5 text-xl font-semibold outline-none ring-primary focus-visible:ring-2"
               >
-                <NeokudilongaLogo className="size-8" />
-                <span className="font-headline">Neokudilonga</span>
+                <BiblioAngolaLogoAbbr className="size-8" />
               </Link>
             </SidebarHeader>
             <SidebarMenu>

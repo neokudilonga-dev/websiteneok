@@ -8,7 +8,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { NeokudilongaLogo } from "@/components/logo";
+import { BiblioAngolaLogo } from "@/components/logo";
 import { Separator } from "@/components/ui/separator";
 import type { Order } from "@/lib/types";
 
@@ -35,7 +35,7 @@ export function OrderReceiptSheet({
         </SheetHeader>
         <div id="receipt" className="mt-4 flex flex-col space-y-4 p-4 border rounded-lg bg-white text-black">
           <div className="text-center">
-            <NeokudilongaLogo className="h-12 mx-auto" />
+            <BiblioAngolaLogo className="h-12 mx-auto" />
             <p className="text-sm font-bold text-[#DAA520]">Fun Learning</p>
           </div>
           <table className="w-full text-sm border-collapse">
