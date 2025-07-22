@@ -2,12 +2,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Book,
   Building,
   Gamepad2,
   Home,
+  LogOut,
   School,
   ShoppingCart,
   Tags,
@@ -22,8 +23,14 @@ import {
   SidebarMenuButton,
   SidebarTrigger,
   SidebarInset,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 import { BiblioAngolaLogoAbbr } from "@/components/logo";
+import { useAuth } from "@/context/auth-context";
+import { auth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 
 export default function AdminLayout({
   children,
@@ -31,7 +38,14 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user } = useAuth();
   const isActive = (path: string) => pathname === path;
+
+  const handleSignOut = async () => {
+    await signOut(auth);
+    router.push('/login');
+  };
 
   return (
     <SidebarProvider>
@@ -140,6 +154,22 @@ export default function AdminLayout({
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>
+           <SidebarFooter>
+              <div className="flex items-center gap-2">
+                 <Avatar className="h-8 w-8">
+                    {user?.photoURL && <AvatarImage src={user.photoURL} alt={user.displayName || ""} />}
+                    <AvatarFallback>{user?.email?.[0].toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col text-sm">
+                    <span className="font-semibold text-foreground">{user?.displayName}</span>
+                    <span className="text-muted-foreground">{user?.email}</span>
+                </div>
+              </div>
+               <Button variant="ghost" onClick={handleSignOut} className="w-full justify-start">
+                  <LogOut className="mr-2" />
+                  Terminar Sessão
+                </Button>
+            </SidebarFooter>
         </Sidebar>
         <SidebarInset>
           <header className="flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
