@@ -73,8 +73,8 @@ export default function Cart() {
             <SheetFooter className="mt-auto flex flex-col gap-4 bg-background p-6">
               <Separator />
               <div className="flex items-center justify-between text-lg font-semibold">
-                <p>Total</p>
-                <p>{cartTotal.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}</p>
+                <span>Total</span>
+                <span>{cartTotal.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}</span>
               </div>
               <SheetClose asChild>
                  <Link href="/checkout" className="w-full">

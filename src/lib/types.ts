@@ -1,4 +1,5 @@
 
+
 export interface Product {
   id: string;
   name: string;
@@ -30,4 +31,20 @@ export interface CartItem extends Product {
   quantity: number;
   kitId?: string;
   kitName?: string;
+}
+
+export interface Order {
+  reference: string;
+  date: string;
+  studentName: string;
+  guardianName: string;
+  phone: string;
+  email: string;
+  deliveryOption: string;
+  deliveryAddress: string | null;
+  paymentMethod: string;
+  items: CartItem[];
+  total: number;
+  deliveryFee: number;
+  status: 'pending' | 'completed';
 }

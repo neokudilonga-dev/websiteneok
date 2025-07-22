@@ -1,9 +1,11 @@
-import type { School, Product, ReadingPlanItem } from "@/lib/types";
+
+import type { School, Product, ReadingPlanItem, Order } from "@/lib/types";
 
 export const schools: School[] = [
   { id: "escola-a", name: "Escola Primária de Luanda" },
   { id: "escola-b", name: "Colégio Pitruca" },
   { id: "escola-c", name: "Liceu Angolano de Luanda" },
+  { id: "cat", name: "Colégio Angolano de Talatona" },
 ];
 
 export const bookCategories = ["Manual Escolar", "Ficção", "Não-Ficção", "Ciência", "História", "Literatura"];
@@ -144,7 +146,10 @@ export const products: Product[] = [
     dataAiHint: "literature book",
     category: "Literatura",
     stockStatus: "in_stock",
-  }
+  },
+  { id: 'cat-1-1', name: 'A Viagem do Pai Natal', price: 5500, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)' },
+  { id: 'cat-1-2', name: 'Estrofes da Bicharada', price: 5000, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)' },
+  { id: 'cat-1-3', name: 'A Aventura do vento e outros Contos', price: 8500, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)' },
 ];
 
 export const readingPlan: ReadingPlanItem[] = [
@@ -155,4 +160,46 @@ export const readingPlan: ReadingPlanItem[] = [
     { id: 'rp-5', productId: 'book-4', schoolId: 'escola-c', grade: 9, status: 'mandatory' },
     { id: 'rp-6', productId: 'book-5', schoolId: 'escola-b', grade: 7, status: 'mandatory' },
     { id: 'rp-7', productId: 'book-7', schoolId: 'escola-c', grade: 11, status: 'mandatory' },
+    { id: 'rp-8', productId: 'cat-1-1', schoolId: 'cat', grade: 1, status: 'mandatory' },
+    { id: 'rp-9', productId: 'cat-1-2', schoolId: 'cat', grade: 1, status: 'mandatory' },
+    { id: 'rp-10', productId: 'cat-1-3', schoolId: 'cat', grade: 1, status: 'mandatory' },
 ];
+
+export const orders: Order[] = [
+  {
+    reference: 'CAT-2025001',
+    date: '2024-07-21T10:00:00Z',
+    studentName: 'João Melo',
+    guardianName: 'Maria Machado',
+    phone: '923923923',
+    email: 'maria.machado@example.com',
+    deliveryOption: 'tala-morro',
+    deliveryAddress: 'Condomínio Flores',
+    paymentMethod: 'numerario',
+    items: [
+      { id: 'cat-1-1', name: 'A Viagem do Pai Natal', price: 5500, quantity: 1, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)' },
+      { id: 'cat-1-2', name: 'Estrofes da Bicharada', price: 5000, quantity: 1, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)' },
+      { id: 'cat-1-3', name: 'A Aventura do vento e outros Contos', price: 6500, quantity: 1, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)' },
+    ],
+    deliveryFee: 2000,
+    total: 19000,
+    status: 'completed',
+  },
+    {
+    reference: 'CAT-2025002',
+    date: '2024-07-22T11:30:00Z',
+    studentName: 'Ana Silva',
+    guardianName: 'Carlos Silva',
+    phone: '912345678',
+    email: 'carlos.silva@example.com',
+    deliveryOption: 'levantamento',
+    deliveryAddress: '',
+    paymentMethod: 'transferencia',
+    items: [
+      { id: 'book-1', name: 'Jornada da Matemática 1º Ano', price: 1599, quantity: 1, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Um livro de matemática interativo para a primeira classe.' },
+    ],
+    deliveryFee: 0,
+    total: 1599,
+    status: 'pending',
+  }
+]
