@@ -12,7 +12,7 @@ export default function QuemSomosPage() {
             <div className="space-y-12">
                 <div className="text-center">
                     <h1 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">
-                        Sobre a BiblioAngola
+                        Sobre a Neokudilonga
                     </h1>
                     <p className="mt-4 text-lg text-muted-foreground">
                         Conectando conhecimento e futuro através de livros e tecnologia.
@@ -26,11 +26,11 @@ export default function QuemSomosPage() {
                             A nossa missão é fornecer materiais educativos de alta qualidade, desde livros escolares a jogos didáticos, para apoiar o percurso de aprendizagem dos estudantes em Angola. Acreditamos que o acesso ao conhecimento é a chave para o desenvolvimento e um futuro mais próspero.
                         </p>
                         <p className="mt-4 text-muted-foreground">
-                            Na BiblioAngola, combinamos a tradição das livrarias com a conveniência da tecnologia moderna, criando uma plataforma fácil de usar para pais, estudantes e escolas.
+                            Na Neokudilonga, combinamos a tradição das livrarias com a conveniência da tecnologia moderna, criando uma plataforma fácil de usar para pais, estudantes e escolas.
                         </p>
                     </div>
                      <div className="flex items-center justify-center rounded-lg bg-primary/10 p-8">
-                        <BiblioAngolaLogo className="h-48 w-auto text-primary" />
+                        <BiblioAngolaLogo className="h-auto w-full max-w-[300px] text-primary" />
                     </div>
                 </div>
 
@@ -48,7 +48,7 @@ export default function QuemSomosPage() {
                     <div className="order-first md:order-last">
                         <h2 className="font-headline text-2xl font-semibold">A Nossa História</h2>
                         <p className="mt-4 text-muted-foreground">
-                           Fundada com a paixão pela educação, a BiblioAngola nasceu da vontade de simplificar o acesso a materiais escolares em Angola. Começámos como uma pequena livraria e, com o tempo, crescemos para nos tornarmos uma referência no setor, sempre focados nas necessidades das nossas comunidades escolares.
+                           Fundada com a paixão pela educação, a Neokudilonga nasceu da vontade de simplificar o acesso a materiais escolares em Angola. Começámos como uma pequena livraria e, com o tempo, crescemos para nos tornarmos uma referência no setor, sempre focados nas necessidades das nossas comunidades escolares.
                         </p>
                     </div>
                 </div>
