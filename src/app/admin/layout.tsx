@@ -129,11 +129,13 @@ export default function AdminLayout({
           </SidebarContent>
         </Sidebar>
         <SidebarInset>
-          <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+          <header className="flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
             <SidebarTrigger className="sm:hidden" />
             <h1 className="font-headline text-2xl font-semibold">Painel de Administração</h1>
           </header>
-          <main className="flex-1 p-4 sm:p-6">{children}</main>
+          <div className="overflow-x-auto">
+            <main className="flex-1 p-4 sm:p-6">{children}</main>
+          </div>
         </SidebarInset>
       </div>
     </SidebarProvider>
