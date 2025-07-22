@@ -9,12 +9,12 @@ import { BiblioAngolaLogo } from "./logo";
 export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-20 items-center space-x-4 sm:justify-between sm:space-x-0">
+      <div className="container flex h-20 items-center justify-between">
         <div className="flex items-center gap-6 md:gap-10">
           <Link href="/" className="flex items-center space-x-2">
-            <BiblioAngolaLogo className="h-12 w-auto" />
+            <BiblioAngolaLogo className="h-16 w-auto" />
           </Link>
-          <nav className="hidden gap-6 md:flex">
+          <nav className="hidden items-center gap-6 md:flex">
              <Link href="/quem-somos" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
                 Quem Somos
              </Link>
@@ -23,7 +23,7 @@ export default function Header() {
              </Link>
           </nav>
         </div>
-        <div className="flex flex-1 items-center justify-end space-x-4">
+        <div className="flex items-center justify-end space-x-4">
           <nav className="flex items-center space-x-2">
             <Cart />
             <Link href="/admin">
