@@ -26,9 +26,11 @@ export default function Header() {
           </nav>
           <div className="flex items-center space-x-2">
             <Cart />
-            <Link href="/admin">
-              <Button variant="ghost" size="sm">Admin</Button>
-            </Link>
+             {process.env.NEXT_PUBLIC_SHOW_ADMIN_BUTTON === 'true' && (
+              <Link href="/admin">
+                <Button variant="ghost" size="sm">Admin</Button>
+              </Link>
+            )}
           </div>
         </div>
       </div>
