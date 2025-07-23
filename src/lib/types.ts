@@ -37,6 +37,9 @@ export interface CartItem extends Product {
   kitName?: string;
 }
 
+export type PaymentStatus = 'paid' | 'unpaid' | 'partially_paid' | 'cancelled' | 'cod';
+export type DeliveryStatus = 'delivered' | 'not_delivered' | 'school_pickup' | 'out_of_stock' | 'cancelled';
+
 export interface Order {
   reference: string;
   date: string;
@@ -50,5 +53,8 @@ export interface Order {
   items: CartItem[];
   total: number;
   deliveryFee: number;
-  status: 'pending' | 'completed';
+  paymentStatus: PaymentStatus;
+  deliveryStatus: DeliveryStatus;
+  schoolId?: string;
+  schoolName?: string;
 }

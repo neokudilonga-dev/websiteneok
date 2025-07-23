@@ -210,7 +210,10 @@ export const orders: Order[] = [
     ],
     deliveryFee: 2000,
     total: 19000,
-    status: 'completed',
+    paymentStatus: 'paid',
+    deliveryStatus: 'delivered',
+    schoolId: 'cat',
+    schoolName: 'Colégio Angolano de Talatona'
   },
     {
     reference: 'CAT-2025002',
@@ -227,6 +230,9 @@ export const orders: Order[] = [
     ],
     deliveryFee: 0,
     total: 1599,
-    status: 'pending',
+    paymentStatus: 'unpaid',
+    deliveryStatus: 'not_delivered',
+    schoolId: 'escola-a',
+    schoolName: 'Escola Primária de Luanda'
   }
 ]
