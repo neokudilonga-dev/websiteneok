@@ -2,257 +2,105 @@
 import type { School, Product, ReadingPlanItem, Order } from "@/lib/types";
 
 export const schools: School[] = [
-  { id: "escola-a", name: "Escola Primária de Luanda", abbreviation: "EPL", allowPickup: false, allowPickupAtLocation: true },
-  { id: "escola-b", name: "Colégio Pitruca", abbreviation: "CPT", allowPickup: false, allowPickupAtLocation: true },
-  { id: "escola-c", name: "Liceu Angolano de Luanda", abbreviation: "LAL", allowPickup: false, allowPickupAtLocation: true },
-  { id: "cat", name: "Colégio Angolano de Talatona", abbreviation: "CAT", allowPickup: true, allowPickupAtLocation: true },
+  { id: "palanquinhas", name: "Palanquinhas", abbreviation: "PAL", allowPickup: true, allowPickupAtLocation: true },
 ];
 
 export const bookCategories = ["Manual Escolar", "Ficção", "Não-Ficção", "Ciência", "História", "Literatura", "Obrigatórios/ Leitura Orientada", "Sugeridos/ Leitura Recomendada"];
 
 export const publishers = ["Editora Angola", "Livros & Cia", "Saber Mais", "Plural Editores", "Mayamba Editora", "Texto Editores", "ASA"];
 
-
 export const products: Product[] = [
-  {
-    id: "book-1",
-    name: "Jornada da Matemática 1º Ano",
-    description: "Um livro de matemática interativo para a primeira classe.",
-    price: 1599.00,
-    stock: 50,
-    image: "https://placehold.co/600x400.png",
-    images: [],
-    type: "book",
-    dataAiHint: "math textbook",
-    category: "Manual Escolar",
-    stockStatus: "in_stock",
-    publisher: "Saber Mais",
-  },
-  {
-    id: "book-2",
-    name: "Explorador da Ciência 1º Ano",
-    description: "Descubra o mundo ao seu redor com experiências divertidas.",
-    price: 1850.00,
-    stock: 30,
-    image: "https://placehold.co/600x400.png",
-    images: [],
-    type: "book",
-    dataAiHint: "science textbook",
-    category: "Ciência",
-    stockStatus: "in_stock",
-    publisher: "Editora Angola",
-  },
-  {
-    id: "game-1",
-    name: "Blocos do Alfabeto",
-    description: "Uma forma divertida de aprender o alfabeto.",
-    price: 2500.00,
-    stock: 20,
-    image: "",
-    images: ["https://placehold.co/600x400.png", "https://placehold.co/600x400.png"],
-    type: "game",
-    dataAiHint: "alphabet blocks",
-    stockStatus: "in_stock",
-  },
-  {
-    id: "book-3",
-    name: "Química Avançada",
-    description: "Um guia completo de química para o ensino secundário.",
-    price: 3500.00,
-    stock: 0,
-    image: "https://placehold.co/600x400.png",
-    images: [],
-    type: "book",
-    dataAiHint: "chemistry textbook",
-    category: "Ciência",
-    stockStatus: "out_of_stock",
-    publisher: "Livros & Cia",
-  },
-  {
-    id: "book-4",
-    name: "História de Angola",
-    description: "Dos reinos antigos aos dias de hoje.",
-    price: 2299.00,
-    stock: 40,
-    image: "https://placehold.co/600x400.png",
-    images: [],
-    type: "book",
-    dataAiHint: "history book",
-    category: "História",
-    stockStatus: "in_stock",
-    publisher: "Mayamba Editora",
-  },
-  {
-    id: "game-2",
-    name: "Mestre do Código",
-    description: "Aprenda a lógica de programação através de um divertido jogo de tabuleiro.",
-    price: 4500.00,
-    stock: 15,
-    image: "",
-    images: ["https://placehold.co/600x400.png"],
-    type: "game",
-    dataAiHint: "coding game",
-    stockStatus: "in_stock",
-  },
-  {
-    id: "book-5",
-    name: "Gramática Portuguesa",
-    description: "Domine as regras da língua portuguesa.",
-    price: 1999.00,
-    stock: 60,
-    image: "https://placehold.co/600x400.png",
-    images: [],
-    type: "book",
-    dataAiHint: "language book",
-    category: "Manual Escolar",
-    stockStatus: "in_stock",
-    publisher: "Texto Editores",
-  },
-  {
-    id: "book-6",
-    name: "Atlas do Mundo",
-    description: "Explore o mundo com mapas detalhados.",
-    price: 2995.00,
-    stock: 0,
-    image: "https://placehold.co/600x400.png",
-    images: [],
-    type: "book",
-    dataAiHint: "atlas book",
-    category: "Não-Ficção",
-    stockStatus: "sold_out",
-    publisher: "Plural Editores",
-  },
-   {
-    id: "game-3",
-    name: "Duelo de Feiticeiros Matemáticos",
-    description: "Um jogo de cartas competitivo para praticar habilidades matemáticas.",
-    price: 1450.00,
-    stock: 25,
-    image: "",
-    images: ["https://placehold.co/600x400.png"],
-    type: "game",
-    dataAiHint: "math game",
-    stockStatus: "in_stock",
-  },
-   {
-    id: "game-4",
-    name: "Cidade Estratégica",
-    description: "Construa a sua própria cidade e gira os recursos.",
-    price: 3999.00,
-    stock: 10,
-    image: "",
-    images: ["https://placehold.co/600x400.png"],
-    type: "game",
-    dataAiHint: "board game",
-    stockStatus: "out_of_stock",
-  },
-  {
-    id: "book-7",
-    name: "Física para Principiantes",
-    description: "Introdução aos conceitos fundamentais da física.",
-    price: 3200.00,
-    stock: 20,
-    image: "https://placehold.co/600x400.png",
-    images: [],
-    type: "book",
-    dataAiHint: "physics textbook",
-    category: "Ciência",
-    stockStatus: "in_stock",
-    publisher: "Saber Mais",
-  },
-  {
-    id: "book-8",
-    name: "Clássicos da Literatura",
-    description: "Uma coleção de obras literárias clássicas.",
-    price: 2450.00,
-    stock: 35,
-    image: "https://placehold.co/600x400.png",
-    images: [],
-    type: "book",
-    dataAiHint: "literature book",
-    category: "Literatura",
-    stockStatus: "in_stock",
-    publisher: "ASA",
-  },
-  { id: 'cat-1-1', name: 'A Viagem do Pai Natal', price: 5500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada)', publisher: "Mayamba Editora" },
-  { id: 'cat-1-2', name: 'Estrofes da Bicharada', price: 5000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada)', publisher: "Plural Editores" },
-  { id: 'cat-1-3', name: 'A Aventura do vento e outros Contos', price: 8500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada)', publisher: "Texto Editores" },
+  // 1st Grade
+  { id: 'pal-1-1', name: 'Estrofes da Bicharada', price: 5500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'pal-1-2', name: 'Lengalengas Trava-línguas', price: 6500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'pal-1-3', name: 'O Passeio dos Patos', price: 4500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  
+  // 2nd Grade
+  { id: 'pal-2-1', name: 'Histórias com Adivinhas', price: 5500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '2ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'pal-2-2', name: 'União Arco-Íris', price: 4500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '2ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'pal-2-3', name: 'Tombe menino perna mágica', price: 3500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '2ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+
+  // 3rd Grade
+  { id: 'pal-3-1', name: 'Vari a incrível Palanca', price: 5000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '3ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'pal-3-2', name: 'Corpos Celestes', price: 5500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '3ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'pal-3-3', name: 'Sona a Beleza de um desenho', price: 5500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '3ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+
+  // 4th Grade
+  { id: 'pal-4-1', name: 'Duas Abelhas Amigas de um Girassol', price: 5500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '4ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'pal-4-2', name: 'A Mangueira dos Kwanzas', price: 5000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '4ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'pal-4-3', name: 'Gosto deles porque sim', price: 7000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '4ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+
+  // 5th Grade
+  { id: 'pal-5-1', name: 'A Idade da Memória', price: 10000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '5ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'pal-5-2', name: 'Guerra dos Fazedores de chuva', price: 8000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '5ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'pal-5-3', name: 'O Livro que falava com o vento', price: 6000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '5ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+
+  // 6th Grade
+  { id: 'pal-6-1', name: 'Determinação', price: 7000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '6ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'pal-6-2', name: 'Com verso comigo', price: 3000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '6ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'pal-6-3', name: 'O Principezinho', price: 10000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '6ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+
+  // 7th Grade
+  { id: 'pal-7-1', name: 'Quem me dera ser onda', price: 6000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '7a Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'pal-7-2', name: 'Os vivos, o morto e o peixe frito', price: 7000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '7a Classe (com pequenos defeitos que não afectam a leitura)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'pal-7-3', name: 'Alma de Kaluanda', price: 7500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '7a Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+
+  // 8th Grade
+  { id: 'pal-8-1', name: 'Os da minha rua', price: 10000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '8a Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'pal-8-2', name: 'Fábulas de Sanji', price: 6000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '8a Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'pal-8-3', name: 'Vidas Novas', price: 4000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '8a Classe (com pequenos defeitos que não afectam a leitura)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  
+  // 9th Grade
+  { id: 'pal-9-1', name: 'Undengue', price: 5000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '9a Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'pal-9-2', name: 'Do rio ao Mar', price: 5000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '9a Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'pal-9-3', name: 'Teoria Geral do Esquecimento', price: 10000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '9a Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
 ];
 
 export const readingPlan: ReadingPlanItem[] = [
-    { id: 'rp-1', productId: 'book-1', schoolId: 'escola-a', grade: 1, status: 'mandatory' },
-    { id: 'rp-2', productId: 'book-2', schoolId: 'escola-a', grade: 1, status: 'recommended' },
-    { id: 'rp-3', productId: 'book-3', schoolId: 'escola-c', grade: 12, status: 'mandatory' },
-    { id: 'rp-4', productId: 'book-4', schoolId: 'escola-b', grade: 8, status: 'mandatory' },
-    { id: 'rp-5', productId: 'book-4', schoolId: 'escola-c', grade: 9, status: 'mandatory' },
-    { id: 'rp-6', productId: 'book-5', schoolId: 'escola-b', grade: 7, status: 'mandatory' },
-    { id: 'rp-7', productId: 'book-7', schoolId: 'escola-c', grade: 11, status: 'mandatory' },
-    { id: 'rp-8', productId: 'cat-1-1', schoolId: 'cat', grade: 1, status: 'mandatory' },
-    { id: 'rp-9', productId: 'cat-1-2', schoolId: 'cat', grade: 1, status: 'mandatory' },
-    { id: 'rp-10', productId: 'cat-1-3', schoolId: 'cat', grade: 1, status: 'mandatory' },
+    // 1st Grade
+    { id: 'rp-pal-1-1', productId: 'pal-1-1', schoolId: 'palanquinhas', grade: 1, status: 'mandatory' },
+    { id: 'rp-pal-1-2', productId: 'pal-1-2', schoolId: 'palanquinhas', grade: 1, status: 'mandatory' },
+    { id: 'rp-pal-1-3', productId: 'pal-1-3', schoolId: 'palanquinhas', grade: 1, status: 'mandatory' },
+    
+    // 2nd Grade
+    { id: 'rp-pal-2-1', productId: 'pal-2-1', schoolId: 'palanquinhas', grade: 2, status: 'mandatory' },
+    { id: 'rp-pal-2-2', productId: 'pal-2-2', schoolId: 'palanquinhas', grade: 2, status: 'mandatory' },
+    { id: 'rp-pal-2-3', productId: 'pal-2-3', schoolId: 'palanquinhas', grade: 2, status: 'mandatory' },
+
+    // 3rd Grade
+    { id: 'rp-pal-3-1', productId: 'pal-3-1', schoolId: 'palanquinhas', grade: 3, status: 'mandatory' },
+    { id: 'rp-pal-3-2', productId: 'pal-3-2', schoolId: 'palanquinhas', grade: 3, status: 'mandatory' },
+    { id: 'rp-pal-3-3', productId: 'pal-3-3', schoolId: 'palanquinhas', grade: 3, status: 'mandatory' },
+
+    // 4th Grade
+    { id: 'rp-pal-4-1', productId: 'pal-4-1', schoolId: 'palanquinhas', grade: 4, status: 'mandatory' },
+    { id: 'rp-pal-4-2', productId: 'pal-4-2', schoolId: 'palanquinhas', grade: 4, status: 'mandatory' },
+    { id: 'rp-pal-4-3', productId: 'pal-4-3', schoolId: 'palanquinhas', grade: 4, status: 'mandatory' },
+
+    // 5th Grade
+    { id: 'rp-pal-5-1', productId: 'pal-5-1', schoolId: 'palanquinhas', grade: 5, status: 'mandatory' },
+    { id: 'rp-pal-5-2', productId: 'pal-5-2', schoolId: 'palanquinhas', grade: 5, status: 'mandatory' },
+    { id: 'rp-pal-5-3', productId: 'pal-5-3', schoolId: 'palanquinhas', grade: 5, status: 'mandatory' },
+
+    // 6th Grade
+    { id: 'rp-pal-6-1', productId: 'pal-6-1', schoolId: 'palanquinhas', grade: 6, status: 'mandatory' },
+    { id: 'rp-pal-6-2', productId: 'pal-6-2', schoolId: 'palanquinhas', grade: 6, status: 'mandatory' },
+    { id: 'rp-pal-6-3', productId: 'pal-6-3', schoolId: 'palanquinhas', grade: 6, status: 'mandatory' },
+
+    // 7th Grade
+    { id: 'rp-pal-7-1', productId: 'pal-7-1', schoolId: 'palanquinhas', grade: 7, status: 'mandatory' },
+    { id: 'rp-pal-7-2', productId: 'pal-7-2', schoolId: 'palanquinhas', grade: 7, status: 'mandatory' },
+    { id: 'rp-pal-7-3', productId: 'pal-7-3', schoolId: 'palanquinhas', grade: 7, status: 'mandatory' },
+
+    // 8th Grade
+    { id: 'rp-pal-8-1', productId: 'pal-8-1', schoolId: 'palanquinhas', grade: 8, status: 'mandatory' },
+    { id: 'rp-pal-8-2', productId: 'pal-8-2', schoolId: 'palanquinhas', grade: 8, status: 'mandatory' },
+    { id: 'rp-pal-8-3', productId: 'pal-8-3', schoolId: 'palanquinhas', grade: 8, status: 'mandatory' },
+
+    // 9th Grade
+    { id: 'rp-pal-9-1', productId: 'pal-9-1', schoolId: 'palanquinhas', grade: 9, status: 'mandatory' },
+    { id: 'rp-pal-9-2', productId: 'pal-9-2', schoolId: 'palanquinhas', grade: 9, status: 'mandatory' },
+    { id: 'rp-pal-9-3', productId: 'pal-9-3', schoolId: 'palanquinhas', grade: 9, status: 'mandatory' },
 ];
 
-export const orders: Order[] = [
-  {
-    reference: 'CAT-2025001',
-    date: '2024-07-21T10:00:00Z',
-    studentName: 'João Melo',
-    guardianName: 'Maria Machado',
-    phone: '923923923',
-    email: 'maria.machado@example.com',
-    deliveryOption: 'tala-morro',
-    deliveryAddress: 'Condomínio Flores',
-    paymentMethod: 'numerario',
-    items: [
-      { id: 'cat-1-1', name: 'A Viagem do Pai Natal', price: 5500, quantity: 1, type: 'book', stock: 100, image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada)', publisher: "Mayamba Editora" },
-      { id: 'cat-1-2', name: 'Estrofes da Bicharada', price: 5000, quantity: 1, type: 'book', stock: 100, image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada)', publisher: "Plural Editores" },
-      { id: 'cat-1-3', name: 'A Aventura do vento e outros Contos', price: 6500, quantity: 1, type: 'book', stock: 100, image: "https://placehold.co/600x400.png", images: [], description: '1ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada)', publisher: "Texto Editores" },
-    ],
-    deliveryFee: 2000,
-    total: 19000,
-    paymentStatus: 'paid',
-    deliveryStatus: 'delivered',
-    schoolId: 'cat',
-    schoolName: 'Colégio Angolano de Talatona'
-  },
-    {
-    reference: 'EPL-2025002',
-    date: '2024-07-22T11:30:00Z',
-    studentName: 'Ana Silva',
-    guardianName: 'Carlos Silva',
-    phone: '912345678',
-    email: 'carlos.silva@example.com',
-    deliveryOption: 'levantamento',
-    deliveryAddress: '',
-    paymentMethod: 'transferencia',
-    items: [
-      { id: 'book-1', name: 'Jornada da Matemática 1º Ano', price: 1599, quantity: 1, type: 'book', stock: 50, image: "https://placehold.co/600x400.png", images: [], description: 'Um livro de matemática interativo para a primeira classe.', category: "Manual Escolar", publisher: "Saber Mais" },
-    ],
-    deliveryFee: 0,
-    total: 1599,
-    paymentStatus: 'unpaid',
-    deliveryStatus: 'not_delivered',
-    schoolId: 'escola-a',
-    schoolName: 'Escola Primária de Luanda'
-  },
-  {
-    reference: 'LIV-2025003',
-    date: '2024-07-23T14:00:00Z',
-    studentName: undefined,
-    guardianName: 'Rui Costa',
-    phone: '933445566',
-    email: 'rui.costa@example.com',
-    deliveryOption: 'outras',
-    deliveryAddress: 'Viana, Luanda',
-    paymentMethod: 'numerario',
-    items: [
-      { id: 'game-2', name: 'Mestre do Código', price: 4500, quantity: 1, type: 'game', stock: 15, image: "", images: ["https://placehold.co/600x400.png"], description: "Aprenda a lógica de programação através de um divertido jogo de tabuleiro.", stockStatus: "in_stock" },
-    ],
-    deliveryFee: 4000,
-    total: 8500,
-    paymentStatus: 'cod',
-    deliveryStatus: 'not_delivered',
-    schoolId: 'livraria',
-    schoolName: 'Livraria'
-  }
-]
+export const orders: Order[] = [];
