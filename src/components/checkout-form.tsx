@@ -121,6 +121,17 @@ export default function CheckoutForm() {
     const deliveryFee = getDeliveryFee();
     const finalTotal = cartTotal + deliveryFee;
 
+    const generateOrderReference = () => {
+        let prefix = "LIV";
+        if (schoolsInCart.length > 0) {
+            const school = schools.find(s => s.id === schoolsInCart[0].id);
+            if (school) {
+                prefix = school.abbreviation;
+            }
+        }
+        return `${prefix}-${new Date().getFullYear()}${(Math.random() * 90000 + 10000).toFixed(0)}`;
+    }
+
     const onSubmit = (data: CheckoutFormValues) => {
         if(cartItems.length === 0){
             toast({
@@ -131,7 +142,7 @@ export default function CheckoutForm() {
             return;
         }
 
-        const orderReference = `CAT-${new Date().getFullYear()}${(Math.random() * 90000 + 10000).toFixed(0)}`;
+        const orderReference = generateOrderReference();
         
         // In a real app, you would send this data to your backend API
         const orderData = {

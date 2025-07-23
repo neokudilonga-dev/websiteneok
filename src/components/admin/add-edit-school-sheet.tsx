@@ -37,6 +37,7 @@ interface AddEditSchoolSheetProps {
 const schoolFormSchema = z.object({
   name: z.string().min(3, "O nome da escola deve ter pelo menos 3 caracteres."),
   id: z.string().min(3, "O ID deve ter pelo menos 3 caracteres.").regex(/^[a-z0-9-]+$/, "O ID só pode conter letras minúsculas, números e hífenes."),
+  abbreviation: z.string().min(2, "A abreviação deve ter pelo menos 2 caracteres.").max(5, "A abreviação não pode ter mais de 5 caracteres.").regex(/^[A-Z0-9]+$/, "A abreviação só pode conter letras maiúsculas e números."),
   allowPickup: z.boolean().default(false),
   allowPickupAtLocation: z.boolean().default(false),
 });
@@ -54,6 +55,7 @@ export function AddEditSchoolSheet({
     defaultValues: {
       name: "",
       id: "",
+      abbreviation: "",
       allowPickup: false,
       allowPickupAtLocation: false,
     },
@@ -65,11 +67,12 @@ export function AddEditSchoolSheet({
         form.reset({
             name: school.name,
             id: school.id,
+            abbreviation: school.abbreviation,
             allowPickup: school.allowPickup || false,
             allowPickupAtLocation: school.allowPickupAtLocation || false,
         });
         } else {
-        form.reset({ name: "", id: "", allowPickup: false, allowPickupAtLocation: false });
+        form.reset({ name: "", id: "", abbreviation: "", allowPickup: false, allowPickupAtLocation: false });
         }
     }
   }, [school, form, isOpen]);
@@ -107,19 +110,35 @@ export function AddEditSchoolSheet({
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>ID da Escola</FormLabel>
-                    <FormControl>
-                      <Input placeholder="ex: escola-primaria-luanda" {...field} disabled={!!school} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+               <div className="grid grid-cols-2 gap-4">
+                 <FormField
+                    control={form.control}
+                    name="id"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>ID da Escola</FormLabel>
+                        <FormControl>
+                        <Input placeholder="ex: escola-luanda" {...field} disabled={!!school} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="abbreviation"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Abreviação</FormLabel>
+                        <FormControl>
+                        <Input placeholder="ex: EPL" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+               </div>
+              
                <FormField
                 control={form.control}
                 name="allowPickup"

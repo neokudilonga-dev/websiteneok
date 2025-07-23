@@ -28,6 +28,7 @@ import {
 import { schools as initialSchools } from "@/lib/data";
 import type { School } from "@/lib/types";
 import { AddEditSchoolSheet } from "@/components/admin/add-edit-school-sheet";
+import { Badge } from "@/components/ui/badge";
 
 export default function SchoolsPage() {
   const [schools, setSchools] = useState<School[]>(initialSchools);
@@ -85,6 +86,7 @@ export default function SchoolsPage() {
               <TableRow>
                 <TableHead>Nome da Escola</TableHead>
                 <TableHead>ID</TableHead>
+                <TableHead>Abreviação</TableHead>
                 <TableHead>Levant. no Colégio</TableHead>
                 <TableHead>Levant. no Local</TableHead>
                 <TableHead className="text-right">
@@ -97,6 +99,9 @@ export default function SchoolsPage() {
                 <TableRow key={school.id}>
                   <TableCell className="font-medium">{school.name}</TableCell>
                   <TableCell className="font-mono text-sm text-muted-foreground">{school.id}</TableCell>
+                   <TableCell>
+                      <Badge variant="secondary">{school.abbreviation}</Badge>
+                   </TableCell>
                   <TableCell>
                     {renderCheck(school.allowPickup)}
                   </TableCell>

@@ -2,10 +2,10 @@
 import type { School, Product, ReadingPlanItem, Order } from "@/lib/types";
 
 export const schools: School[] = [
-  { id: "escola-a", name: "Escola Primária de Luanda", allowPickup: false, allowPickupAtLocation: true },
-  { id: "escola-b", name: "Colégio Pitruca", allowPickup: false, allowPickupAtLocation: true },
-  { id: "escola-c", name: "Liceu Angolano de Luanda", allowPickup: false, allowPickupAtLocation: true },
-  { id: "cat", name: "Colégio Angolano de Talatona", allowPickup: true, allowPickupAtLocation: true },
+  { id: "escola-a", name: "Escola Primária de Luanda", abbreviation: "EPL", allowPickup: false, allowPickupAtLocation: true },
+  { id: "escola-b", name: "Colégio Pitruca", abbreviation: "CPT", allowPickup: false, allowPickupAtLocation: true },
+  { id: "escola-c", name: "Liceu Angolano de Luanda", abbreviation: "LAL", allowPickup: false, allowPickupAtLocation: true },
+  { id: "cat", name: "Colégio Angolano de Talatona", abbreviation: "CAT", allowPickup: true, allowPickupAtLocation: true },
 ];
 
 export const bookCategories = ["Manual Escolar", "Ficção", "Não-Ficção", "Ciência", "História", "Literatura", "Obrigatórios/ Leitura Orientada", "Sugeridos/ Leitura Recomendada"];
@@ -216,7 +216,7 @@ export const orders: Order[] = [
     schoolName: 'Colégio Angolano de Talatona'
   },
     {
-    reference: 'CAT-2025002',
+    reference: 'EPL-2025002',
     date: '2024-07-22T11:30:00Z',
     studentName: 'Ana Silva',
     guardianName: 'Carlos Silva',
@@ -234,5 +234,25 @@ export const orders: Order[] = [
     deliveryStatus: 'not_delivered',
     schoolId: 'escola-a',
     schoolName: 'Escola Primária de Luanda'
+  },
+  {
+    reference: 'LIV-2025003',
+    date: '2024-07-23T14:00:00Z',
+    studentName: undefined,
+    guardianName: 'Rui Costa',
+    phone: '933445566',
+    email: 'rui.costa@example.com',
+    deliveryOption: 'outras',
+    deliveryAddress: 'Viana, Luanda',
+    paymentMethod: 'numerario',
+    items: [
+      { id: 'game-2', name: 'Mestre do Código', price: 4500, quantity: 1, type: 'game', stock: 15, image: "", images: ["https://placehold.co/600x400.png"], description: "Aprenda a lógica de programação através de um divertido jogo de tabuleiro.", stockStatus: "in_stock" },
+    ],
+    deliveryFee: 4000,
+    total: 8500,
+    paymentStatus: 'cod',
+    deliveryStatus: 'not_delivered',
+    schoolId: 'livraria',
+    schoolName: 'Livraria'
   }
 ]

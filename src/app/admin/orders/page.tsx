@@ -115,7 +115,7 @@ export default function OrdersPage() {
   };
 
   const getSchoolName = (schoolId: string | undefined) => {
-    if (!schoolId) return 'N/A';
+    if (!schoolId || schoolId === 'livraria') return 'Livraria (LIV)';
     return schools.find(s => s.id === schoolId)?.name || schoolId;
   }
 
@@ -143,13 +143,14 @@ export default function OrdersPage() {
             <div className="flex flex-col gap-4 sm:flex-row">
                  <Select value={schoolFilter} onValueChange={setSchoolFilter}>
                     <SelectTrigger className="w-full sm:w-[200px]">
-                        <SelectValue placeholder="Filtrar por escola" />
+                        <SelectValue placeholder="Filtrar por cliente" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">Todas as Escolas</SelectItem>
+                        <SelectItem value="all">Todos os Clientes</SelectItem>
                         {schools.map(school => (
                             <SelectItem key={school.id} value={school.id}>{school.name}</SelectItem>
                         ))}
+                        <SelectItem value="livraria">Livraria (LIV)</SelectItem>
                     </SelectContent>
                 </Select>
                  <DropdownMenu>
