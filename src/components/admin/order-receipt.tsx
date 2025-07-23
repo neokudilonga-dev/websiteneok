@@ -93,8 +93,8 @@ export function OrderReceiptSheet({
           <SheetTitle>Recibo da Encomenda</SheetTitle>
         </SheetHeader>
         <ScrollArea className="flex-1">
-          <div id="receipt-container" className="py-4 pr-6">
-            <div ref={receiptRef} id="receipt" className="space-y-4 p-4 border rounded-lg bg-white text-black">
+          <div id="receipt-container" className="py-4 pr-6 overflow-x-auto">
+            <div ref={receiptRef} id="receipt" className="space-y-4 p-4 border rounded-lg bg-white text-black min-w-[210mm]">
               <div className="text-center">
                 <BiblioAngolaLogo className="h-12 mx-auto" />
               </div>
