@@ -34,6 +34,7 @@ import type { Order, Product, School, PaymentStatus, DeliveryStatus } from "@/li
 import { ChevronDown, Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState(initialOrders);
@@ -159,17 +160,21 @@ export default function OrdersPage() {
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-[240px]">
-                        <DropdownMenuLabel>Estado do Pagamento</DropdownMenuLabel>
-                        <DropdownMenuRadioGroup value={paymentStatusFilter} onValueChange={(val) => setPaymentStatusFilter(val as any)}>
-                            <DropdownMenuRadioItem value="all">Todos</DropdownMenuRadioItem>
-                            {paymentStatusOptions.map(opt => <DropdownMenuRadioItem key={opt.value} value={opt.value}>{opt.label}</DropdownMenuRadioItem>)}
-                        </DropdownMenuRadioGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuLabel>Estado da Entrega</DropdownMenuLabel>
-                         <DropdownMenuRadioGroup value={deliveryStatusFilter} onValueChange={(val) => setDeliveryStatusFilter(val as any)}>
-                            <DropdownMenuRadioItem value="all">Todos</DropdownMenuRadioItem>
-                             {deliveryStatusOptions.map(opt => <DropdownMenuRadioItem key={opt.value} value={opt.value}>{opt.label}</DropdownMenuRadioItem>)}
-                        </DropdownMenuRadioGroup>
+                        <ScrollArea className="h-72">
+                            <div className="p-2">
+                                <DropdownMenuLabel>Estado do Pagamento</DropdownMenuLabel>
+                                <DropdownMenuRadioGroup value={paymentStatusFilter} onValueChange={(val) => setPaymentStatusFilter(val as any)}>
+                                    <DropdownMenuRadioItem value="all">Todos</DropdownMenuRadioItem>
+                                    {paymentStatusOptions.map(opt => <DropdownMenuRadioItem key={opt.value} value={opt.value}>{opt.label}</DropdownMenuRadioItem>)}
+                                </DropdownMenuRadioGroup>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuLabel>Estado da Entrega</DropdownMenuLabel>
+                                <DropdownMenuRadioGroup value={deliveryStatusFilter} onValueChange={(val) => setDeliveryStatusFilter(val as any)}>
+                                    <DropdownMenuRadioItem value="all">Todos</DropdownMenuRadioItem>
+                                    {deliveryStatusOptions.map(opt => <DropdownMenuRadioItem key={opt.value} value={opt.value}>{opt.label}</DropdownMenuRadioItem>)}
+                                </DropdownMenuRadioGroup>
+                            </div>
+                        </ScrollArea>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
