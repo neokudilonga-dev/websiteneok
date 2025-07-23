@@ -13,10 +13,8 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { BiblioAngolaLogo } from "@/components/logo";
-import { Separator } from "@/components/ui/separator";
 import type { Order } from "@/lib/types";
 import { Download, Printer } from "lucide-react";
-import { ScrollArea } from "../ui/scroll-area";
 
 interface OrderReceiptSheetProps {
   isOpen: boolean;
@@ -92,8 +90,8 @@ export function OrderReceiptSheet({
         <SheetHeader>
           <SheetTitle>Recibo da Encomenda</SheetTitle>
         </SheetHeader>
-        <ScrollArea className="flex-1">
-          <div id="receipt-container" className="py-4 pr-6 overflow-x-auto">
+        <div className="flex-1 overflow-auto">
+          <div id="receipt-container" className="py-4 pr-6">
             <div ref={receiptRef} id="receipt" className="space-y-4 p-4 border rounded-lg bg-white text-black min-w-[210mm]">
               <div className="text-center">
                 <BiblioAngolaLogo className="h-12 mx-auto" />
@@ -158,7 +156,7 @@ export function OrderReceiptSheet({
               <p className="text-center text-xs pt-4">----------------------------------</p>
             </div>
           </div>
-        </ScrollArea>
+        </div>
         <SheetFooter className="mt-auto pt-4">
             <div className="flex w-full gap-2">
                  <Button onClick={handlePrint} className="w-full">
