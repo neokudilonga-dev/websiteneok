@@ -16,6 +16,7 @@ import { BiblioAngolaLogo } from "@/components/logo";
 import { Separator } from "@/components/ui/separator";
 import type { Order } from "@/lib/types";
 import { Download, Printer } from "lucide-react";
+import { ScrollArea } from "../ui/scroll-area";
 
 interface OrderReceiptSheetProps {
   isOpen: boolean;
@@ -31,7 +32,17 @@ export function OrderReceiptSheet({
   const receiptRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = () => {
-    window.print();
+    const printWindow = window.open('', '', 'height=600,width=800');
+    if (printWindow) {
+      printWindow.document.write('<html><head><title>Recibo</title>');
+      printWindow.document.write('<style>@media print { body { -webkit-print-color-adjust: exact; } table { border-collapse: collapse; width: 100%;} td, th { border: 1px solid black; padding: 8px; } }</style>');
+      printWindow.document.write('</head><body>');
+      printWindow.document.write(receiptRef.current?.innerHTML || '');
+      printWindow.document.write('</body></html>');
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+    }
   };
 
   const handleDownloadPdf = async () => {
@@ -77,76 +88,78 @@ export function OrderReceiptSheet({
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetContent className="w-full sm:max-w-md">
+      <SheetContent className="flex flex-col w-full sm:max-w-md">
         <SheetHeader>
           <SheetTitle>Recibo da Encomenda</SheetTitle>
         </SheetHeader>
-        <div id="receipt-container" className="py-4">
-          <div ref={receiptRef} id="receipt" className="space-y-4 p-4 border rounded-lg bg-white text-black">
-            <div className="text-center">
-              <BiblioAngolaLogo className="h-12 mx-auto" />
-            </div>
-            <table className="w-full text-sm border-collapse">
-              <tbody>
-                <tr className="border-b">
-                  <td className="font-bold p-2 border border-black">Escola</td>
-                  <td className="p-2 border border-black">{order.schoolName || 'N/A'}</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="font-bold p-2 border border-black">Nome do(a) Aluno(a)</td>
-                  <td className="p-2 border border-black">{order.studentName}</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="font-bold p-2 border border-black">Nome do(a) Encarregado(a)</td>
-                  <td className="p-2 border border-black">{order.guardianName}</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="font-bold p-2 border border-black">Número de Refêrencia</td>
-                  <td className="p-2 border border-black">{order.reference}</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="font-bold p-2 border border-black">Número de Telefone</td>
-                  <td className="p-2 border border-black">{order.phone}</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="font-bold p-2 border border-black">LOCAL ENTREGA:</td>
-                  <td className="p-2 border border-black">{order.deliveryAddress || "N/A"}</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="font-bold p-2 border border-black">Forma de Pagamento</td>
-                  <td className="p-2 border border-black uppercase">{order.paymentMethod}</td>
-                </tr>
-              </tbody>
-            </table>
+        <ScrollArea className="flex-1">
+          <div id="receipt-container" className="py-4 pr-6">
+            <div ref={receiptRef} id="receipt" className="space-y-4 p-4 border rounded-lg bg-white text-black">
+              <div className="text-center">
+                <BiblioAngolaLogo className="h-12 mx-auto" />
+              </div>
+              <table className="w-full text-sm border-collapse">
+                <tbody>
+                  <tr className="border-b">
+                    <td className="font-bold p-2 border border-black">Escola</td>
+                    <td className="p-2 border border-black">{order.schoolName || 'N/A'}</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="font-bold p-2 border border-black">Nome do(a) Aluno(a)</td>
+                    <td className="p-2 border border-black">{order.studentName}</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="font-bold p-2 border border-black">Nome do(a) Encarregado(a)</td>
+                    <td className="p-2 border border-black">{order.guardianName}</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="font-bold p-2 border border-black">Número de Refêrencia</td>
+                    <td className="p-2 border border-black">{order.reference}</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="font-bold p-2 border border-black">Número de Telefone</td>
+                    <td className="p-2 border border-black">{order.phone}</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="font-bold p-2 border border-black">LOCAL ENTREGA:</td>
+                    <td className="p-2 border border-black">{order.deliveryAddress || "N/A"}</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="font-bold p-2 border border-black">Forma de Pagamento</td>
+                    <td className="p-2 border border-black uppercase">{order.paymentMethod}</td>
+                  </tr>
+                </tbody>
+              </table>
 
-            <table className="w-full text-sm border-collapse">
-              <thead>
-                  <tr className="border-b">
-                      <th className="font-bold p-2 border border-black text-left">ENCOMENDA:</th>
-                      <th className="font-bold p-2 border border-black text-right">PREÇO:Kz</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {order.items.map(item => (
-                      <tr key={item.id} className="border-b">
-                          <td className="p-2 border border-black">{item.name}</td>
-                          <td className="p-2 border border-black text-right">{item.price.toLocaleString('pt-PT')}Kz</td>
-                      </tr>
-                  ))}
-                  <tr className="border-b">
-                      <td className="p-2 border border-black">Entrega ao Domicílio</td>
-                      <td className="p-2 border border-black text-right">{order.deliveryFee.toLocaleString('pt-PT')}Kz</td>
-                  </tr>
-                  <tr className="border-b font-bold text-base">
-                      <td className="p-2 border border-black">TOTAL</td>
-                      <td className="p-2 border border-black text-right">{order.total.toLocaleString('pt-PT')}Kz</td>
-                  </tr>
-              </tbody>
-            </table>
-            <p className="text-center text-xs pt-4">----------------------------------</p>
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                    <tr className="border-b">
+                        <th className="font-bold p-2 border border-black text-left">ENCOMENDA:</th>
+                        <th className="font-bold p-2 border border-black text-right">PREÇO:Kz</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {order.items.map(item => (
+                        <tr key={item.id} className="border-b">
+                            <td className="p-2 border border-black">{item.name}</td>
+                            <td className="p-2 border border-black text-right">{item.price.toLocaleString('pt-PT')}Kz</td>
+                        </tr>
+                    ))}
+                    <tr className="border-b">
+                        <td className="p-2 border border-black">Entrega ao Domicílio</td>
+                        <td className="p-2 border border-black text-right">{order.deliveryFee.toLocaleString('pt-PT')}Kz</td>
+                    </tr>
+                    <tr className="border-b font-bold text-base">
+                        <td className="p-2 border border-black">TOTAL</td>
+                        <td className="p-2 border border-black text-right">{order.total.toLocaleString('pt-PT')}Kz</td>
+                    </tr>
+                </tbody>
+              </table>
+              <p className="text-center text-xs pt-4">----------------------------------</p>
+            </div>
           </div>
-        </div>
-        <SheetFooter>
+        </ScrollArea>
+        <SheetFooter className="mt-auto pt-4">
             <div className="flex w-full gap-2">
                  <Button onClick={handlePrint} className="w-full">
                     <Printer className="mr-2" />
