@@ -277,17 +277,17 @@ export default function LojaPage() {
                    )}
                    </>
                 ) : (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         {schools.map(school => (
                             <Button 
                                 key={school.id} 
                                 onClick={() => handleSchoolSelect(school)}
                                 variant="outline"
-                                className="h-auto justify-start p-6 text-left"
+                                className="h-auto transform-gpu rounded-lg border bg-card p-6 text-left shadow-sm transition-all hover:scale-[1.02] hover:shadow-md focus:scale-[1.02] focus:shadow-md focus:ring-2 focus:ring-primary focus:ring-offset-2"
                             >
                                 <div className="flex flex-col">
-                                    <span className="text-lg font-semibold">{school.name}</span>
-                                    <span className="text-sm text-muted-foreground">Ver plano de leitura</span>
+                                    <span className="font-headline text-lg font-semibold text-primary">{school.name}</span>
+                                    <span className="mt-1 text-sm text-muted-foreground">Ver plano de leitura</span>
                                 </div>
                             </Button>
                         ))}
