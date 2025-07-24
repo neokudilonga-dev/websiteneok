@@ -282,11 +282,11 @@ export default function LojaPage() {
                             <button
                                 key={school.id}
                                 onClick={() => handleSchoolSelect(school)}
-                                className="h-auto w-full transform-gpu rounded-lg border bg-card p-6 text-left shadow-sm transition-all hover:scale-[1.02] hover:shadow-md focus:scale-[1.02] focus:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                                className="h-auto w-full transform-gpu rounded-lg border bg-accent/80 p-6 text-left shadow-sm transition-all hover:scale-[1.02] hover:bg-accent hover:shadow-md focus:scale-[1.02] focus:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                             >
                                 <div className="flex flex-col">
                                     <span className="font-headline text-lg font-semibold text-primary">{school.name}</span>
-                                    <span className="mt-1 text-sm text-muted-foreground">Ver plano de leitura</span>
+                                    <span className="mt-1 text-sm text-primary/80">Ver plano de leitura</span>
                                 </div>
                             </button>
                         ))}
