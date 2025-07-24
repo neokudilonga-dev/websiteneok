@@ -60,3 +60,8 @@ export interface Order {
   schoolId?: string;
   schoolName?: string;
 }
+
+export interface Category {
+    name: string;
+    type: 'book' | 'game';
+}

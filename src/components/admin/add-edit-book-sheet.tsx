@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import {
@@ -26,9 +27,9 @@ import {
   FormMessage,
   FormDescription,
 } from "@/components/ui/form";
-import type { Product, ReadingPlanItem } from "@/lib/types";
-import { schools, bookCategories as initialBookCategories, publishers } from "@/lib/data";
-import { useEffect, useState, ChangeEvent } from "react";
+import type { Product, ReadingPlanItem, Category } from "@/lib/types";
+import { schools, allCategories, publishers } from "@/lib/data";
+import { useEffect, useState, ChangeEvent, useMemo } from "react";
 import { PlusCircle, Trash2, Upload } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -71,8 +72,7 @@ export function AddEditBookSheet({
   readingPlan,
 }: AddEditBookSheetProps) {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
-    // In a real app, you would fetch categories from your API
-    const [bookCategories, setBookCategories] = useState(initialBookCategories);
+    const bookCategories = useMemo(() => allCategories.filter(c => c.type === 'book'), []);
 
 
   const form = useForm<BookFormValues>({
@@ -303,7 +303,7 @@ export function AddEditBookSheet({
                                 </FormControl>
                                 <SelectContent>
                                     {bookCategories.map(cat => (
-                                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                                    <SelectItem key={cat.name} value={cat.name}>{cat.name}</SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>

@@ -1,10 +1,11 @@
 
+
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from 'next/navigation';
-import type { School, Product, ReadingPlanItem } from "@/lib/types";
-import { schools, products as allProducts, readingPlan, bookCategories } from "@/lib/data";
+import type { School, Product, ReadingPlanItem, Category } from "@/lib/types";
+import { schools, products as allProducts, readingPlan, allCategories } from "@/lib/data";
 import Header from "@/components/header";
 import ProductGrid from "@/components/product-grid";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -36,8 +37,11 @@ export default function LojaPage() {
   const [showIndividual, setShowIndividual] = useState<string | null>(null);
   const { addKitToCart } = useCart();
   
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [bookSearchQuery, setBookSearchQuery] = useState("");
+  const [selectedBookCategory, setSelectedBookCategory] = useState("all");
+
+  const [gameSearchQuery, setGameSearchQuery] = useState("");
+  const [selectedGameCategory, setSelectedGameCategory] = useState("all");
   
   useEffect(() => {
     // Sync tab state if URL changes
@@ -86,16 +90,27 @@ export default function LojaPage() {
     return grades;
   }, [schoolReadingPlan, productsById]);
   
-  const allGames = allProducts.filter((p) => p.type === "game" && p.stockStatus !== 'sold_out');
+  const filteredGames = useMemo(() => {
+    return allProducts.filter(p => 
+        p.type === 'game' && 
+        p.stockStatus !== 'sold_out' &&
+        p.name.toLowerCase().includes(gameSearchQuery.toLowerCase()) &&
+        (selectedGameCategory === 'all' || p.category === selectedGameCategory)
+    )
+  }, [allProducts, gameSearchQuery, selectedGameCategory]);
+
+  const bookCategories = useMemo(() => allCategories.filter(c => c.type === 'book'), []);
+  const gameCategories = useMemo(() => allCategories.filter(c => c.type === 'game'), []);
+
 
   const filteredBooks = useMemo(() => {
     return allProducts.filter(p => 
         p.type === 'book' && 
         p.stockStatus !== 'sold_out' &&
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        (selectedCategory === 'all' || p.category === selectedCategory)
+        p.name.toLowerCase().includes(bookSearchQuery.toLowerCase()) &&
+        (selectedBookCategory === 'all' || p.category === selectedBookCategory)
     )
-  }, [searchQuery, selectedCategory]);
+  }, [bookSearchQuery, selectedBookCategory]);
 
 
   const renderTitle = () => {
@@ -302,18 +317,18 @@ export default function LojaPage() {
                             type="search"
                             placeholder="Pesquisar por nome do livro..."
                             className="w-full rounded-lg bg-background pl-8"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            value={bookSearchQuery}
+                            onChange={(e) => setBookSearchQuery(e.target.value)}
                         />
                     </div>
-                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <Select value={selectedBookCategory} onValueChange={setSelectedBookCategory}>
                         <SelectTrigger className="w-full sm:w-[280px]">
                             <SelectValue placeholder="Filtrar por categoria" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">Todas as Categorias</SelectItem>
                             {bookCategories.map(category => (
-                                <SelectItem key={category} value={category}>{category}</SelectItem>
+                                <SelectItem key={category.name} value={category.name}>{category.name}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
@@ -321,8 +336,31 @@ export default function LojaPage() {
               <ProductGrid products={filteredBooks} />
             </TabsContent>
 
-            <TabsContent value="jogos" className="mt-6">
-              <ProductGrid products={allGames} />
+            <TabsContent value="jogos" className="mt-6 space-y-6">
+                <div className="flex flex-col gap-4 sm:flex-row">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            type="search"
+                            placeholder="Pesquisar por nome do jogo..."
+                            className="w-full rounded-lg bg-background pl-8"
+                            value={gameSearchQuery}
+                            onChange={(e) => setGameSearchQuery(e.target.value)}
+                        />
+                    </div>
+                    <Select value={selectedGameCategory} onValueChange={setSelectedGameCategory}>
+                        <SelectTrigger className="w-full sm:w-[280px]">
+                            <SelectValue placeholder="Filtrar por categoria" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Todas as Categorias</SelectItem>
+                            {gameCategories.map(category => (
+                                <SelectItem key={category.name} value={category.name}>{category.name}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+              <ProductGrid products={filteredGames} />
             </TabsContent>
           </Tabs>
         </div>

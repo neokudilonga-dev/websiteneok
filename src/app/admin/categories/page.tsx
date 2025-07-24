@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState } from "react";
@@ -30,25 +31,31 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { bookCategories as initialBookCategories } from "@/lib/data";
+import { allCategories as initialCategories } from "@/lib/data";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import type { Category } from "@/lib/types";
+import { Badge } from "@/components/ui/badge";
 
 
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState<string[]>(initialBookCategories);
-  const [newCategory, setNewCategory] = useState('');
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryType, setNewCategoryType] = useState<'book' | 'game'>('book');
 
   const handleAddCategory = () => {
-    if (newCategory && !categories.includes(newCategory)) {
+    if (newCategoryName && !categories.find(c => c.name.toLowerCase() === newCategoryName.toLowerCase())) {
         // In a real app, you'd call an API here.
-        setCategories([...categories, newCategory]);
-        setNewCategory('');
+        setCategories([...categories, { name: newCategoryName, type: newCategoryType }]);
+        setNewCategoryName('');
+        setNewCategoryType('book');
     }
   };
 
   const handleDeleteCategory = (categoryToDelete: string) => {
     // In a real app, you'd call an API here.
-    setCategories(categories.filter((c) => c !== categoryToDelete));
+    setCategories(categories.filter((c) => c.name !== categoryToDelete));
   };
 
 
@@ -57,8 +64,8 @@ export default function CategoriesPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-4">
           <div className="space-y-1">
-            <CardTitle>Categorias de Livros</CardTitle>
-            <CardDescription>Faça a gestão das categorias para os livros.</CardDescription>
+            <CardTitle>Categorias</CardTitle>
+            <CardDescription>Faça a gestão das categorias para os livros e jogos.</CardDescription>
           </div>
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -71,14 +78,33 @@ export default function CategoriesPage() {
                 <AlertDialogHeader>
                 <AlertDialogTitle>Adicionar Nova Categoria</AlertDialogTitle>
                 <AlertDialogDescription>
-                    Digite o nome da nova categoria de livro.
+                    Digite o nome e selecione o tipo da nova categoria.
                 </AlertDialogDescription>
                 </AlertDialogHeader>
-                <Input 
-                    value={newCategory} 
-                    onChange={(e) => setNewCategory(e.target.value)} 
-                    placeholder="Ex: Biologia"
-                />
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="category-name">Nome da Categoria</Label>
+                        <Input 
+                            id="category-name"
+                            value={newCategoryName} 
+                            onChange={(e) => setNewCategoryName(e.target.value)} 
+                            placeholder="Ex: Biologia"
+                        />
+                    </div>
+                     <div className="space-y-2">
+                        <Label>Tipo de Categoria</Label>
+                        <RadioGroup defaultValue="book" onValueChange={(value) => setNewCategoryType(value as 'book' | 'game')} value={newCategoryType}>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="book" id="r-book" />
+                                <Label htmlFor="r-book">Livro</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="game" id="r-game" />
+                                <Label htmlFor="r-game">Jogo e Outros</Label>
+                            </div>
+                        </RadioGroup>
+                     </div>
+                </div>
                 <AlertDialogFooter>
                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
                 <AlertDialogAction onClick={handleAddCategory}>Adicionar</AlertDialogAction>
@@ -92,6 +118,7 @@ export default function CategoriesPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Nome da Categoria</TableHead>
+                <TableHead>Tipo</TableHead>
                 <TableHead className="w-[100px] text-right">
                   <span className="sr-only">Ações</span>
                 </TableHead>
@@ -99,8 +126,13 @@ export default function CategoriesPage() {
             </TableHeader>
             <TableBody>
               {categories.map((category) => (
-                <TableRow key={category}>
-                  <TableCell className="font-medium">{category}</TableCell>
+                <TableRow key={category.name}>
+                  <TableCell className="font-medium">{category.name}</TableCell>
+                   <TableCell>
+                     <Badge variant={category.type === 'book' ? 'secondary' : 'default'}>
+                        {category.type === 'book' ? 'Livro' : 'Jogo'}
+                     </Badge>
+                   </TableCell>
                   <TableCell className="text-right">
                      <AlertDialog>
                         <AlertDialogTrigger asChild>
@@ -123,7 +155,7 @@ export default function CategoriesPage() {
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDeleteCategory(category)} className="bg-destructive hover:bg-destructive/90">Eliminar</AlertDialogAction>
+                            <AlertDialogAction onClick={() => handleDeleteCategory(category.name)} className="bg-destructive hover:bg-destructive/90">Eliminar</AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
