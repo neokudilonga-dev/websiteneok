@@ -39,13 +39,13 @@ interface AddEditBookSheetProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   book?: Product;
-  onSaveChanges: (book: Product, readingPlan: {schoolId: string, grade: number, status: 'mandatory' | 'recommended'}[]) => void;
+  onSaveChanges: (book: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => void;
   readingPlan: ReadingPlanItem[];
 }
 
 const readingPlanItemSchema = z.object({
   schoolId: z.string().min(1, "A escola é obrigatória."),
-  grade: z.coerce.number().min(1, "O ano é obrigatório.").max(12),
+  grade: z.union([z.coerce.number(), z.string()]).refine(val => val !== '', "O ano é obrigatório."),
   status: z.enum(["mandatory", "recommended"]),
 });
 
@@ -409,7 +409,7 @@ export function AddEditBookSheet({
                                 <FormItem>
                                     <FormLabel>Ano</FormLabel>
                                     <FormControl>
-                                    <Input type="number" className="w-24" {...field} />
+                                    <Input placeholder="Ex: 1 ou Iniciação" className="w-28" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -455,7 +455,7 @@ export function AddEditBookSheet({
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => append({ schoolId: '', grade: 1, status: 'mandatory' })}
+                    onClick={() => append({ schoolId: '', grade: '', status: 'mandatory' })}
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Adicionar ao Plano de Leitura

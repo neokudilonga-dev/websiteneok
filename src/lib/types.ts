@@ -20,7 +20,7 @@ export interface ReadingPlanItem {
   id: string;
   productId: string;
   schoolId: string;
-  grade: number;
+  grade: number | string;
   status: "mandatory" | "recommended";
 }
 

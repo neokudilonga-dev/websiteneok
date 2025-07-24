@@ -197,6 +197,13 @@ export const readingPlan: ReadingPlanItem[] = [
     { id: 'rp-pal-9-1', productId: 'pal-9-1', schoolId: 'palanquinhas', grade: 9, status: 'mandatory' },
     { id: 'rp-pal-9-2', productId: 'pal-9-2', schoolId: 'palanquinhas', grade: 9, status: 'mandatory' },
     { id: 'rp-pal-9-3', productId: 'pal-9-3', schoolId: 'palanquinhas', grade: 9, status: 'mandatory' },
+    { id: 'rp-pal-outros-1', productId: 'game-1', schoolId: 'palanquinhas', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-pal-outros-2', productId: 'game-2', schoolId: 'palanquinhas', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-pal-outros-3', productId: 'game-3', schoolId: 'palanquinhas', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-pal-outros-4', productId: 'game-4', schoolId: 'palanquinhas', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-pal-outros-5', productId: 'other-1', schoolId: 'palanquinhas', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-pal-outros-6', productId: 'other-2', schoolId: 'palanquinhas', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-pal-outros-7', productId: 'other-3', schoolId: 'palanquinhas', grade: 'Outros', status: 'mandatory' },
 
     // CAT-PT (mandatory and recommended)
     // 1st Grade
@@ -291,6 +298,20 @@ export const readingPlan: ReadingPlanItem[] = [
     { id: 'rp-cat-pt-rec-1c', productId: 'cat-pt-rec-1', schoolId: 'cat-pt', grade: 12, status: 'recommended' },
     { id: 'rp-cat-pt-rec-2c', productId: 'cat-pt-rec-2', schoolId: 'cat-pt', grade: 12, status: 'recommended' },
     { id: 'rp-cat-pt-rec-3c', productId: 'cat-pt-rec-3', schoolId: 'cat-pt', grade: 12, status: 'recommended' },
+    { id: 'rp-cat-pt-outros-1', productId: 'game-1', schoolId: 'cat-pt', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-cat-pt-outros-2', productId: 'game-2', schoolId: 'cat-pt', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-cat-pt-outros-3', productId: 'game-3', schoolId: 'cat-pt', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-cat-pt-outros-4', productId: 'game-4', schoolId: 'cat-pt', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-cat-pt-outros-5', productId: 'other-1', schoolId: 'cat-pt', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-cat-pt-outros-6', productId: 'other-2', schoolId: 'cat-pt', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-cat-pt-outros-7', productId: 'other-3', schoolId: 'cat-pt', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-cat-pt-outros-8', productId: 'other-7', schoolId: 'cat-pt', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-cat-pt-outros-9', productId: 'other-8', schoolId: 'cat-pt', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-cat-pt-outros-10', productId: 'other-9', schoolId: 'cat-pt', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-cat-pt-outros-11', productId: 'other-10', schoolId: 'cat-pt', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-cat-pt-outros-12', productId: 'other-11', schoolId: 'cat-pt', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-cat-pt-outros-13', productId: 'other-12', schoolId: 'cat-pt', grade: 'Outros', status: 'mandatory' },
+
 
     // CAT-Cambridge (mandatory only)
     { id: 'rp-cat-cmb-1-1', productId: 'cat-cmb-1-1', schoolId: 'cat-cambridge', grade: 1, status: 'mandatory' },
@@ -313,6 +334,13 @@ export const readingPlan: ReadingPlanItem[] = [
     { id: 'rp-cat-cmb-8-1', productId: 'cat-cmb-8-1', schoolId: 'cat-cambridge', grade: 8, status: 'mandatory' },
     { id: 'rp-cat-cmb-8-2', productId: 'cat-cmb-8-2', schoolId: 'cat-cambridge', grade: 8, status: 'mandatory' },
     { id: 'rp-cat-cmb-8-3', productId: 'cat-cmb-8-3', schoolId: 'cat-cambridge', grade: 8, status: 'mandatory' },
+    { id: 'rp-cat-cmb-outros-1', productId: 'game-1', schoolId: 'cat-cambridge', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-cat-cmb-outros-2', productId: 'game-2', schoolId: 'cat-cambridge', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-cat-cmb-outros-3', productId: 'game-3', schoolId: 'cat-cambridge', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-cat-cmb-outros-4', productId: 'game-4', schoolId: 'cat-cambridge', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-cat-cmb-outros-5', productId: 'other-2', schoolId: 'cat-cambridge', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-cat-cmb-outros-6', productId: 'other-3', schoolId: 'cat-cambridge', grade: 'Outros', status: 'mandatory' },
+    { id: 'rp-cat-cmb-outros-7', productId: 'other-1', schoolId: 'cat-cambridge', grade: 'Outros', status: 'mandatory' },
 ];
 
 export const orders: Order[] = [];

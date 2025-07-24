@@ -53,7 +53,7 @@ export default function Home() {
     : [], [selectedSchool]);
 
   const productsByGrade = useMemo(() => {
-    const grades: { [key: number]: GradeProducts } = {};
+    const grades: { [key: string]: GradeProducts } = {};
     schoolReadingPlan.forEach(item => {
       const product = productsById[item.productId];
       if (product && product.stockStatus !== 'sold_out') {
@@ -112,7 +112,7 @@ export default function Home() {
   };
 
   const renderProductGridWithBadges = (products: Product[], grade: string) => {
-    const gradePlan = schoolReadingPlan.filter(p => p.grade === Number(grade));
+    const gradePlan = schoolReadingPlan.filter(p => String(p.grade) === grade);
 
     return (
       <ProductGrid products={products} renderBadge={(product) => {
@@ -136,6 +136,28 @@ export default function Home() {
     return products.reduce((acc, product) => acc + product.price, 0);
   }
 
+  const customGradeSort = (a: [string, any], b: [string, any]) => {
+      const gradeA = a[0];
+      const gradeB = b[0];
+
+      const getOrder = (grade: string) => {
+          if (grade.toLowerCase() === 'iniciação') return -1;
+          if (grade.toLowerCase() === 'outros') return 100;
+          const num = parseInt(grade, 10);
+          return isNaN(num) ? 99 : num;
+      };
+
+      const orderA = getOrder(gradeA);
+      const orderB = getOrder(gradeB);
+
+      return orderA - orderB;
+  };
+
+  const getGradeDisplayName = (grade: string) => {
+    if (String(grade).toLowerCase() === 'iniciação') return 'Iniciação';
+    if (String(grade).toLowerCase() === 'outros') return 'Outros';
+    return `${grade}ª Classe`;
+  };
 
   return (
     <div className="flex min-h-screen w-full flex-col">
@@ -168,11 +190,11 @@ export default function Home() {
                 </div>
                 {selectedSchool ? (
                    Object.keys(productsByGrade).length > 0 ? (
-                    <Accordion type="single" collapsible className="w-full" defaultValue={`item-${Object.keys(productsByGrade)[0]}`} onValueChange={() => setShowIndividual(null)}>
-                      {Object.entries(productsByGrade).sort(([a], [b]) => Number(a) - Number(b)).map(([grade, gradeProducts]) => (
+                    <Accordion type="single" collapsible className="w-full" defaultValue={`item-${Object.keys(productsByGrade).sort((a,b) => customGradeSort([a,0],[b,0]))[0]}`} onValueChange={() => setShowIndividual(null)}>
+                      {Object.entries(productsByGrade).sort(customGradeSort).map(([grade, gradeProducts]) => (
                         <AccordionItem value={`item-${grade}`} key={grade}>
                           <AccordionTrigger className="text-xl font-semibold">
-                            {`${grade}º Ano`}
+                            {getGradeDisplayName(grade)}
                           </AccordionTrigger>
                           <AccordionContent>
                             <div className="space-y-6">
@@ -183,7 +205,7 @@ export default function Home() {
                                                 <div className="rounded-lg border bg-card p-6">
                                                     <h3 className="font-headline text-2xl font-semibold">Kit Obrigatório ({gradeProducts.mandatory.length} livros)</h3>
                                                     <p className="mt-2 text-muted-foreground">Compre todos os livros obrigatórios.</p>
-                                                    <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.mandatory, `Kit Obrigatório do ${grade}º Ano - ${selectedSchool.name}`)}>
+                                                    <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.mandatory, `Kit Obrigatório do ${getGradeDisplayName(grade)} - ${selectedSchool.name}`)}>
                                                         <ShoppingCart className="mr-2 h-5 w-5" /> 
                                                         Adicionar por {calculateKitPrice(gradeProducts.mandatory).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}
                                                     </Button>
@@ -193,7 +215,7 @@ export default function Home() {
                                                  <div className="rounded-lg border bg-card p-6">
                                                     <h3 className="font-headline text-2xl font-semibold">Kit Recomendado ({gradeProducts.recommended.length} livros)</h3>
                                                     <p className="mt-2 text-muted-foreground">Compre todos os livros recomendados.</p>
-                                                    <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.recommended, `Kit Recomendado do ${grade}º Ano - ${selectedSchool.name}`)}>
+                                                    <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.recommended, `Kit Recomendado do ${getGradeDisplayName(grade)} - ${selectedSchool.name}`)}>
                                                         <ShoppingCart className="mr-2 h-5 w-5" /> 
                                                         Adicionar por {calculateKitPrice(gradeProducts.recommended).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}
                                                     </Button>
@@ -203,9 +225,9 @@ export default function Home() {
                                      ) : (
                                         gradeProducts.all.length > 0 &&
                                         <div className="rounded-lg border bg-card p-6">
-                                            <h3 className="font-headline text-2xl font-semibold">Kit Completo {grade}ª Classe ({gradeProducts.all.length} livros)</h3>
+                                            <h3 className="font-headline text-2xl font-semibold">Kit Completo {getGradeDisplayName(grade)} ({gradeProducts.all.length} livros)</h3>
                                             <p className="mt-2 text-muted-foreground">Compre todos os livros para o ano letivo.</p>
-                                            <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.all, `Kit Completo do ${grade}º Ano - ${selectedSchool.name}`)}>
+                                            <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.all, `Kit Completo do ${getGradeDisplayName(grade)} - ${selectedSchool.name}`)}>
                                                 <ShoppingCart className="mr-2 h-5 w-5" /> 
                                                 Adicionar por {calculateKitPrice(gradeProducts.all).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}
                                             </Button>
