@@ -4,7 +4,6 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { CartProvider } from "@/context/cart-context";
 import { WhatsAppButton } from "@/components/whatsapp-button";
-import Loading from "@/components/loading";
 
 
 export const metadata: Metadata = {
@@ -26,7 +25,6 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased" suppressHydrationWarning>
         <CartProvider>
-        <Loading />
         {children}
         <Toaster />
         <WhatsAppButton />
