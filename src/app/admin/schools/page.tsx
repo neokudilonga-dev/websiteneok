@@ -25,13 +25,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { schools as initialSchools } from "@/lib/data";
 import type { School } from "@/lib/types";
 import { AddEditSchoolSheet } from "@/components/admin/add-edit-school-sheet";
 import { Badge } from "@/components/ui/badge";
+import { useData } from "@/context/data-context";
 
 export default function SchoolsPage() {
-  const [schools, setSchools] = useState<School[]>(initialSchools);
+  const { schools, addSchool, updateSchool, deleteSchool } = useData();
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [selectedSchool, setSelectedSchool] = useState<School | undefined>(
     undefined
@@ -48,17 +48,14 @@ export default function SchoolsPage() {
   };
 
   const handleDeleteSchool = (schoolId: string) => {
-    // In a real app, you'd call an API here.
-    setSchools(schools.filter((s) => s.id !== schoolId));
+    deleteSchool(schoolId);
   };
 
   const handleSaveChanges = (school: School) => {
-    // In a real app, you'd call an API here.
     if (selectedSchool) {
-      setSchools(schools.map((s) => (s.id === school.id ? school : s)));
+      updateSchool(school);
     } else {
-      // For demo, using a simplified ID generation
-      setSchools([...schools, { ...school, id: `school-${Date.now()}` }]);
+      addSchool(school);
     }
   };
 

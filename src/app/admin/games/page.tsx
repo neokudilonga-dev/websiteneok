@@ -28,16 +28,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { products as initialProducts, readingPlan as initialReadingPlan } from "@/lib/data";
-import type { Product, ReadingPlanItem } from "@/lib/types";
+import type { Product } from "@/lib/types";
 import { AddEditGameSheet } from "@/components/admin/add-edit-game-sheet";
 import { Input } from "@/components/ui/input";
+import { useData } from "@/context/data-context";
 
 export default function GamesPage() {
-  const [products, setProducts] = useState<Product[]>(
-    initialProducts.filter((p) => p.type === "game")
-  );
-  const [readingPlan, setReadingPlan] = useState<ReadingPlanItem[]>(initialReadingPlan);
+  const { products, addProduct, updateProduct, deleteProduct, updateReadingPlanForProduct } = useData();
 
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [selectedGame, setSelectedGame] = useState<Product | undefined>(
@@ -46,14 +43,15 @@ export default function GamesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSoldOut, setShowSoldOut] = useState(false);
 
+  const gameProducts = useMemo(() => products.filter(p => p.type === 'game'), [products]);
 
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
+    return gameProducts.filter((product) => {
       const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStock = showSoldOut || product.stockStatus !== 'sold_out';
       return matchesSearch && matchesStock;
     });
-  }, [products, searchQuery, showSoldOut]);
+  }, [gameProducts, searchQuery, showSoldOut]);
 
   const handleAddGame = () => {
     setSelectedGame(undefined);
@@ -66,29 +64,17 @@ export default function GamesPage() {
   };
 
   const handleDeleteGame = (gameId: string) => {
-    setProducts(products.filter((p) => p.id !== gameId));
-    setReadingPlan(readingPlan.filter(item => item.productId !== gameId));
+    deleteProduct(gameId);
   };
 
-  const handleSaveChanges = (game: Product, newReadingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => {
+  const handleSaveChanges = (gameData: Product, newReadingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => {
+    let game = gameData;
     if (selectedGame) {
-      setProducts(products.map((p) => (p.id === game.id ? game : p)));
+      updateProduct(game);
     } else {
-      const newGame = { ...game, id: `game-${Date.now()}` };
-      setProducts([...products, newGame]);
-      game.id = newGame.id;
+      game = addProduct(game);
     }
-
-    // Update reading plan
-    const otherSchoolsPlan = readingPlan.filter(item => item.productId !== game.id);
-    const thisGamePlan: ReadingPlanItem[] = newReadingPlan.map((rp, index) => ({
-      id: `rp-game-${game.id}-${index}-${Date.now()}`,
-      productId: game.id,
-      schoolId: rp.schoolId,
-      grade: rp.grade,
-      status: rp.status,
-    }));
-    setReadingPlan([...otherSchoolsPlan, ...thisGamePlan]);
+    updateReadingPlanForProduct(game.id, newReadingPlan);
   };
 
   return (
@@ -222,7 +208,6 @@ export default function GamesPage() {
         setIsOpen={setSheetOpen}
         game={selectedGame}
         onSaveChanges={handleSaveChanges}
-        readingPlan={readingPlan}
       />
     </>
   );

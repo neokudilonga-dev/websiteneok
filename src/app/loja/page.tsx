@@ -1,11 +1,9 @@
 
-
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from 'next/navigation';
-import type { School, Product, ReadingPlanItem, Category } from "@/lib/types";
-import { schools, products as allProducts, readingPlan, allCategories } from "@/lib/data";
+import type { School, Product } from "@/lib/types";
 import Header from "@/components/header";
 import ProductGrid from "@/components/product-grid";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,9 +14,7 @@ import { useCart } from "@/context/cart-context";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import ProductCard from "@/components/product-card";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-
+import { useData } from "@/context/data-context";
 
 interface GradeProducts {
   mandatory: Product[];
@@ -27,6 +23,7 @@ interface GradeProducts {
 }
 
 export default function LojaPage() {
+  const { schools, products: allProducts, readingPlan, categories } = useData();
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') || 'planos';
   
@@ -65,11 +62,11 @@ export default function LojaPage() {
       acc[product.id] = product;
       return acc;
     }, {} as Record<string, Product>);
-  }, []);
+  }, [allProducts]);
 
   const schoolReadingPlan = useMemo(() => selectedSchool
     ? readingPlan.filter((item) => item.schoolId === selectedSchool.id)
-    : [], [selectedSchool]);
+    : [], [selectedSchool, readingPlan]);
 
   const productsByGrade = useMemo(() => {
     const grades: { [key: string]: GradeProducts } = {};
@@ -99,8 +96,8 @@ export default function LojaPage() {
     )
   }, [allProducts, gameSearchQuery, selectedGameCategory]);
 
-  const bookCategories = useMemo(() => allCategories.filter(c => c.type === 'book'), []);
-  const gameCategories = useMemo(() => allCategories.filter(c => c.type === 'game'), []);
+  const bookCategories = useMemo(() => categories.filter(c => c.type === 'book'), [categories]);
+  const gameCategories = useMemo(() => categories.filter(c => c.type === 'game'), [categories]);
 
 
   const filteredBooks = useMemo(() => {
@@ -110,7 +107,7 @@ export default function LojaPage() {
         p.name.toLowerCase().includes(bookSearchQuery.toLowerCase()) &&
         (selectedBookCategory === 'all' || p.category === selectedBookCategory)
     )
-  }, [bookSearchQuery, selectedBookCategory]);
+  }, [allProducts, bookSearchQuery, selectedBookCategory]);
 
 
   const renderTitle = () => {

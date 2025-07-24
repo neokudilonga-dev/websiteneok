@@ -30,25 +30,23 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { publishers as initialPublishers } from "@/lib/data";
 import { Input } from "@/components/ui/input";
+import { useData } from "@/context/data-context";
 
 
 export default function PublishersPage() {
-  const [publishers, setPublishers] = useState<string[]>(initialPublishers);
+  const { publishers, addPublisher, deletePublisher } = useData();
   const [newPublisher, setNewPublisher] = useState('');
 
   const handleAddPublisher = () => {
     if (newPublisher && !publishers.includes(newPublisher)) {
-        // In a real app, you'd call an API here.
-        setPublishers([...publishers, newPublisher]);
+        addPublisher(newPublisher);
         setNewPublisher('');
     }
   };
 
   const handleDeletePublisher = (publisherToDelete: string) => {
-    // In a real app, you'd call an API here.
-    setPublishers(publishers.filter((p) => p !== publisherToDelete));
+    deletePublisher(publisherToDelete);
   };
 
 

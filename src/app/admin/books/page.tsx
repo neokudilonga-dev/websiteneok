@@ -24,23 +24,19 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { products as initialProducts, schools, readingPlan as initialReadingPlan, bookCategories, publishers } from "@/lib/data";
-import type { Product, ReadingPlanItem, School } from "@/lib/types";
+import type { Product, ReadingPlanItem } from "@/lib/types";
 import { AddEditBookSheet } from "@/components/admin/add-edit-book-sheet";
 import { Input } from "@/components/ui/input";
+import { useData } from "@/context/data-context";
 
 export default function BooksPage() {
-  const [products, setProducts] = useState<Product[]>(
-    initialProducts.filter((p) => p.type === "book")
-  );
-  const [readingPlan, setReadingPlan] = useState<ReadingPlanItem[]>(initialReadingPlan);
+  const { products, addProduct, updateProduct, deleteProduct, readingPlan, updateReadingPlanForProduct, schools, publishers } = useData();
 
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Product | undefined>(
@@ -50,14 +46,16 @@ export default function BooksPage() {
   const [stockFilter, setStockFilter] = useState("all");
   const [publisherFilter, setPublisherFilter] = useState("all");
 
+  const bookProducts = useMemo(() => products.filter(p => p.type === 'book'), [products]);
+
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
+    return bookProducts.filter((product) => {
       const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStock = stockFilter === 'all' || product.stockStatus === stockFilter;
       const matchesPublisher = publisherFilter === 'all' || product.publisher === publisherFilter;
       return matchesSearch && matchesStock && matchesPublisher;
     });
-  }, [products, searchQuery, stockFilter, publisherFilter]);
+  }, [bookProducts, searchQuery, stockFilter, publisherFilter]);
 
   const handleAddBook = () => {
     setSelectedBook(undefined);
@@ -70,32 +68,17 @@ export default function BooksPage() {
   };
 
   const handleDeleteBook = (bookId: string) => {
-    // In a real app, you'd call an API here.
-    setProducts(products.filter((p) => p.id !== bookId));
-    // Also remove from reading plan
-    setReadingPlan(readingPlan.filter(item => item.productId !== bookId));
+    deleteProduct(bookId);
   };
 
-  const handleSaveChanges = (book: Product, newReadingPlan: {schoolId: string, grade: number, status: 'mandatory' | 'recommended'}[]) => {
-    // In a real app, you'd call an API here.
+  const handleSaveChanges = (bookData: Product, newReadingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => {
+    let book = bookData;
     if (selectedBook) {
-      setProducts(products.map((p) => (p.id === book.id ? book : p)));
+      updateProduct(book);
     } else {
-      const newBook = { ...book, id: `book-${Date.now()}` };
-      setProducts([...products, newBook ]);
-      book.id = newBook.id; // update book id for reading plan
+      book = addProduct(book);
     }
-
-    // Update reading plan
-    const otherSchoolsPlan = readingPlan.filter(item => item.productId !== book.id);
-    const thisBookPlan: ReadingPlanItem[] = newReadingPlan.map((rp, index) => ({
-      id: `rp-${book.id}-${index}-${Date.now()}`,
-      productId: book.id,
-      schoolId: rp.schoolId,
-      grade: rp.grade,
-      status: rp.status,
-    }));
-    setReadingPlan([...otherSchoolsPlan, ...thisBookPlan]);
+    updateReadingPlanForProduct(book.id, newReadingPlan);
   };
 
   const getSchoolAbbreviation = (schoolId: string) => {
@@ -248,7 +231,6 @@ export default function BooksPage() {
         setIsOpen={setSheetOpen}
         book={selectedBook}
         onSaveChanges={handleSaveChanges}
-        readingPlan={readingPlan}
       />
     </>
   );

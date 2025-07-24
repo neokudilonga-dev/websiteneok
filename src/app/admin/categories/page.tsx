@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState } from "react";
@@ -11,7 +10,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, MoreHorizontal, Trash2 } from "lucide-react";
+import { PlusCircle, Trash2 } from "lucide-react";
 import {
   Table,
   TableHeader,
@@ -31,31 +30,29 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { allCategories as initialCategories } from "@/lib/data";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import type { Category } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
+import { useData } from "@/context/data-context";
 
 
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const { categories, addCategory, deleteCategory } = useData();
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newCategoryType, setNewCategoryType] = useState<'book' | 'game'>('book');
 
   const handleAddCategory = () => {
     if (newCategoryName && !categories.find(c => c.name.toLowerCase() === newCategoryName.toLowerCase())) {
-        // In a real app, you'd call an API here.
-        setCategories([...categories, { name: newCategoryName, type: newCategoryType }]);
+        addCategory({ name: newCategoryName, type: newCategoryType });
         setNewCategoryName('');
         setNewCategoryType('book');
     }
   };
 
   const handleDeleteCategory = (categoryToDelete: string) => {
-    // In a real app, you'd call an API here.
-    setCategories(categories.filter((c) => c.name !== categoryToDelete));
+    deleteCategory(categoryToDelete);
   };
 
 

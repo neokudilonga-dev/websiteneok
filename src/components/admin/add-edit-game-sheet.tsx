@@ -27,19 +27,18 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import type { Product, ReadingPlanItem } from "@/lib/types";
-import { schools } from "@/lib/data";
 import { useEffect, useState, ChangeEvent } from "react";
 import { PlusCircle, Trash2, Upload } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Image from "next/image";
+import { useData } from "@/context/data-context";
 
 interface AddEditGameSheetProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   game?: Product;
   onSaveChanges: (game: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => void;
-  readingPlan: ReadingPlanItem[];
 }
 
 const readingPlanItemSchema = z.object({
@@ -66,8 +65,9 @@ export function AddEditGameSheet({
   setIsOpen,
   game,
   onSaveChanges,
-  readingPlan,
 }: AddEditGameSheetProps) {
+  const { schools, readingPlan } = useData();
+
   const form = useForm<GameFormValues>({
     resolver: zodResolver(gameFormSchema),
     defaultValues: {

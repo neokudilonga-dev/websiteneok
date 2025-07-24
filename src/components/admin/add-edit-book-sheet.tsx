@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import {
@@ -27,13 +26,13 @@ import {
   FormMessage,
   FormDescription,
 } from "@/components/ui/form";
-import type { Product, ReadingPlanItem, Category } from "@/lib/types";
-import { schools, allCategories, publishers } from "@/lib/data";
+import type { Product, ReadingPlanItem } from "@/lib/types";
 import { useEffect, useState, ChangeEvent, useMemo } from "react";
 import { PlusCircle, Trash2, Upload } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Image from "next/image";
+import { useData } from "@/context/data-context";
 
 
 interface AddEditBookSheetProps {
@@ -41,7 +40,6 @@ interface AddEditBookSheetProps {
   setIsOpen: (isOpen: boolean) => void;
   book?: Product;
   onSaveChanges: (book: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => void;
-  readingPlan: ReadingPlanItem[];
 }
 
 const readingPlanItemSchema = z.object({
@@ -69,10 +67,10 @@ export function AddEditBookSheet({
   setIsOpen,
   book,
   onSaveChanges,
-  readingPlan,
 }: AddEditBookSheetProps) {
+    const { schools, categories, publishers, readingPlan } = useData();
     const [imagePreview, setImagePreview] = useState<string | null>(null);
-    const bookCategories = useMemo(() => allCategories.filter(c => c.type === 'book'), []);
+    const bookCategories = useMemo(() => categories.filter(c => c.type === 'book'), [categories]);
 
 
   const form = useForm<BookFormValues>({
