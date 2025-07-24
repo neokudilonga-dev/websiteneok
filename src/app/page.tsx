@@ -197,56 +197,59 @@ export default function Home() {
                             {getGradeDisplayName(grade)}
                           </AccordionTrigger>
                           <AccordionContent>
-                            <div className="space-y-6">
-                                <div className="grid gap-6 lg:grid-cols-2">
-                                     {selectedSchool.hasRecommendedPlan ? (
-                                        <>
-                                            {gradeProducts.mandatory.length > 0 && (
-                                                <div className="rounded-lg border bg-card p-6">
-                                                    <h3 className="font-headline text-2xl font-semibold">Kit Obrigatório ({gradeProducts.mandatory.length} livros)</h3>
-                                                    <p className="mt-2 text-muted-foreground">Compre todos os livros obrigatórios.</p>
-                                                    <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.mandatory, `Kit Obrigatório do ${getGradeDisplayName(grade)} - ${selectedSchool.name}`)}>
-                                                        <ShoppingCart className="mr-2 h-5 w-5" /> 
-                                                        Adicionar por {calculateKitPrice(gradeProducts.mandatory).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                                                    </Button>
-                                                </div>
-                                            )}
-                                            {gradeProducts.recommended.length > 0 && (
-                                                 <div className="rounded-lg border bg-card p-6">
-                                                    <h3 className="font-headline text-2xl font-semibold">Kit Recomendado ({gradeProducts.recommended.length} livros)</h3>
-                                                    <p className="mt-2 text-muted-foreground">Compre todos os livros recomendados.</p>
-                                                    <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.recommended, `Kit Recomendado do ${getGradeDisplayName(grade)} - ${selectedSchool.name}`)}>
-                                                        <ShoppingCart className="mr-2 h-5 w-5" /> 
-                                                        Adicionar por {calculateKitPrice(gradeProducts.recommended).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                                                    </Button>
-                                                </div>
-                                            )}
-                                        </>
-                                     ) : (
-                                        gradeProducts.all.length > 0 &&
-                                        <div className="rounded-lg border bg-card p-6">
-                                            <h3 className="font-headline text-2xl font-semibold">Kit Completo {getGradeDisplayName(grade)} ({gradeProducts.all.length} livros)</h3>
-                                            <p className="mt-2 text-muted-foreground">Compre todos os livros para o ano letivo.</p>
-                                            <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.all, `Kit Completo do ${getGradeDisplayName(grade)} - ${selectedSchool.name}`)}>
-                                                <ShoppingCart className="mr-2 h-5 w-5" /> 
-                                                Adicionar por {calculateKitPrice(gradeProducts.all).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                             {String(grade).toLowerCase() === 'outros' ? (
+                                renderProductGridWithBadges(gradeProducts.all, grade)
+                             ) : (
+                                <div className="space-y-6">
+                                    <div className="grid gap-6 lg:grid-cols-2">
+                                        {selectedSchool.hasRecommendedPlan ? (
+                                            <>
+                                                {gradeProducts.mandatory.length > 0 && (
+                                                    <div className="rounded-lg border bg-card p-6">
+                                                        <h3 className="font-headline text-2xl font-semibold">Kit Obrigatório ({gradeProducts.mandatory.length} livros)</h3>
+                                                        <p className="mt-2 text-muted-foreground">Compre todos os livros obrigatórios.</p>
+                                                        <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.mandatory, `Kit Obrigatório do ${getGradeDisplayName(grade)} - ${selectedSchool.name}`)}>
+                                                            <ShoppingCart className="mr-2 h-5 w-5" /> 
+                                                            Adicionar por {calculateKitPrice(gradeProducts.mandatory).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                                                        </Button>
+                                                    </div>
+                                                )}
+                                                {gradeProducts.recommended.length > 0 && (
+                                                    <div className="rounded-lg border bg-card p-6">
+                                                        <h3 className="font-headline text-2xl font-semibold">Kit Recomendado ({gradeProducts.recommended.length} livros)</h3>
+                                                        <p className="mt-2 text-muted-foreground">Compre todos os livros recomendados.</p>
+                                                        <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.recommended, `Kit Recomendado do ${getGradeDisplayName(grade)} - ${selectedSchool.name}`)}>
+                                                            <ShoppingCart className="mr-2 h-5 w-5" /> 
+                                                            Adicionar por {calculateKitPrice(gradeProducts.recommended).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                                                        </Button>
+                                                    </div>
+                                                )}
+                                            </>
+                                        ) : (
+                                            gradeProducts.all.length > 0 &&
+                                            <div className="rounded-lg border bg-card p-6 lg:col-span-2">
+                                                <h3 className="font-headline text-2xl font-semibold">Kit Completo {getGradeDisplayName(grade)} ({gradeProducts.all.length} livros)</h3>
+                                                <p className="mt-2 text-muted-foreground">Compre todos os livros para o ano letivo.</p>
+                                                <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.all, `Kit Completo do ${getGradeDisplayName(grade)} - ${selectedSchool.name}`)}>
+                                                    <ShoppingCart className="mr-2 h-5 w-5" /> 
+                                                    Adicionar por {calculateKitPrice(gradeProducts.all).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {showIndividual === grade ? (
+                                        renderProductGridWithBadges(gradeProducts.all, grade)
+                                    ) : (
+                                        <div className="text-center mt-6">
+                                            <Button variant="outline" onClick={() => setShowIndividual(grade)}>
+                                                Comprar em separado
+                                                <ChevronRight className="ml-2 h-4 w-4" />
                                             </Button>
                                         </div>
-                                     )}
+                                    )}
                                 </div>
-
-
-                                {showIndividual === grade ? (
-                                    renderProductGridWithBadges(gradeProducts.all, grade)
-                                ) : (
-                                    <div className="text-center mt-6">
-                                        <Button variant="outline" onClick={() => setShowIndividual(grade)}>
-                                            Comprar em separado
-                                            <ChevronRight className="ml-2 h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                )}
-                            </div>
+                             )}
                           </AccordionContent>
                         </AccordionItem>
                       ))}
