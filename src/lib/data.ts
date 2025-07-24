@@ -4,9 +4,10 @@ import type { School, Product, ReadingPlanItem, Order } from "@/lib/types";
 export const schools: School[] = [
   { id: "palanquinhas", name: "Palanquinhas", abbreviation: "PAL", allowPickup: true, allowPickupAtLocation: true, hasRecommendedPlan: false },
   { id: "cat-pt", name: "Colégio Angolano de Talatona (Currículo Português)", abbreviation: "CAT-PT", allowPickup: true, allowPickupAtLocation: true, hasRecommendedPlan: true },
+  { id: "cat-cambridge", name: "Colégio Angolano de Talatona (Cambridge)", abbreviation: "CAT-CMB", allowPickup: true, allowPickupAtLocation: true, hasRecommendedPlan: false },
 ];
 
-export const bookCategories = ["Manual Escolar", "Ficção", "Não-Ficção", "Ciência", "História", "Literatura", "Obrigatórios/ Leitura Orientada", "Sugeridos/ Leitura Recomendada", "Dicionário", "Gramática", "Instrumento Musical"];
+export const bookCategories = ["Manual Escolar", "Ficção", "Não-Ficção", "Ciência", "História", "Literatura", "Obrigatórios/ Leitura Orientada", "Sugeridos/ Leitura Recomendada", "Dicionário", "Gramática", "Instrumento Musical", "Leitura em Inglês"];
 
 export const publishers = ["Editora Angola", "Livros & Cia", "Saber Mais", "Plural Editores", "Mayamba Editora", "Texto Editores", "ASA"];
 
@@ -76,7 +77,7 @@ export const products: Product[] = [
   { id: 'cat-pt-5-2', name: 'A Bicicleta que tinha bigodes (com pequenos defeitos que não afectam a leitura)', price: 8000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '5ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
   { id: 'cat-pt-5-3', name: 'A Bicicleta que tinha bigodes (a importar)', price: 16500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '5ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
   { id: 'cat-pt-5-4', name: 'A Menina do Mar (a importar)', price: 21000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '5ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
-  { id: 'cat-pt-5-5', name: 'Charlotte\'s Web', price: 23000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '5ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'cat-pt-5-5', name: 'Charlotte\'s Web', price: 23000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '5ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
   { id: 'cat-pt-5-6', name: 'Os Candengues no Cemitério dos Barcos', price: 6000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '5ª Classe (Sugeridos/ Leitura Recomendada)', category: 'Sugeridos/ Leitura Recomendada', stockStatus: "in_stock" },
   { id: 'cat-pt-5-7', name: 'Alex Ponto Com Uma Aventura Virtual', price: 6500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '5ª Classe (Sugeridos/ Leitura Recomendada)', category: 'Sugeridos/ Leitura Recomendada', stockStatus: "in_stock" },
   { id: 'cat-pt-5-8', name: 'A Lagoa Misteriosa', price: 9000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '5ª Classe (Sugeridos/ Leitura Recomendada)', category: 'Sugeridos/ Leitura Recomendada', stockStatus: "in_stock" },
@@ -84,7 +85,7 @@ export const products: Product[] = [
   { id: 'cat-pt-6-1', name: 'Em Busca do Mar', price: 5000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '6ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
   { id: 'cat-pt-6-2', name: 'O Principezinho', price: 10000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '6ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
   { id: 'cat-pt-6-3', name: 'A idade da memória', price: 10000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '6ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
-  { id: 'cat-pt-6-4', name: 'Matilda (in English)', price: 23000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '6ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'cat-pt-6-4', name: 'Matilda (in English)', price: 23000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '6ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
   { id: 'cat-pt-6-5', name: 'Histórias de D. Quixote', price: 16000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '6ª Classe (Sugeridos/ Leitura Recomendada)', category: 'Sugeridos/ Leitura Recomendada', stockStatus: "in_stock" },
   { id: 'cat-pt-6-6', name: 'Alex Ponto Com Joe Silicone Vai à Escola', price: 6500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '6ª Classe (Sugeridos/ Leitura Recomendada)', category: 'Sugeridos/ Leitura Recomendada', stockStatus: "in_stock" },
   { id: 'cat-pt-6-7', name: 'Uma escuridão bonita (a importar)', price: 15000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '6ª Classe (Sugeridos/ Leitura Recomendada)', category: 'Sugeridos/ Leitura Recomendada', stockStatus: "in_stock" },
@@ -92,43 +93,60 @@ export const products: Product[] = [
   { id: 'cat-pt-7-1', name: 'Quem me dera ser onda', price: 6000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '7ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
   { id: 'cat-pt-7-2', name: 'Fábulas de Sanji', price: 6000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '7ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
   { id: 'cat-pt-7-3', name: 'O Cavaleiro da Dinamarca ( a importar)', price: 22000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '7ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
-  { id: 'cat-pt-7-4', name: 'Adventures of Huckleberry Finn', price: 23500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '7ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'cat-pt-7-4', name: 'Adventures of Huckleberry Finn', price: 23500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '7ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
   { id: 'cat-pt-7-5', name: 'As Aventuras de Tom Sawyer', price: 19000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '7ª Classe (Sugeridos/ Leitura Recomendada)', category: 'Sugeridos/ Leitura Recomendada', stockStatus: "in_stock" },
   { id: 'cat-pt-7-6', name: 'Alex Ponto com Mary Lob Lagosta', price: 6500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '7ª Classe (Sugeridos/ Leitura Recomendada)', category: 'Sugeridos/ Leitura Recomendada', stockStatus: "in_stock" },
   // 8th Grade
   { id: 'cat-pt-8-1', name: 'História de uma gaivota e do gato que a ensinou a voar', price: 25000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '8ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
   { id: 'cat-pt-8-2', name: 'O Gato Malhado e a Andorinha Sinhá', price: 13000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '8ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
   { id: 'cat-pt-8-3', name: 'Os da minha rua', price: 10000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '8ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
-  { id: 'cat-pt-8-4', name: 'Harry Potter and the Philosopher\'s Stone', price: 26000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '8ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'cat-pt-8-4', name: 'Harry Potter and the Philosopher\'s Stone', price: 26000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '8ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
   { id: 'cat-pt-8-5', name: 'Poemas com Cacimbo e Pássaros', price: 6500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '8ª Classe (Sugeridos/ Leitura Recomendada)', category: 'Sugeridos/ Leitura Recomendada', stockStatus: "in_stock" },
   { id: 'cat-pt-8-6', name: 'Undengue', price: 5000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '8ª Classe (Sugeridos/ Leitura Recomendada)', category: 'Sugeridos/ Leitura Recomendada', stockStatus: "in_stock" },
   // 9th Grade
   { id: 'cat-pt-9-1', name: 'Parábola do cágado velho', price: 9000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '9ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
   { id: 'cat-pt-9-2', name: 'Avó Dezanove e o Segredo do Soviético', price: 20000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '9ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
   { id: 'cat-pt-9-3', name: 'Fantasma de Canterville e outros contos', price: 15000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '9ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
-  { id: 'cat-pt-9-4', name: 'Wonder', price: 24500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '9ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'cat-pt-9-4', name: 'Wonder', price: 24500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '9ª Classe (Obrigatórios/ Leitura Orientada)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
   { id: 'cat-pt-9-5', name: 'Do rio ao mar', price: 5000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '9ª Classe (Sugeridos/ Leitura Recomendada)', category: 'Sugeridos/ Leitura Recomendada', stockStatus: "in_stock" },
   { id: 'cat-pt-9-6', name: 'A rainha Ginga', price: 28500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '9ª Classe (Sugeridos/ Leitura Recomendada)', category: 'Sugeridos/ Leitura Recomendada', stockStatus: "in_stock" },
   // 10th Grade
   { id: 'cat-pt-10-1', name: 'Dom Casmurro', price: 11000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '10ª Classe', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
   { id: 'cat-pt-10-2', name: 'Morte no Nilo', price: 24500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '10ª Classe', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
   { id: 'cat-pt-10-3', name: 'Contos Fantásticos - Esgotado no Editor', price: 0, stock: 0, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '10ª Classe', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "sold_out" },
-  { id: 'cat-pt-10-4', name: 'To Kill a Mockingbird', price: 27000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '10ª Classe', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'cat-pt-10-4', name: 'To Kill a Mockingbird', price: 27000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '10ª Classe', category: 'Leitura em Inglês', stockStatus: "in_stock" },
   // 11th Grade
   { id: 'cat-pt-11-1', name: 'O retrato de Dorian Gray', price: 15500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '11ª Classe', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
   { id: 'cat-pt-11-2', name: 'Esaú e Jacob', price: 33000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '11ª Classe', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
   { id: 'cat-pt-11-3', name: 'O Vendedor de passados', price: 27000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '11ª Classe', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
-  { id: 'cat-pt-11-4', name: 'Nervous Conditions', price: 29000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '11ª Classe', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'cat-pt-11-4', name: 'Nervous Conditions', price: 29000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '11ª Classe', category: 'Leitura em Inglês', stockStatus: "in_stock" },
   // 12th Grade
   { id: 'cat-pt-12-1', name: 'Manana (esgotado, em processo de re-edição)', price: 0, stock: 0, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '12ª Classe', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "sold_out" },
   { id: 'cat-pt-12-2', name: 'Um Crime no Expresso do Oriente', price: 15000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '12ª Classe', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
   { id: 'cat-pt-12-3', name: 'Auto da Barca do Inferno', price: 13000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '12ª Classe', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
-  { id: 'cat-pt-12-4', name: 'Things Fall Apart', price: 30000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '12ª Classe', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'cat-pt-12-4', name: 'Things Fall Apart', price: 30000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: '12ª Classe', category: 'Leitura em Inglês', stockStatus: "in_stock" },
   // Recommended 10-12
   { id: 'cat-pt-rec-1', name: 'Esse Cabelo', price: 10000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Livros recomendados 10a a 12a Classe', category: 'Sugeridos/ Leitura Recomendada', stockStatus: "in_stock" },
   { id: 'cat-pt-rec-2', name: 'Teoria Geral do Esquecimento', price: 10000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Livros recomendados 10a a 12a Classe', category: 'Sugeridos/ Leitura Recomendada', stockStatus: "in_stock" },
   { id: 'cat-pt-rec-3', name: 'O Feitiço da Rama de Abóbora', price: 6000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Livros recomendados 10a a 12a Classe', category: 'Sugeridos/ Leitura Recomendada', stockStatus: "in_stock" },
   
+  // Cambridge Books
+  { id: 'cat-cmb-1-1', name: 'The Tale of Peter Rabbit', price: 20000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 1 (Mandatory/Obrigatório)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
+  { id: 'cat-cmb-2-1', name: 'The Gruffalo', price: 23500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 2 (Mandatory/Obrigatório)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
+  { id: 'cat-cmb-3-1', name: 'The Story of Ferdinand', price: 20000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 3 (Mandatory/Obrigatório)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
+  { id: 'cat-cmb-4-1', name: 'The Cat in the Hat', price: 23000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 4 (Mandatory/Obrigatório)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
+  { id: 'cat-cmb-4-2', name: 'Muadi o regresso dos elefantes', price: 5000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 4 (Mandatory/Obrigatório)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'cat-cmb-5-1', name: 'Fantastic Mr Fox', price: 20000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 5 (Mandatory/Obrigatório)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
+  { id: 'cat-cmb-5-2', name: 'The Wild Robot', price: 23000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 5 (Mandatory/Obrigatório)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
+  { id: 'cat-cmb-5-3', name: 'A Origem das Chuvas', price: 10000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 5 (Mandatory/Obrigatório)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'cat-cmb-6-1', name: 'Diary of a Wimpy Kid', price: 23000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 6 (Mandatory/Obrigatório)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
+  { id: 'cat-cmb-6-2', name: 'Charlie and the Chocolate Factory', price: 21000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 6 (Mandatory/Obrigatório)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
+  { id: 'cat-cmb-7-1', name: 'Holes', price: 23500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 7 (Mandatory/Obrigatório)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
+  { id: 'cat-cmb-7-2', name: 'Os Candengues no Parque da Quissama', price: 6000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 7 (Mandatory/Obrigatório)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+  { id: 'cat-cmb-8-1', name: 'The Boy in the Striped Pyjamas', price: 23000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 8 (Mandatory/Obrigatório)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
+  { id: 'cat-cmb-8-2', name: 'Paper Towns', price: 25000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 8 (Mandatory/Obrigatório)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
+  { id: 'cat-cmb-8-3', name: 'Contos do Mar Sem Fim', price: 7000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 8 (Mandatory/Obrigatório)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
+
   // Other Items
   { id: 'other-1', name: 'Dicionário Básico da Língua Portuguesa', price: 11000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Outros (1ª a 6ª classe)', category: 'Dicionário', stockStatus: "in_stock" },
   { id: 'other-2', name: 'Dicionário Ing-Pt / Pt-Ing', price: 13000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Outros (1ª a 6ª classe)', category: 'Dicionário', stockStatus: "in_stock" },
@@ -273,6 +291,28 @@ export const readingPlan: ReadingPlanItem[] = [
     { id: 'rp-cat-pt-rec-1c', productId: 'cat-pt-rec-1', schoolId: 'cat-pt', grade: 12, status: 'recommended' },
     { id: 'rp-cat-pt-rec-2c', productId: 'cat-pt-rec-2', schoolId: 'cat-pt', grade: 12, status: 'recommended' },
     { id: 'rp-cat-pt-rec-3c', productId: 'cat-pt-rec-3', schoolId: 'cat-pt', grade: 12, status: 'recommended' },
+
+    // CAT-Cambridge (mandatory only)
+    { id: 'rp-cat-cmb-1-1', productId: 'cat-cmb-1-1', schoolId: 'cat-cambridge', grade: 1, status: 'mandatory' },
+    { id: 'rp-cat-cmb-2-1', productId: 'cat-cmb-2-1', schoolId: 'cat-cambridge', grade: 2, status: 'mandatory' },
+    { id: 'rp-cat-cmb-3-1', productId: 'cat-cmb-3-1', schoolId: 'cat-cambridge', grade: 3, status: 'mandatory' },
+    { id: 'rp-cat-cmb-4-1', productId: 'cat-pt-5-5', schoolId: 'cat-cambridge', grade: 4, status: 'mandatory' },
+    { id: 'rp-cat-cmb-4-2', productId: 'cat-cmb-4-1', schoolId: 'cat-cambridge', grade: 4, status: 'mandatory' },
+    { id: 'rp-cat-cmb-4-3', productId: 'pal-3-1', schoolId: 'cat-cambridge', grade: 4, status: 'mandatory' },
+    { id: 'rp-cat-cmb-4-4', productId: 'cat-cmb-4-2', schoolId: 'cat-cambridge', grade: 4, status: 'mandatory' },
+    { id: 'rp-cat-cmb-5-1', productId: 'cat-cmb-5-1', schoolId: 'cat-cambridge', grade: 5, status: 'mandatory' },
+    { id: 'rp-cat-cmb-5-2', productId: 'cat-cmb-5-2', schoolId: 'cat-cambridge', grade: 5, status: 'mandatory' },
+    { id: 'rp-cat-cmb-5-3', productId: 'cat-pt-2-4', schoolId: 'cat-cambridge', grade: 5, status: 'mandatory' },
+    { id: 'rp-cat-cmb-6-1', productId: 'cat-cmb-6-1', schoolId: 'cat-cambridge', grade: 6, status: 'mandatory' },
+    { id: 'rp-cat-cmb-6-2', productId: 'cat-cmb-6-2', schoolId: 'cat-cambridge', grade: 6, status: 'mandatory' },
+    { id: 'rp-cat-cmb-6-3', productId: 'cat-pt-5-2', schoolId: 'cat-cambridge', grade: 6, status: 'mandatory' },
+    { id: 'rp-cat-cmb-6-4', productId: 'cat-pt-5-3', schoolId: 'cat-cambridge', grade: 6, status: 'mandatory' },
+    { id: 'rp-cat-cmb-7-1', productId: 'cat-cmb-7-1', schoolId: 'cat-cambridge', grade: 7, status: 'mandatory' },
+    { id: 'rp-cat-cmb-7-2', productId: 'cat-pt-9-4', schoolId: 'cat-cambridge', grade: 7, status: 'mandatory' },
+    { id: 'rp-cat-cmb-7-3', productId: 'cat-cmb-7-2', schoolId: 'cat-cambridge', grade: 7, status: 'mandatory' },
+    { id: 'rp-cat-cmb-8-1', productId: 'cat-cmb-8-1', schoolId: 'cat-cambridge', grade: 8, status: 'mandatory' },
+    { id: 'rp-cat-cmb-8-2', productId: 'cat-cmb-8-2', schoolId: 'cat-cambridge', grade: 8, status: 'mandatory' },
+    { id: 'rp-cat-cmb-8-3', productId: 'cat-cmb-8-3', schoolId: 'cat-cambridge', grade: 8, status: 'mandatory' },
 ];
 
 export const orders: Order[] = [];

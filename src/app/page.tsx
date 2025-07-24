@@ -201,6 +201,7 @@ export default function Home() {
                                             )}
                                         </>
                                      ) : (
+                                        gradeProducts.all.length > 0 &&
                                         <div className="rounded-lg border bg-card p-6">
                                             <h3 className="font-headline text-2xl font-semibold">Kit Completo {grade}ª Classe ({gradeProducts.all.length} livros)</h3>
                                             <p className="mt-2 text-muted-foreground">Compre todos os livros para o ano letivo.</p>
