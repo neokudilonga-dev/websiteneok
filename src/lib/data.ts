@@ -138,16 +138,14 @@ export const products: Product[] = [
   { id: 'cat-cmb-4-2', name: 'Muadi o regresso dos elefantes', price: 5000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 4 (Mandatory/Obrigatório)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
   { id: 'cat-cmb-5-1', name: 'Fantastic Mr Fox', price: 20000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 5 (Mandatory/Obrigatório)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
   { id: 'cat-cmb-5-2', name: 'The Wild Robot', price: 23000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 5 (Mandatory/Obrigatório)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
-  { id: 'cat-cmb-5-3', name: 'A Origem das Chuvas', price: 10000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 5 (Mandatory/Obrigatório)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
   { id: 'cat-cmb-6-1', name: 'Diary of a Wimpy Kid', price: 23000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 6 (Mandatory/Obrigatório)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
   { id: 'cat-cmb-6-2', name: 'Charlie and the Chocolate Factory', price: 21000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 6 (Mandatory/Obrigatório)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
   { id: 'cat-cmb-7-1', name: 'Holes', price: 23500, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 7 (Mandatory/Obrigatório)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
-  { id: 'cat-cmb-7-2', name: 'Os Candengues no Parque da Quissama', price: 6000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 7 (Mandatory/Obrigatório)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
   { id: 'cat-cmb-8-1', name: 'The Boy in the Striped Pyjamas', price: 23000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 8 (Mandatory/Obrigatório)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
   { id: 'cat-cmb-8-2', name: 'Paper Towns', price: 25000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 8 (Mandatory/Obrigatório)', category: 'Leitura em Inglês', stockStatus: "in_stock" },
   { id: 'cat-cmb-8-3', name: 'Contos do Mar Sem Fim', price: 7000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Grade 8 (Mandatory/Obrigatório)', category: 'Obrigatórios/ Leitura Orientada', stockStatus: "in_stock" },
 
-  // Other Items
+  // Other Items - Books
   { id: 'other-1', name: 'Dicionário Básico da Língua Portuguesa', price: 11000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Outros (1ª a 6ª classe)', category: 'Dicionário', stockStatus: "in_stock" },
   { id: 'other-2', name: 'Dicionário Ing-Pt / Pt-Ing', price: 13000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Outros (1ª a 6ª classe)', category: 'Dicionário', stockStatus: "in_stock" },
   { id: 'other-3', name: 'Dicionário Básico Ilustrado 1o ciclo', price: 11000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Outros (1ª a 6ª classe)', category: 'Dicionário', stockStatus: "in_stock" },
@@ -161,7 +159,7 @@ export const products: Product[] = [
   { id: 'other-11', name: 'Dicionário Fundamental Língua Portuguesa', price: 9000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Outros (7a a 12a classe)', category: 'Dicionário', stockStatus: "in_stock" },
   { id: 'other-12', name: 'Dicionário Editora da Língua Portuguesa', price: 23000, stock: 100, type: 'book', image: "https://placehold.co/600x400.png", images: [], description: 'Outros (7a a 12a classe)', category: 'Dicionário', stockStatus: "in_stock" },
 
-  // Musical Instruments
+  // Musical Instruments - Games
   { id: 'game-1', name: 'Melódica Azul', price: 31000, stock: 100, type: 'game', images: ["https://placehold.co/600x400.png"], image: "", description: 'Instrumento Musical', category: 'Instrumento Musical', stockStatus: "in_stock" },
   { id: 'game-2', name: 'Melódica Vermelha', price: 31000, stock: 100, type: 'game', images: ["https://placehold.co/600x400.png"], image: "", description: 'Instrumento Musical', category: 'Instrumento Musical', stockStatus: "in_stock" },
   { id: 'game-3', name: 'Melódica Preta', price: 31000, stock: 100, type: 'game', images: ["https://placehold.co/600x400.png"], image: "", description: 'Instrumento Musical', category: 'Instrumento Musical', stockStatus: "in_stock" },
@@ -197,13 +195,6 @@ export const readingPlan: ReadingPlanItem[] = [
     { id: 'rp-pal-9-1', productId: 'pal-9-1', schoolId: 'palanquinhas', grade: 9, status: 'mandatory' },
     { id: 'rp-pal-9-2', productId: 'pal-9-2', schoolId: 'palanquinhas', grade: 9, status: 'mandatory' },
     { id: 'rp-pal-9-3', productId: 'pal-9-3', schoolId: 'palanquinhas', grade: 9, status: 'mandatory' },
-    { id: 'rp-pal-outros-1', productId: 'game-1', schoolId: 'palanquinhas', grade: 'Outros', status: 'mandatory' },
-    { id: 'rp-pal-outros-2', productId: 'game-2', schoolId: 'palanquinhas', grade: 'Outros', status: 'mandatory' },
-    { id: 'rp-pal-outros-3', productId: 'game-3', schoolId: 'palanquinhas', grade: 'Outros', status: 'mandatory' },
-    { id: 'rp-pal-outros-4', productId: 'game-4', schoolId: 'palanquinhas', grade: 'Outros', status: 'mandatory' },
-    { id: 'rp-pal-outros-5', productId: 'other-1', schoolId: 'palanquinhas', grade: 'Outros', status: 'mandatory' },
-    { id: 'rp-pal-outros-6', productId: 'other-2', schoolId: 'palanquinhas', grade: 'Outros', status: 'mandatory' },
-    { id: 'rp-pal-outros-7', productId: 'other-3', schoolId: 'palanquinhas', grade: 'Outros', status: 'mandatory' },
 
     // CAT-PT (mandatory and recommended)
     // 1st Grade
@@ -298,6 +289,7 @@ export const readingPlan: ReadingPlanItem[] = [
     { id: 'rp-cat-pt-rec-1c', productId: 'cat-pt-rec-1', schoolId: 'cat-pt', grade: 12, status: 'recommended' },
     { id: 'rp-cat-pt-rec-2c', productId: 'cat-pt-rec-2', schoolId: 'cat-pt', grade: 12, status: 'recommended' },
     { id: 'rp-cat-pt-rec-3c', productId: 'cat-pt-rec-3', schoolId: 'cat-pt', grade: 12, status: 'recommended' },
+    // CAT-PT - Outros
     { id: 'rp-cat-pt-outros-1', productId: 'game-1', schoolId: 'cat-pt', grade: 'Outros', status: 'mandatory' },
     { id: 'rp-cat-pt-outros-2', productId: 'game-2', schoolId: 'cat-pt', grade: 'Outros', status: 'mandatory' },
     { id: 'rp-cat-pt-outros-3', productId: 'game-3', schoolId: 'cat-pt', grade: 'Outros', status: 'mandatory' },

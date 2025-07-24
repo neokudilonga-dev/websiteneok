@@ -26,9 +26,11 @@ import {
   FormMessage,
   FormDescription,
 } from "@/components/ui/form";
-import type { Product } from "@/lib/types";
+import type { Product, ReadingPlanItem } from "@/lib/types";
+import { schools } from "@/lib/data";
 import { useEffect, useState, ChangeEvent } from "react";
 import { PlusCircle, Trash2, Upload } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Image from "next/image";
 
@@ -36,8 +38,16 @@ interface AddEditGameSheetProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   game?: Product;
-  onSaveChanges: (game: Product) => void;
+  onSaveChanges: (game: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => void;
+  readingPlan: ReadingPlanItem[];
 }
+
+const readingPlanItemSchema = z.object({
+  schoolId: z.string().min(1, "A escola é obrigatória."),
+  grade: z.union([z.coerce.number(), z.string()]).refine(val => val !== '', "O ano é obrigatório."),
+  status: z.enum(["mandatory", "recommended"]),
+});
+
 
 const gameFormSchema = z.object({
   name: z.string().min(3, "O nome deve ter pelo menos 3 caracteres."),
@@ -46,6 +56,7 @@ const gameFormSchema = z.object({
   stock: z.coerce.number().min(0, "O stock deve ser um número positivo."),
   images: z.array(z.string()).min(1, "Pelo menos uma imagem é obrigatória."),
   stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out']),
+  readingPlan: z.array(readingPlanItemSchema).optional(),
 });
 
 type GameFormValues = z.infer<typeof gameFormSchema>;
@@ -55,6 +66,7 @@ export function AddEditGameSheet({
   setIsOpen,
   game,
   onSaveChanges,
+  readingPlan,
 }: AddEditGameSheetProps) {
   const form = useForm<GameFormValues>({
     resolver: zodResolver(gameFormSchema),
@@ -65,6 +77,7 @@ export function AddEditGameSheet({
       stock: 0,
       images: [],
       stockStatus: "in_stock",
+      readingPlan: [],
     },
   });
 
@@ -73,9 +86,18 @@ export function AddEditGameSheet({
     name: "images",
   });
 
+  const { fields: readingPlanFields, append: appendReadingPlan, remove: removeReadingPlan } = useFieldArray({
+    control: form.control,
+    name: "readingPlan",
+  });
+
   useEffect(() => {
     if (isOpen) {
       if (game) {
+        const gameReadingPlan = readingPlan
+          .filter(rp => rp.productId === game.id)
+          .map(rp => ({ schoolId: rp.schoolId, grade: rp.grade, status: rp.status }));
+        
         form.reset({
           name: game.name,
           description: game.description,
@@ -83,6 +105,7 @@ export function AddEditGameSheet({
           stock: game.stock,
           images: game.images || [],
           stockStatus: game.stockStatus || 'in_stock',
+          readingPlan: gameReadingPlan,
         });
       } else {
         form.reset({
@@ -92,10 +115,11 @@ export function AddEditGameSheet({
           stock: 0,
           images: [],
           stockStatus: "in_stock",
+          readingPlan: [],
         });
       }
     }
-  }, [game, form, isOpen]);
+  }, [game, form, isOpen, readingPlan]);
 
   const onSubmit = (data: GameFormValues) => {
     onSaveChanges({
@@ -108,7 +132,7 @@ export function AddEditGameSheet({
       images: data.images,
       stockStatus: data.stockStatus,
       image: "",
-    });
+    }, data.readingPlan || []);
     setIsOpen(false);
   };
 
@@ -306,6 +330,98 @@ export function AddEditGameSheet({
                     </FormItem>
                 )}
                 />
+
+                <div>
+                    <Label>Plano de Leitura</Label>
+                    <FormDescription className="mb-2">
+                        Adicione este item aos planos de leitura das escolas.
+                    </FormDescription>
+                    <div className="space-y-4">
+                    {readingPlanFields.map((field, index) => (
+                        <div key={field.id} className="flex flex-col gap-4 rounded-md border p-4">
+                            <div className="flex items-end gap-2">
+                                <FormField
+                                    control={form.control}
+                                    name={`readingPlan.${index}.schoolId`}
+                                    render={({ field }) => (
+                                    <FormItem className="flex-1">
+                                        <FormLabel>Escola</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                            <SelectValue placeholder="Selecione uma escola" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {schools.map(school => (
+                                            <SelectItem key={school.id} value={school.id}>{school.name}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name={`readingPlan.${index}.grade`}
+                                    render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Ano/Categoria</FormLabel>
+                                        <FormControl>
+                                        <Input placeholder="Ex: 1 ou Outros" className="w-28" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                    )}
+                                />
+                                <Button type="button" variant="destructive" size="icon" onClick={() => removeReadingPlan(index)}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                            <FormField
+                                control={form.control}
+                                name={`readingPlan.${index}.status`}
+                                render={({ field }) => (
+                                    <FormItem className="space-y-3">
+                                    <FormLabel>Estado</FormLabel>
+                                    <FormControl>
+                                        <RadioGroup
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value}
+                                        className="flex items-center space-x-4"
+                                        >
+                                        <FormItem className="flex items-center space-x-2 space-y-0">
+                                            <FormControl>
+                                            <RadioGroupItem value="mandatory" />
+                                            </FormControl>
+                                            <FormLabel className="font-normal">Obrigatório</FormLabel>
+                                        </FormItem>
+                                        <FormItem className="flex items-center space-x-2 space-y-0">
+                                            <FormControl>
+                                            <RadioGroupItem value="recommended" />
+                                            </FormControl>
+                                            <FormLabel className="font-normal">Recomendado</FormLabel>
+                                        </FormItem>
+                                        </RadioGroup>
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    ))}
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => appendReadingPlan({ schoolId: '', grade: '', status: 'mandatory' })}
+                    >
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Adicionar ao Plano de Leitura
+                    </Button>
+                    </div>
+                </div>
 
             </div>
             <SheetFooter className="mt-auto pt-4">

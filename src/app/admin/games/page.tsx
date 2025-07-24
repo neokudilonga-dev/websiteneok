@@ -28,8 +28,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { products as initialProducts } from "@/lib/data";
-import type { Product } from "@/lib/types";
+import { products as initialProducts, readingPlan as initialReadingPlan } from "@/lib/data";
+import type { Product, ReadingPlanItem } from "@/lib/types";
 import { AddEditGameSheet } from "@/components/admin/add-edit-game-sheet";
 import { Input } from "@/components/ui/input";
 
@@ -37,6 +37,8 @@ export default function GamesPage() {
   const [products, setProducts] = useState<Product[]>(
     initialProducts.filter((p) => p.type === "game")
   );
+  const [readingPlan, setReadingPlan] = useState<ReadingPlanItem[]>(initialReadingPlan);
+
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [selectedGame, setSelectedGame] = useState<Product | undefined>(
     undefined
@@ -65,22 +67,35 @@ export default function GamesPage() {
 
   const handleDeleteGame = (gameId: string) => {
     setProducts(products.filter((p) => p.id !== gameId));
+    setReadingPlan(readingPlan.filter(item => item.productId !== gameId));
   };
 
-  const handleSaveChanges = (game: Product) => {
+  const handleSaveChanges = (game: Product, newReadingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => {
     if (selectedGame) {
       setProducts(products.map((p) => (p.id === game.id ? game : p)));
     } else {
       const newGame = { ...game, id: `game-${Date.now()}` };
       setProducts([...products, newGame]);
+      game.id = newGame.id;
     }
+
+    // Update reading plan
+    const otherSchoolsPlan = readingPlan.filter(item => item.productId !== game.id);
+    const thisGamePlan: ReadingPlanItem[] = newReadingPlan.map((rp, index) => ({
+      id: `rp-game-${game.id}-${index}-${Date.now()}`,
+      productId: game.id,
+      schoolId: rp.schoolId,
+      grade: rp.grade,
+      status: rp.status,
+    }));
+    setReadingPlan([...otherSchoolsPlan, ...thisGamePlan]);
   };
 
   return (
     <>
       <Card>
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <CardTitle>Jogos</CardTitle>
+          <CardTitle>Jogos e Outros</CardTitle>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -207,6 +222,7 @@ export default function GamesPage() {
         setIsOpen={setSheetOpen}
         game={selectedGame}
         onSaveChanges={handleSaveChanges}
+        readingPlan={readingPlan}
       />
     </>
   );
