@@ -30,7 +30,7 @@ export default function LojaPage() {
   const initialTab = searchParams.get('tab') || 'planos';
   
   const [selectedSchool, setSelectedSchool] = useState<School | undefined>(
-    schools[0]
+    undefined
   );
   const [activeTab, setActiveTab] = useState(initialTab);
   const [showIndividual, setShowIndividual] = useState<string | null>(null);
