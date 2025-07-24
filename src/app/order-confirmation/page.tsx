@@ -57,7 +57,7 @@ export default function OrderConfirmationPage() {
                 )}
 
                 <Button asChild size="lg">
-                    <Link href="/">Voltar à Loja</Link>
+                    <Link href="/loja">Voltar à Loja</Link>
                 </Button>
             </CardContent>
           </Card>

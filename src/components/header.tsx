@@ -17,6 +17,9 @@ export default function Header() {
         </div>
         <div className="flex items-center justify-end space-x-4">
           <nav className="hidden items-center gap-6 md:flex">
+             <Link href="/loja" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+                Loja
+             </Link>
              <Link href="/quem-somos" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
                 Quem Somos
              </Link>
