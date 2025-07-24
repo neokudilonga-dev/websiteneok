@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import Cart from "./cart";
-import { BiblioAngolaLogo } from "./logo";
+import { NeokudilongaLogo } from "./logo";
 import { Button } from "./ui/button";
 
 export default function Header() {
@@ -12,7 +12,7 @@ export default function Header() {
       <div className="container flex h-20 items-center justify-between">
         <div className="flex items-center gap-6 md:gap-10">
           <Link href="/" className="flex items-center space-x-2">
-            <BiblioAngolaLogo className="h-16 w-auto" />
+            <NeokudilongaLogo className="h-16 w-auto" />
           </Link>
         </div>
         <div className="flex items-center justify-end space-x-4">

@@ -100,7 +100,7 @@ export default function LandingPage() {
             <div className="container text-center">
                 <h2 className="font-headline text-3xl font-bold">Como Funciona</h2>
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
-                    Comprar na BiblioAngola é fácil e rápido. Siga estes passos simples.
+                    Comprar na Neokudilonga é fácil e rápido. Siga estes passos simples.
                 </p>
                 <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
                     <div className="flex flex-col items-center gap-4">

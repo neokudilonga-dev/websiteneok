@@ -1,5 +1,5 @@
 
-export function BiblioAngolaLogo({ className }: { className?: string }) {
+export function NeokudilongaLogo({ className }: { className?: string }) {
   return (
     <svg
       version="1.0"
@@ -32,7 +32,7 @@ export function BiblioAngolaLogo({ className }: { className?: string }) {
   );
 }
 
-export function BiblioAngolaLogoAbbr({ className }: { className?: string }) {
+export function NeokudilongaLogoAbbr({ className }: { className?: string }) {
   return (
     <svg
       version="1.0"

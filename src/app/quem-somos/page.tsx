@@ -1,7 +1,7 @@
 
 import Image from "next/image";
 import Header from "@/components/header";
-import { BiblioAngolaLogo } from "@/components/logo";
+import { NeokudilongaLogo } from "@/components/logo";
 
 export default function QuemSomosPage() {
   return (
@@ -30,7 +30,7 @@ export default function QuemSomosPage() {
                         </p>
                     </div>
                      <div className="flex items-center justify-center rounded-lg bg-primary/10 p-8">
-                        <BiblioAngolaLogo className="h-auto w-full max-w-[300px] text-primary" />
+                        <NeokudilongaLogo className="h-auto w-full max-w-[300px] text-primary" />
                     </div>
                 </div>
 

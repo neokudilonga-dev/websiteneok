@@ -12,7 +12,7 @@ import {
   SheetFooter,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { BiblioAngolaLogo } from "@/components/logo";
+import { NeokudilongaLogo } from "@/components/logo";
 import type { Order } from "@/lib/types";
 import { Download, Printer } from "lucide-react";
 
@@ -91,10 +91,10 @@ export function OrderReceiptSheet({
           <SheetTitle>Recibo da Encomenda</SheetTitle>
         </SheetHeader>
         <div className="flex-1 overflow-auto">
-          <div id="receipt-container" className="py-4 pr-6">
+          <div id="receipt-container" className="py-4 pr-6 overflow-x-auto">
             <div ref={receiptRef} id="receipt" className="space-y-4 p-4 border rounded-lg bg-white text-black min-w-[210mm]">
               <div className="text-center">
-                <BiblioAngolaLogo className="h-12 mx-auto" />
+                <NeokudilongaLogo className="h-12 mx-auto" />
               </div>
               <table className="w-full text-sm border-collapse">
                 <tbody>

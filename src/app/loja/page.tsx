@@ -197,7 +197,7 @@ export default function LojaPage() {
                             {getGradeDisplayName(grade)}
                           </AccordionTrigger>
                           <AccordionContent>
-                             {String(grade).toLowerCase() === 'outros' ? (
+                             {String(grade).toLowerCase() === 'outros' || showIndividual === grade ? (
                                 renderProductGridWithBadges(gradeProducts.all, grade)
                              ) : (
                                 <div className="space-y-6">
@@ -238,9 +238,7 @@ export default function LojaPage() {
                                         )}
                                     </div>
 
-                                    {showIndividual === grade ? (
-                                        renderProductGridWithBadges(gradeProducts.all, grade)
-                                    ) : (
+                                    {showIndividual !== grade && (
                                         <div className="text-center mt-6">
                                             <Button variant="outline" onClick={() => setShowIndividual(grade)}>
                                                 Comprar em separado
