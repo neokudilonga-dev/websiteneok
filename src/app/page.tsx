@@ -12,7 +12,7 @@ export default function LandingPage() {
       <Header />
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative h-[60vh] min-h-[400px] w-full bg-primary/10">
+        <section className="relative h-[50vh] min-h-[350px] w-full bg-primary/10">
           <div className="absolute inset-0 z-0">
              <Image
                 src="https://placehold.co/1920x1080.png"
@@ -25,17 +25,12 @@ export default function LandingPage() {
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
           </div>
           <div className="container relative z-10 flex h-full flex-col items-center justify-center text-center">
-            <h1 className="font-headline text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
+            <h1 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
               Regresso às aulas com a Neokudilonga
             </h1>
-            <p className="mt-6 max-w-2xl text-lg text-foreground/80">
+            <p className="mt-4 max-w-2xl text-lg text-foreground/80">
               Encontre os planos de leitura escolares, livros, e jogos didácticos. A sua jornada de conhecimento começa aqui.
             </p>
-            <Button asChild size="lg" className="mt-8">
-              <Link href="/loja">
-                Ir para a Loja <ArrowRight className="ml-2" />
-              </Link>
-            </Button>
           </div>
         </section>
 
