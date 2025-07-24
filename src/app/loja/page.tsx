@@ -8,15 +8,15 @@ import { schools, products as allProducts, readingPlan, bookCategories } from "@
 import Header from "@/components/header";
 import ProductGrid from "@/components/product-grid";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import SchoolSelector from "@/components/school-selector";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, ShoppingCart, Search } from "lucide-react";
+import { ChevronRight, ShoppingCart, Search, ArrowLeft } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ProductCard from "@/components/product-card";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 
 interface GradeProducts {
@@ -47,11 +47,14 @@ export default function LojaPage() {
     }
   }, [searchParams, activeTab]);
 
-  const handleSchoolChange = (schoolId: string) => {
-    const school = schools.find((s) => s.id === schoolId);
+  const handleSchoolSelect = (school: School) => {
     setSelectedSchool(school);
     setShowIndividual(null); // Reset when school changes
   };
+
+  const handleGoBackToSchoolSelection = () => {
+    setSelectedSchool(undefined);
+  }
   
   const productsById = useMemo(() => {
     return allProducts.reduce((acc, product) => {
@@ -100,7 +103,7 @@ export default function LojaPage() {
       case "planos":
         return selectedSchool
           ? `Plano de Leitura: ${selectedSchool.name}`
-          : "Selecione uma escola";
+          : "Selecione a sua escola";
       case "catalogo":
         return "Todos os Livros";
       case "jogos":
@@ -113,7 +116,9 @@ export default function LojaPage() {
    const renderDescription = () => {
     switch (activeTab) {
       case 'planos':
-        return 'Selecione a escola para ver os livros recomendados por ano escolar.';
+        return selectedSchool 
+            ? 'Selecione a classe para ver os livros recomendados.' 
+            : 'Selecione a escola para ver os planos de leitura.';
       case 'catalogo':
         return 'Explore todos os livros disponíveis no nosso catálogo.';
       case 'jogos':
@@ -193,15 +198,15 @@ export default function LojaPage() {
              </div>
 
             <TabsContent value="planos" className="mt-6">
-                <div className="mb-6">
-                    <SchoolSelector
-                        schools={schools}
-                        selectedSchool={selectedSchool}
-                        onSchoolChange={handleSchoolChange}
-                    />
-                </div>
                 {selectedSchool ? (
-                   Object.keys(productsByGrade).length > 0 ? (
+                    <>
+                    <div className="mb-4">
+                        <Button variant="outline" onClick={handleGoBackToSchoolSelection}>
+                            <ArrowLeft className="mr-2" />
+                            Voltar
+                        </Button>
+                    </div>
+                   {Object.keys(productsByGrade).length > 0 ? (
                     <Accordion type="single" collapsible className="w-full" defaultValue={`item-${Object.keys(productsByGrade).sort((a,b) => customGradeSort([a,0],[b,0]))[0]}`} onValueChange={() => setShowIndividual(null)}>
                       {Object.entries(productsByGrade).sort(customGradeSort).map(([grade, gradeProducts]) => (
                         <AccordionItem value={`item-${grade}`} key={grade}>
@@ -269,11 +274,23 @@ export default function LojaPage() {
                         <h3 className="font-headline text-2xl font-semibold tracking-tight">Nenhum livro encontrado</h3>
                         <p className="text-muted-foreground">Ainda não há livros do plano de leitura para esta escola.</p>
                     </div>
-                   )
+                   )}
+                   </>
                 ) : (
-                     <div className="mx-auto flex max-w-7xl flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/20 p-12 text-center">
-                        <h3 className="font-headline text-2xl font-semibold tracking-tight">Selecione uma escola</h3>
-                        <p className="text-muted-foreground">Por favor, selecione uma escola para ver a lista de materiais.</p>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        {schools.map(school => (
+                            <Button 
+                                key={school.id} 
+                                onClick={() => handleSchoolSelect(school)}
+                                variant="outline"
+                                className="h-auto justify-start p-6 text-left"
+                            >
+                                <div className="flex flex-col">
+                                    <span className="text-lg font-semibold">{school.name}</span>
+                                    <span className="text-sm text-muted-foreground">Ver plano de leitura</span>
+                                </div>
+                            </Button>
+                        ))}
                     </div>
                 )}
             </TabsContent>
