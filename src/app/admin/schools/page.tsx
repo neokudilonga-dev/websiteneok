@@ -89,6 +89,7 @@ export default function SchoolsPage() {
                 <TableHead>Abreviação</TableHead>
                 <TableHead>Levant. no Colégio</TableHead>
                 <TableHead>Levant. no Local</TableHead>
+                <TableHead>Plano Recomendado</TableHead>
                 <TableHead className="text-right">
                   <span className="sr-only">Ações</span>
                 </TableHead>
@@ -107,6 +108,9 @@ export default function SchoolsPage() {
                   </TableCell>
                    <TableCell>
                     {renderCheck(school.allowPickupAtLocation)}
+                  </TableCell>
+                   <TableCell>
+                    {renderCheck(school.hasRecommendedPlan)}
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>

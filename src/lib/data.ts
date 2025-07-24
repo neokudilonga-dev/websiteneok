@@ -2,7 +2,7 @@
 import type { School, Product, ReadingPlanItem, Order } from "@/lib/types";
 
 export const schools: School[] = [
-  { id: "palanquinhas", name: "Palanquinhas", abbreviation: "PAL", allowPickup: true, allowPickupAtLocation: true },
+  { id: "palanquinhas", name: "Palanquinhas", abbreviation: "PAL", allowPickup: true, allowPickupAtLocation: true, hasRecommendedPlan: false },
 ];
 
 export const bookCategories = ["Manual Escolar", "Ficção", "Não-Ficção", "Ciência", "História", "Literatura", "Obrigatórios/ Leitura Orientada", "Sugeridos/ Leitura Recomendada"];

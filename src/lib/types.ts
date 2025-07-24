@@ -30,6 +30,7 @@ export interface School {
   abbreviation: string;
   allowPickup?: boolean;
   allowPickupAtLocation?: boolean;
+  hasRecommendedPlan?: boolean;
 }
 
 export interface CartItem extends Product {

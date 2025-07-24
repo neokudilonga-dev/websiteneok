@@ -40,6 +40,7 @@ const schoolFormSchema = z.object({
   abbreviation: z.string().min(2, "A abreviação deve ter pelo menos 2 caracteres.").max(5, "A abreviação não pode ter mais de 5 caracteres.").regex(/^[A-Z0-9]+$/, "A abreviação só pode conter letras maiúsculas e números."),
   allowPickup: z.boolean().default(false),
   allowPickupAtLocation: z.boolean().default(false),
+  hasRecommendedPlan: z.boolean().default(false),
 });
 
 type SchoolFormValues = z.infer<typeof schoolFormSchema>;
@@ -58,6 +59,7 @@ export function AddEditSchoolSheet({
       abbreviation: "",
       allowPickup: false,
       allowPickupAtLocation: false,
+      hasRecommendedPlan: false,
     },
   });
 
@@ -70,9 +72,10 @@ export function AddEditSchoolSheet({
             abbreviation: school.abbreviation,
             allowPickup: school.allowPickup || false,
             allowPickupAtLocation: school.allowPickupAtLocation || false,
+            hasRecommendedPlan: school.hasRecommendedPlan || false,
         });
         } else {
-        form.reset({ name: "", id: "", abbreviation: "", allowPickup: false, allowPickupAtLocation: false });
+        form.reset({ name: "", id: "", abbreviation: "", allowPickup: false, allowPickupAtLocation: false, hasRecommendedPlan: false });
         }
     }
   }, [school, form, isOpen]);
@@ -166,6 +169,27 @@ export function AddEditSchoolSheet({
                       <FormLabel>Permitir Levantamento no Local</FormLabel>
                       <FormDescription>
                         Condomínio BCI 6 Casas, Casa No. 6
+                      </FormDescription>
+                       <FormMessage />
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="hasRecommendedPlan"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel>Tem Plano de Leitura Recomendado</FormLabel>
+                      <FormDescription>
+                        Ative se a escola tiver kits recomendados para além dos obrigatórios.
                       </FormDescription>
                        <FormMessage />
                     </div>
