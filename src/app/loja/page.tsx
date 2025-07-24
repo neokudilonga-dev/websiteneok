@@ -1,7 +1,8 @@
 
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from 'next/navigation';
 import type { School, Product, ReadingPlanItem } from "@/lib/types";
 import { schools, products as allProducts, readingPlan, bookCategories } from "@/lib/data";
 import Header from "@/components/header";
@@ -25,15 +26,26 @@ interface GradeProducts {
 }
 
 export default function LojaPage() {
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get('tab') || 'planos';
+  
   const [selectedSchool, setSelectedSchool] = useState<School | undefined>(
     schools[0]
   );
-  const [activeTab, setActiveTab] = useState("planos");
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [showIndividual, setShowIndividual] = useState<string | null>(null);
   const { addKitToCart } = useCart();
   
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  
+  useEffect(() => {
+    // Sync tab state if URL changes
+    const tabFromUrl = searchParams.get('tab');
+    if (tabFromUrl && tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams, activeTab]);
 
   const handleSchoolChange = (schoolId: string) => {
     const school = schools.find((s) => s.id === schoolId);
@@ -164,7 +176,7 @@ export default function LojaPage() {
       <Header />
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
         <div className="mx-auto w-full max-w-7xl">
-          <Tabs defaultValue="planos" className="w-full" onValueChange={setActiveTab}>
+          <Tabs value={activeTab} className="w-full" onValueChange={setActiveTab}>
             <TabsList className="grid h-auto w-full grid-cols-1 sm:grid-cols-3">
               <TabsTrigger value="planos" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">Planos de Leitura</TabsTrigger>
               <TabsTrigger value="catalogo" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">Todos os Livros</TabsTrigger>

@@ -15,7 +15,7 @@ export default function LandingPage() {
         <section className="relative h-[60vh] min-h-[400px] w-full bg-primary/10">
           <div className="absolute inset-0 z-0">
              <Image
-                src="https://placehold.co/1920x1080.png"
+                src="https://placehold.co/1920/1080.png"
                 alt="Cartoon of books"
                 fill
                 className="object-cover"
@@ -71,7 +71,7 @@ export default function LandingPage() {
                     Explore o nosso vasto catálogo de livros, para todas as idades e interesses.
                   </p>
                    <Button asChild variant="outline" className="mt-4">
-                        <Link href="/loja#catalogo">Explorar Catálogo</Link>
+                        <Link href="/loja?tab=catalogo">Explorar Catálogo</Link>
                     </Button>
                 </CardContent>
               </Card>
@@ -87,7 +87,7 @@ export default function LandingPage() {
                     Descubra jogos educativos, instrumentos musicais e outros materiais didácticos.
                   </p>
                    <Button asChild variant="outline" className="mt-4">
-                        <Link href="/loja#jogos">Ver Jogos</Link>
+                        <Link href="/loja?tab=jogos">Ver Jogos</Link>
                     </Button>
                 </CardContent>
               </Card>
