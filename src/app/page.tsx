@@ -16,20 +16,20 @@ export default function LandingPage() {
           <div className="absolute inset-0 z-0">
              <Image
                 src="https://placehold.co/1920x1080.png"
-                alt="Children reading books"
+                alt="Cartoon of books"
                 fill
                 className="object-cover"
                 priority
-                data-ai-hint="happy children reading"
+                data-ai-hint="books cartoon"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
           </div>
           <div className="container relative z-10 flex h-full flex-col items-center justify-center text-center">
             <h1 className="font-headline text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-              Tudo o que precisa para o regresso às aulas
+              Regresso às aulas com a Neokudilonga
             </h1>
             <p className="mt-6 max-w-2xl text-lg text-foreground/80">
-              Encontre os planos de leitura escolar, livros, e jogos didáticos. A sua jornada de conhecimento começa aqui.
+              Encontre os planos de leitura escolares, livros, e jogos didácticos. A sua jornada de conhecimento começa aqui.
             </p>
             <Button asChild size="lg" className="mt-8">
               <Link href="/loja">
@@ -84,7 +84,7 @@ export default function LandingPage() {
                 </CardHeader>
                 <CardContent className="text-center">
                   <p className="text-muted-foreground">
-                    Descubra jogos educativos, instrumentos musicais e outros materiais didáticos.
+                    Descubra jogos educativos, instrumentos musicais e outros materiais didácticos.
                   </p>
                    <Button asChild variant="outline" className="mt-4">
                         <Link href="/loja#jogos">Ver Jogos</Link>
