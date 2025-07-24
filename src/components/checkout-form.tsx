@@ -55,12 +55,8 @@ export default function CheckoutForm() {
     const requiresStudentInfo = readingPlanProductIdsInCart.length > 0;
     
     const schoolsInCart = useMemo(() => {
-        const schoolIds = new Set(readingPlanProductIdsInCart.map(item => {
-            const rpItem = readingPlan.find(rp => rp.productId === item.id);
-            return rpItem?.schoolId;
-        }).filter(Boolean));
-
-        return schools.filter(school => schoolIds.has(school.id));
+        const schoolIdsInCart = new Set(readingPlan.filter(rp => readingPlanProductIdsInCart.some(ci => ci.id === rp.productId)).map(rp => rp.schoolId));
+        return schools.filter(school => schoolIdsInCart.has(school.id));
     }, [readingPlanProductIdsInCart]);
 
     const allowPickupAtSchool = useMemo(() => {
@@ -122,8 +118,9 @@ export default function CheckoutForm() {
     const finalTotal = cartTotal + deliveryFee;
 
     const generateOrderReference = () => {
-        let prefix = "LIV";
+        let prefix = "LIV"; // Default prefix
         if (schoolsInCart.length > 0) {
+            // If there are school items, use the first school's abbreviation
             const school = schools.find(s => s.id === schoolsInCart[0].id);
             if (school) {
                 prefix = school.abbreviation;
@@ -158,7 +155,10 @@ export default function CheckoutForm() {
 
         // For demo purposes, we clear the cart and redirect.
         clearCart();
-        router.push(`/order-confirmation?ref=${orderReference}`);
+        const urlParams = new URLSearchParams();
+        urlParams.set("ref", orderReference);
+        urlParams.set("payment", data.paymentMethod);
+        router.push(`/order-confirmation?${urlParams.toString()}`);
 
         toast({
             title: "Encomenda Submetida!",

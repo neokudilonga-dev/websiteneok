@@ -32,8 +32,8 @@ export default function ContactosPage() {
                                     <Phone className="h-6 w-6" />
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-semibold">Telefone e WhatsApp</h3>
-                                    <p className="text-muted-foreground">Contacte-nos para um atendimento mais rápido.</p>
+                                    <h3 className="text-lg font-semibold">WhatsApp</h3>
+                                    <p className="text-muted-foreground">Contacte-nos para um atendimento mais rápido. Não há atendimento telefónico.</p>
                                     <a href="https://wa.me/244919948887" target="_blank" rel="noopener noreferrer" className="mt-1 block text-primary hover:underline">
                                         +244 919 948 887
                                     </a>
@@ -45,9 +45,9 @@ export default function ContactosPage() {
                                 </div>
                                 <div>
                                     <h3 className="text-lg font-semibold">Email</h3>
-                                    <p className="text-muted-foreground">Para questões formais ou envio de documentos.</p>
-                                    <a href="mailto:geral@neokudilonga.co.ao" className="mt-1 block text-primary hover:underline">
-                                        geral@neokudilonga.co.ao
+                                    <p className="text-muted-foreground">Para questões formais ou envio de comprovativos.</p>
+                                    <a href="mailto:neokudilonga@gmail.com" className="mt-1 block text-primary hover:underline">
+                                        neokudilonga@gmail.com
                                     </a>
                                 </div>
                             </div>

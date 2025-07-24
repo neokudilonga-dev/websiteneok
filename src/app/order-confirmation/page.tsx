@@ -6,11 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import Header from "@/components/header";
 import Link from "next/link";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, AlertTriangle } from "lucide-react";
 
 export default function OrderConfirmationPage() {
   const searchParams = useSearchParams();
   const orderRef = searchParams.get("ref");
+  const paymentMethod = searchParams.get("payment");
 
   return (
     <div className="flex min-h-screen w-full flex-col">
@@ -29,9 +30,32 @@ export default function OrderConfirmationPage() {
                 <p className="text-muted-foreground">
                     A sua encomenda com a referência <span className="font-bold text-primary">{orderRef}</span> foi registada com sucesso.
                 </p>
-                <p className="text-muted-foreground">
-                    Receberá um e-mail automático a confirmar o que encomendou. Posteriormente, será contactado/a via WhatsApp para os próximos passos.
-                </p>
+                
+                {paymentMethod === 'transferencia' ? (
+                     <div className="rounded-lg border border-yellow-300 bg-yellow-50 p-4 text-left text-yellow-800">
+                        <div className="flex">
+                            <div className="flex-shrink-0">
+                                <AlertTriangle className="h-5 w-5 text-yellow-400" />
+                            </div>
+                            <div className="ml-3">
+                                <h3 className="text-sm font-medium">Ação Necessária: Pagamento Pendente</h3>
+                                <div className="mt-2 text-sm">
+                                    <p>Para confirmar a sua encomenda, por favor realize o pagamento por transferência bancária para o IBAN abaixo e envie o comprovativo para um dos nossos contactos.</p>
+                                    <ul className="mt-2 list-inside list-disc space-y-1">
+                                        <li><strong>IBAN:</strong> BIC AO06 0051 0000 8030 4996 1512 5</li>
+                                        <li><strong>Email:</strong> neokudilonga@gmail.com</li>
+                                        <li><strong>WhatsApp:</strong> +244 919 948 887</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <p className="text-muted-foreground">
+                        Receberá um e-mail automático a confirmar o que encomendou. Posteriormente, será contactado/a via WhatsApp para os próximos passos.
+                    </p>
+                )}
+
                 <Button asChild size="lg">
                     <Link href="/">Voltar à Loja</Link>
                 </Button>
