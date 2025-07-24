@@ -7,21 +7,38 @@ import { usePathname } from 'next/navigation';
 export default function Loading() {
     const pathname = usePathname();
     const [loading, setLoading] = useState(false);
-    const [previousPath, setPreviousPath] = useState(pathname);
 
     useEffect(() => {
-        if (previousPath !== pathname) {
-            setLoading(true);
-        }
-        setPreviousPath(pathname);
-    }, [pathname, previousPath]);
+        let timer: NodeJS.Timeout;
 
-    useEffect(() => {
-        // This effect runs when the component using the new pathname has mounted
-        // effectively meaning the "loading" is done.
-        setLoading(false);
+        const handleStart = (url: string) => {
+            if (url !== window.location.pathname) {
+                setLoading(true);
+            }
+        };
+
+        const handleComplete = () => {
+            // Add a small delay to prevent flickering on fast page loads
+            timer = setTimeout(() => {
+                setLoading(false);
+            }, 300);
+        };
+
+        // This is a workaround to listen to Next.js navigation events
+        // as we can't directly use the router events here.
+        // We trigger the loading state on pathname change.
+        setLoading(true);
+        handleComplete();
+
+        return () => {
+            clearTimeout(timer);
+        };
     }, [pathname]);
 
+    useEffect(() => {
+        // This effect runs only once on initial mount to hide the loader.
+        setLoading(false);
+    }, []);
 
     if (!loading) {
         return null;

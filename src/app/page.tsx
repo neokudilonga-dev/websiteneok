@@ -15,7 +15,7 @@ export default function LandingPage() {
         <section className="relative h-[60vh] min-h-[400px] w-full bg-primary/10">
           <div className="absolute inset-0 z-0">
              <Image
-                src="https://placehold.co/1920/1080.png"
+                src="https://placehold.co/1920x1080.png"
                 alt="Cartoon of books"
                 fill
                 className="object-cover"
