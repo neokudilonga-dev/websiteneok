@@ -74,7 +74,7 @@ export default function Cart() {
               <Separator />
               <div className="flex items-center justify-between text-lg font-semibold">
                 <span>Total</span>
-                <span>{cartTotal.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}</span>
+                <span>{cartTotal.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
               </div>
               <SheetClose asChild>
                  <Link href="/checkout" className="w-full">

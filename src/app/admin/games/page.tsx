@@ -161,6 +161,8 @@ export default function GamesPage() {
                     {product.price.toLocaleString("pt-PT", {
                       style: "currency",
                       currency: "AOA",
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
                     })}
                   </TableCell>
                   <TableCell className="hidden md:table-cell">

@@ -210,6 +210,8 @@ export default function OrdersPage() {
                     {order.total.toLocaleString("pt-PT", {
                       style: "currency",
                       currency: "AOA",
+                      minimumFractionDigits: 0, 
+                      maximumFractionDigits: 0
                     })}
                   </TableCell>
                   <TableCell>

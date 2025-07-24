@@ -318,7 +318,7 @@ export default function CheckoutForm() {
                 </div>
 
                 <Button type="submit" size="lg" className="w-full">
-                    Enviar Encomenda e Pagar {finalTotal.toLocaleString("pt-PT", { style: "currency", currency: "AOA" })}
+                    Enviar Encomenda e Pagar {finalTotal.toLocaleString("pt-PT", { style: "currency", currency: "AOA", minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                 </Button>
             </form>
         </Form>

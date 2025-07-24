@@ -58,13 +58,15 @@ export default function CheckoutPage() {
                             {item.price.toLocaleString("pt-PT", {
                               style: "currency",
                               currency: "AOA",
+                              minimumFractionDigits: 0, 
+                              maximumFractionDigits: 0
                             })}
                           </p>
                         </div>
                         <p className="font-semibold">
                           {(item.price * item.quantity).toLocaleString(
                             "pt-PT",
-                            { style: "currency", currency: "AOA" }
+                            { style: "currency", currency: "AOA", minimumFractionDigits: 0, maximumFractionDigits: 0 }
                           )}
                         </p>
                       </div>
@@ -78,6 +80,8 @@ export default function CheckoutPage() {
                         {cartTotal.toLocaleString("pt-PT", {
                           style: "currency",
                           currency: "AOA",
+                          minimumFractionDigits: 0, 
+                          maximumFractionDigits: 0
                         })}
                       </p>
                     </div>
@@ -88,6 +92,8 @@ export default function CheckoutPage() {
                         {cartTotal.toLocaleString("pt-PT", {
                           style: "currency",
                           currency: "AOA",
+                          minimumFractionDigits: 0, 
+                          maximumFractionDigits: 0
                         })}
                       </p>
                     </div>

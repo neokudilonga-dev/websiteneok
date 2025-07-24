@@ -98,8 +98,8 @@ export default function BooksPage() {
     setReadingPlan([...otherSchoolsPlan, ...thisBookPlan]);
   };
 
-  const getSchoolName = (schoolId: string) => {
-    return schools.find(s => s.id === schoolId)?.name || schoolId;
+  const getSchoolAbbreviation = (schoolId: string) => {
+    return schools.find(s => s.id === schoolId)?.abbreviation || schoolId;
   }
   
   const getBookReadingPlan = (productId: string) => {
@@ -197,13 +197,13 @@ export default function BooksPage() {
                    <TableCell>
                     {product.stock}
                    </TableCell>
-                  <TableCell>{product.price.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}</TableCell>
+                  <TableCell>{product.price.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}</TableCell>
                   <TableCell className="hidden md:table-cell">
                     <div className="flex flex-wrap gap-1">
                       {getBookReadingPlan(product.id).length > 0 ? (
                         getBookReadingPlan(product.id).map(item => (
-                            <Badge key={item.id} variant={item.status === 'mandatory' ? 'default' : 'secondary'}>
-                                {getSchoolName(item.schoolId)} - {item.grade}º Ano ({item.status === 'mandatory' ? 'Obrigatório' : 'Recomendado'})
+                            <Badge key={item.id} variant={item.status === 'mandatory' ? 'default' : 'secondary'} title={`${getSchoolAbbreviation(item.schoolId)} - Grade ${item.grade} (${item.status})`}>
+                                {getSchoolAbbreviation(item.schoolId)} - {item.grade}º Ano
                             </Badge>
                         ))
                       ): (

@@ -207,7 +207,7 @@ export default function Home() {
                                                     <p className="mt-2 text-muted-foreground">Compre todos os livros obrigatórios.</p>
                                                     <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.mandatory, `Kit Obrigatório do ${getGradeDisplayName(grade)} - ${selectedSchool.name}`)}>
                                                         <ShoppingCart className="mr-2 h-5 w-5" /> 
-                                                        Adicionar por {calculateKitPrice(gradeProducts.mandatory).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}
+                                                        Adicionar por {calculateKitPrice(gradeProducts.mandatory).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                                                     </Button>
                                                 </div>
                                             )}
@@ -217,7 +217,7 @@ export default function Home() {
                                                     <p className="mt-2 text-muted-foreground">Compre todos os livros recomendados.</p>
                                                     <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.recommended, `Kit Recomendado do ${getGradeDisplayName(grade)} - ${selectedSchool.name}`)}>
                                                         <ShoppingCart className="mr-2 h-5 w-5" /> 
-                                                        Adicionar por {calculateKitPrice(gradeProducts.recommended).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}
+                                                        Adicionar por {calculateKitPrice(gradeProducts.recommended).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                                                     </Button>
                                                 </div>
                                             )}
@@ -229,7 +229,7 @@ export default function Home() {
                                             <p className="mt-2 text-muted-foreground">Compre todos os livros para o ano letivo.</p>
                                             <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.all, `Kit Completo do ${getGradeDisplayName(grade)} - ${selectedSchool.name}`)}>
                                                 <ShoppingCart className="mr-2 h-5 w-5" /> 
-                                                Adicionar por {calculateKitPrice(gradeProducts.all).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}
+                                                Adicionar por {calculateKitPrice(gradeProducts.all).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                                             </Button>
                                         </div>
                                      )}

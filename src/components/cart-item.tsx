@@ -39,9 +39,9 @@ export default function CartItem({ item, isKitItem = false }: CartItemProps) {
       <div className="flex flex-1 flex-col gap-1">
         <div className="flex justify-between">
           <h3 className="font-semibold">{item.name}</h3>
-          <p className="font-semibold">{(item.price * item.quantity).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })}</p>
+          <p className="font-semibold">{(item.price * item.quantity).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
         </div>
-        <p className="text-sm text-muted-foreground">{item.price.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA' })} cada</p>
+        <p className="text-sm text-muted-foreground">{item.price.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })} cada</p>
         <div className="mt-2 flex items-center justify-between">
             {isKitItem ? (
                  <div className="flex items-center gap-2">
