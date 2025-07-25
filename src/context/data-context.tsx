@@ -1,10 +1,9 @@
 
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import type { School, Product, ReadingPlanItem, Order, Category } from "@/lib/types";
 import { 
-    schools as initialSchools, 
     products as initialProducts, 
     readingPlan as initialReadingPlan, 
     allCategories as initialCategories,
@@ -49,21 +48,43 @@ interface DataContextType {
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
-  const [schools, setSchools] = useState<School[]>(initialSchools);
+  const [schools, setSchools] = useState<School[]>([]);
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [readingPlan, setReadingPlan] = useState<ReadingPlanItem[]>(initialReadingPlan);
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [publishers, setPublishers] = useState<string[]>(initialPublishers);
   const [orders, setOrders] = useState<Order[]>(initialOrders);
 
+  useEffect(() => {
+    const fetchSchools = async () => {
+      try {
+        const response = await fetch('/api/schools');
+        if (!response.ok) {
+          throw new Error('Failed to fetch schools');
+        }
+        const data = await response.json();
+        setSchools(data);
+      } catch (error) {
+        console.error(error);
+        // Optionally, load from static data as a fallback
+        // setSchools(initialSchools);
+      }
+    };
+
+    fetchSchools();
+  }, []);
+
   // School mutations
   const addSchool = (school: School) => {
+    // This will be replaced with an API call
     setSchools(prev => [...prev, { ...school, id: `school-${Date.now()}` }]);
   };
   const updateSchool = (updatedSchool: School) => {
+    // This will be replaced with an API call
     setSchools(prev => prev.map(s => s.id === updatedSchool.id ? updatedSchool : s));
   };
   const deleteSchool = (schoolId: string) => {
+    // This will be replaced with an API call
     setSchools(prev => prev.filter(s => s.id !== schoolId));
     setReadingPlan(prev => prev.filter(rp => rp.schoolId !== schoolId));
   };
