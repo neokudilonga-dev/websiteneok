@@ -10,6 +10,7 @@ import {
     publishers as initialPublishers,
     orders as initialOrders
 } from "@/lib/data";
+import { useToast } from "@/hooks/use-toast";
 
 interface DataContextType {
   // Schools
@@ -17,6 +18,7 @@ interface DataContextType {
   addSchool: (school: School) => void;
   updateSchool: (school: School) => void;
   deleteSchool: (schoolId: string) => void;
+  loadingSchools: boolean;
 
   // Products
   products: Product[];
@@ -49,15 +51,18 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [schools, setSchools] = useState<School[]>([]);
+  const [loadingSchools, setLoadingSchools] = useState(true);
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [readingPlan, setReadingPlan] = useState<ReadingPlanItem[]>(initialReadingPlan);
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [publishers, setPublishers] = useState<string[]>(initialPublishers);
   const [orders, setOrders] = useState<Order[]>(initialOrders);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchSchools = async () => {
       try {
+        setLoadingSchools(true);
         const response = await fetch('/api/schools');
         if (!response.ok) {
           throw new Error('Failed to fetch schools');
@@ -66,18 +71,24 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         setSchools(data);
       } catch (error) {
         console.error(error);
-        // Optionally, load from static data as a fallback
-        // setSchools(initialSchools);
+        toast({
+            title: "Error fetching schools",
+            description: "Could not load school data from the database.",
+            variant: "destructive"
+        })
+      } finally {
+        setLoadingSchools(false);
       }
     };
 
     fetchSchools();
-  }, []);
+  }, [toast]);
 
   // School mutations
   const addSchool = (school: School) => {
     // This will be replaced with an API call
-    setSchools(prev => [...prev, { ...school, id: `school-${Date.now()}` }]);
+    const newSchool = { ...school, id: `school-${Date.now()}` };
+    setSchools(prev => [...prev, newSchool]);
   };
   const updateSchool = (updatedSchool: School) => {
     // This will be replaced with an API call
@@ -167,7 +178,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   return (
     <DataContext.Provider
       value={{
-        schools, addSchool, updateSchool, deleteSchool,
+        schools, addSchool, updateSchool, deleteSchool, loadingSchools,
         products, addProduct, updateProduct, deleteProduct,
         readingPlan, updateReadingPlanForProduct,
         categories, addCategory, deleteCategory,

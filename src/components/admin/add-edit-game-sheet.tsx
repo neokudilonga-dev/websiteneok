@@ -33,6 +33,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Image from "next/image";
 import { useData } from "@/context/data-context";
+import { useLanguage } from "@/context/language-context";
 
 interface AddEditGameSheetProps {
   isOpen: boolean;
@@ -49,8 +50,10 @@ const readingPlanItemSchema = z.object({
 
 
 const gameFormSchema = z.object({
-  name: z.string().min(3, "O nome deve ter pelo menos 3 caracteres."),
-  description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
+  name_pt: z.string().min(3, "O nome deve ter pelo menos 3 caracteres."),
+  name_en: z.string().min(3, "The name must be at least 3 characters long."),
+  description_pt: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
+  description_en: z.string().min(10, "The description must be at least 10 characters long."),
   price: z.coerce.number().min(0, "O preço deve ser um número positivo."),
   stock: z.coerce.number().min(0, "O stock deve ser um número positivo."),
   images: z.array(z.string()).min(1, "Pelo menos uma imagem é obrigatória."),
@@ -67,12 +70,15 @@ export function AddEditGameSheet({
   onSaveChanges,
 }: AddEditGameSheetProps) {
   const { schools, readingPlan } = useData();
+  const { language } = useLanguage();
 
   const form = useForm<GameFormValues>({
     resolver: zodResolver(gameFormSchema),
     defaultValues: {
-      name: "",
-      description: "",
+      name_pt: "",
+      name_en: "",
+      description_pt: "",
+      description_en: "",
       price: 0,
       stock: 0,
       images: [],
@@ -99,8 +105,10 @@ export function AddEditGameSheet({
           .map(rp => ({ schoolId: rp.schoolId, grade: rp.grade, status: rp.status }));
         
         form.reset({
-          name: game.name,
-          description: game.description,
+          name_pt: game.name.pt,
+          name_en: game.name.en,
+          description_pt: game.description.pt,
+          description_en: game.description.en,
           price: game.price,
           stock: game.stock,
           images: game.images || [],
@@ -109,8 +117,10 @@ export function AddEditGameSheet({
         });
       } else {
         form.reset({
-          name: "",
-          description: "",
+          name_pt: "",
+          name_en: "",
+          description_pt: "",
+          description_en: "",
           price: 0,
           stock: 0,
           images: [],
@@ -125,8 +135,8 @@ export function AddEditGameSheet({
     onSaveChanges({
       id: game?.id || "",
       type: "game",
-      name: data.name,
-      description: data.description,
+      name: { pt: data.name_pt, en: data.name_en },
+      description: { pt: data.description_pt, en: data.description_en },
       price: data.price,
       stock: data.stock,
       images: data.images,
@@ -186,35 +196,62 @@ export function AddEditGameSheet({
               </SheetDescription>
             </SheetHeader>
             <div className="flex-1 space-y-4 overflow-y-auto py-4 pr-6">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: Mestre do Código" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Descrição</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Uma breve descrição do jogo."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-2">
+                 <Label>Nome do Jogo</Label>
+                 <FormField
+                    control={form.control}
+                    name="name_pt"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormControl>
+                        <Input placeholder="Português" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="name_en"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormControl>
+                        <Input placeholder="Inglês" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Descrição</Label>
+                <FormField
+                    control={form.control}
+                    name="description_pt"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormControl>
+                        <Textarea placeholder="Português" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="description_en"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormControl>
+                        <Textarea placeholder="Inglês" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+              </div>
+
               <FormField
                 control={form.control}
                 name="images"
@@ -354,7 +391,7 @@ export function AddEditGameSheet({
                                         </FormControl>
                                         <SelectContent>
                                             {schools.map(school => (
-                                            <SelectItem key={school.id} value={school.id}>{school.name}</SelectItem>
+                                            <SelectItem key={school.id} value={school.id}>{school.name[language] || school.name.pt}</SelectItem>
                                             ))}
                                         </SelectContent>
                                         </Select>

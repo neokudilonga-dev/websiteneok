@@ -26,6 +26,7 @@ import {
 import type { School } from "@/lib/types";
 import { useEffect } from "react";
 import { Switch } from "../ui/switch";
+import { Label } from "../ui/label";
 
 interface AddEditSchoolSheetProps {
   isOpen: boolean;
@@ -35,7 +36,8 @@ interface AddEditSchoolSheetProps {
 }
 
 const schoolFormSchema = z.object({
-  name: z.string().min(3, "O nome da escola deve ter pelo menos 3 caracteres."),
+  name_pt: z.string().min(3, "O nome da escola deve ter pelo menos 3 caracteres."),
+  name_en: z.string().min(3, "The school name must have at least 3 characters."),
   id: z.string().min(3, "O ID deve ter pelo menos 3 caracteres.").regex(/^[a-z0-9-]+$/, "O ID só pode conter letras minúsculas, números e hífenes."),
   abbreviation: z.string().min(2, "A abreviação deve ter pelo menos 2 caracteres.").max(5, "A abreviação não pode ter mais de 5 caracteres.").regex(/^[A-Z0-9]+$/, "A abreviação só pode conter letras maiúsculas e números."),
   allowPickup: z.boolean().default(false),
@@ -54,7 +56,8 @@ export function AddEditSchoolSheet({
   const form = useForm<SchoolFormValues>({
     resolver: zodResolver(schoolFormSchema),
     defaultValues: {
-      name: "",
+      name_pt: "",
+      name_en: "",
       id: "",
       abbreviation: "",
       allowPickup: false,
@@ -67,7 +70,8 @@ export function AddEditSchoolSheet({
      if (isOpen) {
         if (school) {
         form.reset({
-            name: school.name,
+            name_pt: school.name.pt,
+            name_en: school.name.en,
             id: school.id,
             abbreviation: school.abbreviation,
             allowPickup: school.allowPickup || false,
@@ -75,14 +79,21 @@ export function AddEditSchoolSheet({
             hasRecommendedPlan: school.hasRecommendedPlan || false,
         });
         } else {
-        form.reset({ name: "", id: "", abbreviation: "", allowPickup: false, allowPickupAtLocation: false, hasRecommendedPlan: false });
+        form.reset({ name_pt: "", name_en: "", id: "", abbreviation: "", allowPickup: false, allowPickupAtLocation: false, hasRecommendedPlan: false });
         }
     }
   }, [school, form, isOpen]);
 
 
   const onSubmit = (data: SchoolFormValues) => {
-    onSaveChanges(data);
+    onSaveChanges({
+        id: school?.id || data.id,
+        name: { pt: data.name_pt, en: data.name_en },
+        abbreviation: data.abbreviation,
+        allowPickup: data.allowPickup,
+        allowPickupAtLocation: data.allowPickupAtLocation,
+        hasRecommendedPlan: data.hasRecommendedPlan,
+    });
     setIsOpen(false);
   };
 
@@ -100,19 +111,33 @@ export function AddEditSchoolSheet({
               </SheetDescription>
             </SheetHeader>
             <div className="flex-1 space-y-4 overflow-y-auto py-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome da Escola</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: Escola Primária de Luanda" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-2">
+                <Label>Nome da Escola</Label>
+                <FormField
+                  control={form.control}
+                  name="name_pt"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input placeholder="Português" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="name_en"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input placeholder="Inglês" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
                <div className="grid grid-cols-2 gap-4">
                  <FormField
                     control={form.control}

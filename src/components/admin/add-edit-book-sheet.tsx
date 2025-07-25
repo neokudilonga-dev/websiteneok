@@ -26,13 +26,14 @@ import {
   FormMessage,
   FormDescription,
 } from "@/components/ui/form";
-import type { Product, ReadingPlanItem } from "@/lib/types";
+import type { Product } from "@/lib/types";
 import { useEffect, useState, ChangeEvent, useMemo } from "react";
 import { PlusCircle, Trash2, Upload } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Image from "next/image";
 import { useData } from "@/context/data-context";
+import { useLanguage } from "@/context/language-context";
 
 
 interface AddEditBookSheetProps {
@@ -49,8 +50,10 @@ const readingPlanItemSchema = z.object({
 });
 
 const bookFormSchema = z.object({
-  name: z.string().min(3, "O nome deve ter pelo menos 3 caracteres."),
-  description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
+  name_pt: z.string().min(3, "O nome deve ter pelo menos 3 caracteres."),
+  name_en: z.string().min(3, "The name must be at least 3 characters long."),
+  description_pt: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
+  description_en: z.string().min(10, "The description must be at least 10 characters long."),
   price: z.coerce.number().min(0, "O preço deve ser um número positivo."),
   stock: z.coerce.number().min(0, "O stock deve ser um número positivo."),
   image: z.string().min(1, "A imagem é obrigatória."),
@@ -69,6 +72,7 @@ export function AddEditBookSheet({
   onSaveChanges,
 }: AddEditBookSheetProps) {
     const { schools, categories, publishers, readingPlan } = useData();
+    const { t, language } = useLanguage();
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const bookCategories = useMemo(() => categories.filter(c => c.type === 'book'), [categories]);
 
@@ -76,8 +80,10 @@ export function AddEditBookSheet({
   const form = useForm<BookFormValues>({
     resolver: zodResolver(bookFormSchema),
     defaultValues: {
-      name: "",
-      description: "",
+      name_pt: "",
+      name_en: "",
+      description_pt: "",
+      description_en: "",
       price: 0,
       stock: 0,
       image: "",
@@ -101,8 +107,10 @@ export function AddEditBookSheet({
           .map(rp => ({ schoolId: rp.schoolId, grade: rp.grade, status: rp.status }));
         
         form.reset({
-          name: book.name,
-          description: book.description,
+          name_pt: book.name.pt,
+          name_en: book.name.en,
+          description_pt: book.description.pt,
+          description_en: book.description.en,
           price: book.price,
           stock: book.stock,
           image: book.image,
@@ -114,8 +122,10 @@ export function AddEditBookSheet({
         setImagePreview(book.image);
       } else {
         form.reset({
-          name: "",
-          description: "",
+          name_pt: "",
+          name_en: "",
+          description_pt: "",
+          description_en: "",
           price: 0,
           stock: 0,
           image: "",
@@ -134,8 +144,8 @@ export function AddEditBookSheet({
     onSaveChanges({
         id: book?.id || '',
         type: 'book',
-        name: data.name,
-        description: data.description,
+        name: { pt: data.name_pt, en: data.name_en },
+        description: { pt: data.description_pt, en: data.description_en },
         price: data.price,
         stock: data.stock,
         image: data.image,
@@ -193,32 +203,62 @@ export function AddEditBookSheet({
               </SheetDescription>
             </SheetHeader>
             <div className="flex-1 space-y-4 overflow-y-auto py-4 pr-6">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: Jornada da Matemática 1º Ano" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Descrição</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Uma breve descrição do livro." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-2">
+                 <Label>Nome do Livro</Label>
+                 <FormField
+                    control={form.control}
+                    name="name_pt"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormControl>
+                        <Input placeholder="Português" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="name_en"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormControl>
+                        <Input placeholder="Inglês" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+              </div>
+
+               <div className="space-y-2">
+                 <Label>Descrição</Label>
+                 <FormField
+                    control={form.control}
+                    name="description_pt"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormControl>
+                        <Textarea placeholder="Português" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="description_en"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormControl>
+                        <Textarea placeholder="Inglês" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+               </div>
+              
                <FormField
                 control={form.control}
                 name="image"
@@ -392,7 +432,7 @@ export function AddEditBookSheet({
                                     </FormControl>
                                     <SelectContent>
                                         {schools.map(school => (
-                                        <SelectItem key={school.id} value={school.id}>{school.name}</SelectItem>
+                                        <SelectItem key={school.id} value={school.id}>{school.name[language] || school.name.pt}</SelectItem>
                                         ))}
                                     </SelectContent>
                                     </Select>
