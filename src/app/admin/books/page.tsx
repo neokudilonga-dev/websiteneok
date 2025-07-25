@@ -52,7 +52,7 @@ export default function BooksPage() {
 
   const filteredProducts = useMemo(() => {
     return bookProducts.filter((product) => {
-      const name = product.name[language] || product.name.pt;
+      const name = product.name ? (product.name[language] || product.name.pt) : '';
       const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStock = stockFilter === 'all' || product.stockStatus === stockFilter;
       const matchesPublisher = publisherFilter === 'all' || product.publisher === publisherFilter;
@@ -97,6 +97,11 @@ export default function BooksPage() {
     if (status === 'in_stock') return t('stock_status.in_stock');
     if (status === 'out_of_stock') return t('stock_status.out_of_stock');
     return '';
+  }
+
+  const getProductName = (product: Product) => {
+    if (!product.name) return 'No Name';
+    return product.name[language] || product.name.pt;
   }
 
 
@@ -170,14 +175,14 @@ export default function BooksPage() {
                 <TableRow key={product.id}>
                   <TableCell className="hidden sm:table-cell">
                     <Image
-                      alt={product.name[language] || product.name.pt}
+                      alt={getProductName(product)}
                       className="aspect-square rounded-md object-cover"
                       height="64"
                       src={product.image || 'https://placehold.co/64x64.png'}
                       width="64"
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{product.name[language] || product.name.pt}</TableCell>
+                  <TableCell className="font-medium">{getProductName(product)}</TableCell>
                    <TableCell className="text-muted-foreground">{product.publisher || 'N/A'}</TableCell>
                    <TableCell>
                       <Badge 

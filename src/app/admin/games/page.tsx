@@ -49,7 +49,7 @@ export default function GamesPage() {
 
   const filteredProducts = useMemo(() => {
     return gameProducts.filter((product) => {
-      const name = product.name[language] || product.name.pt;
+      const name = product.name ? (product.name[language] || product.name.pt) : '';
       const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStock = showSoldOut || product.stockStatus !== 'sold_out';
       return matchesSearch && matchesStock;
@@ -85,6 +85,11 @@ export default function GamesPage() {
     if (status === 'in_stock') return t('stock_status.in_stock');
     if (status === 'out_of_stock') return t('stock_status.out_of_stock');
     return '';
+  }
+  
+  const getProductName = (product: Product) => {
+    if (!product.name) return 'No Name';
+    return product.name[language] || product.name.pt;
   }
 
   return (
@@ -148,14 +153,14 @@ export default function GamesPage() {
                 <TableRow key={product.id}>
                   <TableCell className="hidden sm:table-cell">
                     <Image
-                      alt={product.name[language] || product.name.pt}
+                      alt={getProductName(product)}
                       className="aspect-square rounded-md object-cover"
                       height="64"
                       src={product.images?.[0] || "https://placehold.co/64x64.png"}
                       width="64"
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{product.name[language] || product.name.pt}</TableCell>
+                  <TableCell className="font-medium">{getProductName(product)}</TableCell>
                   <TableCell>
                       <Badge 
                         variant={product.stockStatus === 'sold_out' ? 'destructive' : product.stockStatus === 'out_of_stock' ? 'secondary' : 'default'}
