@@ -36,10 +36,12 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import type { Category } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { useData } from "@/context/data-context";
+import { useLanguage } from "@/context/language-context";
 
 
 export default function CategoriesPage() {
   const { categories, addCategory, deleteCategory } = useData();
+  const { t } = useLanguage();
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newCategoryType, setNewCategoryType] = useState<'book' | 'game'>('book');
 
@@ -61,50 +63,50 @@ export default function CategoriesPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-4">
           <div className="space-y-1">
-            <CardTitle>Categorias</CardTitle>
-            <CardDescription>Faça a gestão das categorias para os livros e jogos.</CardDescription>
+            <CardTitle>{t('categories_page.title')}</CardTitle>
+            <CardDescription>{t('categories_page.description')}</CardDescription>
           </div>
           <AlertDialog>
             <AlertDialogTrigger asChild>
                 <Button>
                     <PlusCircle className="mr-2" />
-                    Adicionar Categoria
+                    {t('categories_page.add_category')}
                 </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                <AlertDialogTitle>Adicionar Nova Categoria</AlertDialogTitle>
+                <AlertDialogTitle>{t('categories_page.dialog_title')}</AlertDialogTitle>
                 <AlertDialogDescription>
-                    Digite o nome e selecione o tipo da nova categoria.
+                    {t('categories_page.dialog_description')}
                 </AlertDialogDescription>
                 </AlertDialogHeader>
                 <div className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="category-name">Nome da Categoria</Label>
+                        <Label htmlFor="category-name">{t('categories_page.category_name')}</Label>
                         <Input 
                             id="category-name"
                             value={newCategoryName} 
                             onChange={(e) => setNewCategoryName(e.target.value)} 
-                            placeholder="Ex: Biologia"
+                            placeholder={t('categories_page.category_name_placeholder')}
                         />
                     </div>
                      <div className="space-y-2">
-                        <Label>Tipo de Categoria</Label>
+                        <Label>{t('categories_page.category_type')}</Label>
                         <RadioGroup defaultValue="book" onValueChange={(value) => setNewCategoryType(value as 'book' | 'game')} value={newCategoryType}>
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="book" id="r-book" />
-                                <Label htmlFor="r-book">Livro</Label>
+                                <Label htmlFor="r-book">{t('common.book')}</Label>
                             </div>
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="game" id="r-game" />
-                                <Label htmlFor="r-game">Jogo e Outros</Label>
+                                <Label htmlFor="r-game">{t('common.game_and_other')}</Label>
                             </div>
                         </RadioGroup>
                      </div>
                 </div>
                 <AlertDialogFooter>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={handleAddCategory}>Adicionar</AlertDialogAction>
+                <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                <AlertDialogAction onClick={handleAddCategory}>{t('common.add')}</AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
@@ -114,10 +116,10 @@ export default function CategoriesPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nome da Categoria</TableHead>
-                <TableHead>Tipo</TableHead>
+                <TableHead>{t('categories_page.category_name')}</TableHead>
+                <TableHead>{t('common.type')}</TableHead>
                 <TableHead className="w-[100px] text-right">
-                  <span className="sr-only">Ações</span>
+                  <span className="sr-only">{t('common.actions')}</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -127,7 +129,7 @@ export default function CategoriesPage() {
                   <TableCell className="font-medium">{category.name}</TableCell>
                    <TableCell>
                      <Badge variant={category.type === 'book' ? 'secondary' : 'default'}>
-                        {category.type === 'book' ? 'Livro' : 'Jogo'}
+                        {category.type === 'book' ? t('common.book') : t('common.game')}
                      </Badge>
                    </TableCell>
                   <TableCell className="text-right">
@@ -140,19 +142,19 @@ export default function CategoriesPage() {
                                 className="text-destructive hover:text-destructive"
                             >
                                 <Trash2 className="h-4 w-4" />
-                                <span className="sr-only">Eliminar Categoria</span>
+                                <span className="sr-only">{t('categories_page.delete_category')}</span>
                             </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                             <AlertDialogHeader>
-                            <AlertDialogTitle>Tem a certeza?</AlertDialogTitle>
+                            <AlertDialogTitle>{t('common.are_you_sure')}</AlertDialogTitle>
                             <AlertDialogDescription>
-                                Esta ação não pode ser desfeita. Isto irá eliminar permanentemente a categoria.
+                                {t('common.action_cannot_be_undone_category')}
                             </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDeleteCategory(category.name)} className="bg-destructive hover:bg-destructive/90">Eliminar</AlertDialogAction>
+                            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeleteCategory(category.name)} className="bg-destructive hover:bg-destructive/90">{t('common.delete')}</AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>

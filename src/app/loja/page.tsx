@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useData } from "@/context/data-context";
+import { useLanguage } from "@/context/language-context";
 
 interface GradeProducts {
   mandatory: Product[];
@@ -24,6 +25,7 @@ interface GradeProducts {
 
 export default function LojaPage() {
   const { schools, products: allProducts, readingPlan, categories } = useData();
+  const { t, language } = useLanguage();
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') || 'planos';
   
@@ -91,10 +93,10 @@ export default function LojaPage() {
     return allProducts.filter(p => 
         p.type === 'game' && 
         p.stockStatus !== 'sold_out' &&
-        p.name.toLowerCase().includes(gameSearchQuery.toLowerCase()) &&
+        (p.name[language] || p.name.pt).toLowerCase().includes(gameSearchQuery.toLowerCase()) &&
         (selectedGameCategory === 'all' || p.category === selectedGameCategory)
     )
-  }, [allProducts, gameSearchQuery, selectedGameCategory]);
+  }, [allProducts, gameSearchQuery, selectedGameCategory, language]);
 
   const bookCategories = useMemo(() => categories.filter(c => c.type === 'book'), [categories]);
   const gameCategories = useMemo(() => categories.filter(c => c.type === 'game'), [categories]);
@@ -104,22 +106,22 @@ export default function LojaPage() {
     return allProducts.filter(p => 
         p.type === 'book' && 
         p.stockStatus !== 'sold_out' &&
-        p.name.toLowerCase().includes(bookSearchQuery.toLowerCase()) &&
+        (p.name[language] || p.name.pt).toLowerCase().includes(bookSearchQuery.toLowerCase()) &&
         (selectedBookCategory === 'all' || p.category === selectedBookCategory)
     )
-  }, [allProducts, bookSearchQuery, selectedBookCategory]);
+  }, [allProducts, bookSearchQuery, selectedBookCategory, language]);
 
 
   const renderTitle = () => {
     switch (activeTab) {
       case "planos":
         return selectedSchool
-          ? `Plano de Leitura: ${selectedSchool.name}`
-          : "Selecione a sua escola";
+          ? `${t('shop.reading_plan')}: ${selectedSchool.name[language] || selectedSchool.name.pt}`
+          : t('shop.select_your_school');
       case "catalogo":
-        return "Todos os Livros";
+        return t('shop.all_books');
       case "jogos":
-        return "Jogos e Outros Itens";
+        return t('shop.games_and_other_items');
       default:
         return "Neokudilonga";
     }
@@ -129,14 +131,14 @@ export default function LojaPage() {
     switch (activeTab) {
       case 'planos':
         return selectedSchool 
-            ? 'Selecione a classe para ver os livros recomendados.' 
-            : 'Selecione a escola para ver os planos de leitura.';
+            ? t('shop.select_grade_description') 
+            : t('shop.select_school_description');
       case 'catalogo':
-        return 'Explore todos os livros disponíveis no nosso catálogo.';
+        return t('shop.all_books_description');
       case 'jogos':
-        return 'Descubra a nossa seleção de jogos educativos e outros itens.';
+        return t('shop.games_description');
       default:
-        return 'A sua fonte de livros e jogos escolares.';
+        return t('shop.default_description');
     }
   };
 
@@ -152,7 +154,7 @@ export default function LojaPage() {
               variant={planItem.status === 'mandatory' ? 'default' : 'secondary'}
               className="capitalize"
             >
-              {planItem.status === 'mandatory' ? 'Obrigatório' : 'Recomendado'}
+              {planItem.status === 'mandatory' ? t('shop.mandatory') : t('shop.recommended')}
             </Badge>
           );
         }
@@ -170,8 +172,8 @@ export default function LojaPage() {
       const gradeB = b[0];
 
       const getOrder = (grade: string) => {
-          if (grade.toLowerCase() === 'iniciação') return -1;
-          if (grade.toLowerCase() === 'outros') return 100;
+          if (grade.toLowerCase() === 'iniciação' || grade.toLowerCase() === 'reception') return -1;
+          if (grade.toLowerCase() === 'outros' || grade.toLowerCase() === 'others') return 100;
           const num = parseInt(grade, 10);
           return isNaN(num) ? 99 : num;
       };
@@ -183,9 +185,9 @@ export default function LojaPage() {
   };
 
   const getGradeDisplayName = (grade: string) => {
-    if (String(grade).toLowerCase() === 'iniciação') return 'Iniciação';
-    if (String(grade).toLowerCase() === 'outros') return 'Outros';
-    return `${grade}ª Classe`;
+    if (String(grade).toLowerCase() === 'iniciação') return t('grades.reception');
+    if (String(grade).toLowerCase() === 'outros') return t('grades.others');
+    return `${t('grades.grade')} ${grade}`;
   };
 
   return (
@@ -195,9 +197,9 @@ export default function LojaPage() {
         <div className="mx-auto w-full max-w-7xl">
           <Tabs value={activeTab} className="w-full" onValueChange={setActiveTab}>
             <TabsList className="grid h-auto w-full grid-cols-1 sm:grid-cols-3">
-              <TabsTrigger value="planos" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">Planos de Leitura</TabsTrigger>
-              <TabsTrigger value="catalogo" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">Todos os Livros</TabsTrigger>
-              <TabsTrigger value="jogos" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">Jogos e Outros</TabsTrigger>
+              <TabsTrigger value="planos" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">{t('shop.tabs.reading_plans')}</TabsTrigger>
+              <TabsTrigger value="catalogo" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">{t('shop.tabs.all_books')}</TabsTrigger>
+              <TabsTrigger value="jogos" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">{t('shop.tabs.games_and_others')}</TabsTrigger>
             </TabsList>
 
              <div className="mt-6">
@@ -215,7 +217,7 @@ export default function LojaPage() {
                     <div className="mb-4">
                         <Button variant="outline" onClick={handleGoBackToSchoolSelection}>
                             <ArrowLeft className="mr-2" />
-                            Voltar
+                            {t('common.back')}
                         </Button>
                     </div>
                    {Object.keys(productsByGrade).length > 0 ? (
@@ -235,21 +237,21 @@ export default function LojaPage() {
                                             <>
                                                 {gradeProducts.mandatory.length > 0 && (
                                                     <div className="rounded-lg border bg-card p-6">
-                                                        <h3 className="font-headline text-2xl font-semibold">Kit Obrigatório ({gradeProducts.mandatory.length} items)</h3>
-                                                        <p className="mt-2 text-muted-foreground">Compre todos os items obrigatórios.</p>
-                                                        <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.mandatory, `Kit Obrigatório do ${getGradeDisplayName(grade)} - ${selectedSchool.name}`)}>
+                                                        <h3 className="font-headline text-2xl font-semibold">{t('shop.mandatory_kit', { count: gradeProducts.mandatory.length })}</h3>
+                                                        <p className="mt-2 text-muted-foreground">{t('shop.buy_all_mandatory')}</p>
+                                                        <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.mandatory, t('shop.mandatory_kit_name', { grade: getGradeDisplayName(grade), school: selectedSchool.name[language] || selectedSchool.name.pt }))}>
                                                             <ShoppingCart className="mr-2 h-5 w-5" /> 
-                                                            Adicionar por {calculateKitPrice(gradeProducts.mandatory).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                                                            {t('common.add_for')} {calculateKitPrice(gradeProducts.mandatory).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                                                         </Button>
                                                     </div>
                                                 )}
                                                 {gradeProducts.recommended.length > 0 && (
                                                     <div className="rounded-lg border bg-card p-6">
-                                                        <h3 className="font-headline text-2xl font-semibold">Kit Recomendado ({gradeProducts.recommended.length} items)</h3>
-                                                        <p className="mt-2 text-muted-foreground">Compre todos os items recomendados.</p>
-                                                        <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.recommended, `Kit Recomendado do ${getGradeDisplayName(grade)} - ${selectedSchool.name}`)}>
+                                                        <h3 className="font-headline text-2xl font-semibold">{t('shop.recommended_kit', { count: gradeProducts.recommended.length })}</h3>
+                                                        <p className="mt-2 text-muted-foreground">{t('shop.buy_all_recommended')}</p>
+                                                        <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.recommended, t('shop.recommended_kit_name', { grade: getGradeDisplayName(grade), school: selectedSchool.name[language] || selectedSchool.name.pt }))}>
                                                             <ShoppingCart className="mr-2 h-5 w-5" /> 
-                                                            Adicionar por {calculateKitPrice(gradeProducts.recommended).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                                                            {t('common.add_for')} {calculateKitPrice(gradeProducts.recommended).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                                                         </Button>
                                                     </div>
                                                 )}
@@ -257,11 +259,11 @@ export default function LojaPage() {
                                         ) : (
                                             gradeProducts.all.length > 0 &&
                                             <div className="rounded-lg border bg-card p-6 lg:col-span-2">
-                                                <h3 className="font-headline text-2xl font-semibold">Kit Completo {getGradeDisplayName(grade)} ({gradeProducts.all.length} items)</h3>
-                                                <p className="mt-2 text-muted-foreground">Compre todos os items para o ano letivo.</p>
-                                                <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.all, `Kit Completo do ${getGradeDisplayName(grade)} - ${selectedSchool.name}`)}>
+                                                <h3 className="font-headline text-2xl font-semibold">{t('shop.complete_kit', { grade: getGradeDisplayName(grade), count: gradeProducts.all.length })}</h3>
+                                                <p className="mt-2 text-muted-foreground">{t('shop.buy_all_for_school_year')}</p>
+                                                <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.all, t('shop.complete_kit_name', { grade: getGradeDisplayName(grade), school: selectedSchool.name[language] || selectedSchool.name.pt }))}>
                                                     <ShoppingCart className="mr-2 h-5 w-5" /> 
-                                                    Adicionar por {calculateKitPrice(gradeProducts.all).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                                                    {t('common.add_for')} {calculateKitPrice(gradeProducts.all).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                                                 </Button>
                                             </div>
                                         )}
@@ -270,7 +272,7 @@ export default function LojaPage() {
                                     {showIndividual !== grade && (
                                         <div className="text-center mt-6">
                                             <Button variant="outline" onClick={() => setShowIndividual(grade)}>
-                                                Comprar em separado
+                                                {t('shop.buy_separately')}
                                                 <ChevronRight className="ml-2 h-4 w-4" />
                                             </Button>
                                         </div>
@@ -283,8 +285,8 @@ export default function LojaPage() {
                     </Accordion>
                    ) : (
                      <div className="mx-auto flex max-w-7xl flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/20 p-12 text-center">
-                        <h3 className="font-headline text-2xl font-semibold tracking-tight">Nenhum livro encontrado</h3>
-                        <p className="text-muted-foreground">Ainda não há livros do plano de leitura para esta escola.</p>
+                        <h3 className="font-headline text-2xl font-semibold tracking-tight">{t('shop.no_books_found_title')}</h3>
+                        <p className="text-muted-foreground">{t('shop.no_books_found_description')}</p>
                     </div>
                    )}
                    </>
@@ -297,8 +299,8 @@ export default function LojaPage() {
                                 className="h-auto w-full transform-gpu rounded-lg border bg-accent/80 p-6 text-left shadow-sm transition-all hover:scale-[1.02] hover:bg-accent hover:shadow-md focus:scale-[1.02] focus:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                             >
                                 <div className="flex flex-col">
-                                    <span className="font-headline text-lg font-semibold text-primary">{school.name}</span>
-                                    <span className="mt-1 text-sm text-primary/80">Ver plano de leitura</span>
+                                    <span className="font-headline text-lg font-semibold text-primary">{school.name[language] || school.name.pt}</span>
+                                    <span className="mt-1 text-sm text-primary/80">{t('shop.view_reading_plan')}</span>
                                 </div>
                             </button>
                         ))}
@@ -312,7 +314,7 @@ export default function LojaPage() {
                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
                             type="search"
-                            placeholder="Pesquisar por nome do livro..."
+                            placeholder={t('shop.search_books_placeholder')}
                             className="w-full rounded-lg bg-background pl-8"
                             value={bookSearchQuery}
                             onChange={(e) => setBookSearchQuery(e.target.value)}
@@ -320,10 +322,10 @@ export default function LojaPage() {
                     </div>
                     <Select value={selectedBookCategory} onValueChange={setSelectedBookCategory}>
                         <SelectTrigger className="w-full sm:w-[280px]">
-                            <SelectValue placeholder="Filtrar por categoria" />
+                            <SelectValue placeholder={t('shop.filter_by_category')} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">Todas as Categorias</SelectItem>
+                            <SelectItem value="all">{t('shop.all_categories')}</SelectItem>
                             {bookCategories.map(category => (
                                 <SelectItem key={category.name} value={category.name}>{category.name}</SelectItem>
                             ))}
@@ -339,7 +341,7 @@ export default function LojaPage() {
                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
                             type="search"
-                            placeholder="Pesquisar por nome do jogo..."
+                            placeholder={t('shop.search_games_placeholder')}
                             className="w-full rounded-lg bg-background pl-8"
                             value={gameSearchQuery}
                             onChange={(e) => setGameSearchQuery(e.target.value)}
@@ -347,10 +349,10 @@ export default function LojaPage() {
                     </div>
                     <Select value={selectedGameCategory} onValueChange={setSelectedGameCategory}>
                         <SelectTrigger className="w-full sm:w-[280px]">
-                            <SelectValue placeholder="Filtrar por categoria" />
+                            <SelectValue placeholder={t('shop.filter_by_category')} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">Todas as Categorias</SelectItem>
+                            <SelectItem value="all">{t('shop.all_categories')}</SelectItem>
                             {gameCategories.map(category => (
                                 <SelectItem key={category.name} value={category.name}>{category.name}</SelectItem>
                             ))}

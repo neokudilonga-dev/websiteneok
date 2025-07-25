@@ -29,9 +29,11 @@ import type { School } from "@/lib/types";
 import { AddEditSchoolSheet } from "@/components/admin/add-edit-school-sheet";
 import { Badge } from "@/components/ui/badge";
 import { useData } from "@/context/data-context";
+import { useLanguage } from "@/context/language-context";
 
 export default function SchoolsPage() {
   const { schools, addSchool, updateSchool, deleteSchool } = useData();
+  const { t, language } = useLanguage();
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [selectedSchool, setSelectedSchool] = useState<School | undefined>(
     undefined
@@ -71,31 +73,31 @@ export default function SchoolsPage() {
     <>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-4">
-          <CardTitle>Escolas</CardTitle>
+          <CardTitle>{t('schools_page.title')}</CardTitle>
           <Button onClick={handleAddSchool}>
             <PlusCircle className="mr-2" />
-            Adicionar Nova Escola
+            {t('schools_page.add_new_school')}
           </Button>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nome da Escola</TableHead>
+                <TableHead>{t('schools_page.school_name')}</TableHead>
                 <TableHead>ID</TableHead>
-                <TableHead>Abreviação</TableHead>
-                <TableHead>Levant. no Colégio</TableHead>
-                <TableHead>Levant. no Local</TableHead>
-                <TableHead>Plano Recomendado</TableHead>
+                <TableHead>{t('schools_page.abbreviation')}</TableHead>
+                <TableHead>{t('schools_page.pickup_at_school')}</TableHead>
+                <TableHead>{t('schools_page.pickup_at_location')}</TableHead>
+                <TableHead>{t('schools_page.recommended_plan')}</TableHead>
                 <TableHead className="text-right">
-                  <span className="sr-only">Ações</span>
+                  <span className="sr-only">{t('common.actions')}</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {schools.map((school) => (
                 <TableRow key={school.id}>
-                  <TableCell className="font-medium">{school.name}</TableCell>
+                  <TableCell className="font-medium">{school.name[language] || school.name.pt}</TableCell>
                   <TableCell className="font-mono text-sm text-muted-foreground">{school.id}</TableCell>
                    <TableCell>
                       <Badge variant="secondary">{school.abbreviation}</Badge>
@@ -118,21 +120,21 @@ export default function SchoolsPage() {
                           variant="ghost"
                         >
                           <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Alternar menu</span>
+                          <span className="sr-only">{t('common.toggle_menu')}</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                        <DropdownMenuLabel>{t('common.actions')}</DropdownMenuLabel>
                         <DropdownMenuItem
                           onClick={() => handleEditSchool(school)}
                         >
-                          Editar
+                          {t('common.edit')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive"
                           onClick={() => handleDeleteSchool(school.id)}
                         >
-                          Eliminar
+                          {t('common.delete')}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

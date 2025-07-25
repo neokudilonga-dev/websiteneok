@@ -24,6 +24,7 @@ import {
   SidebarInset,
 } from "@/components/ui/sidebar";
 import { NeokudilongaLogoAbbr } from "@/components/logo";
+import { useLanguage } from "@/context/language-context";
 
 export default function AdminLayout({
   children,
@@ -32,6 +33,7 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const isActive = (path: string) => pathname === path;
+  const { t } = useLanguage();
 
   return (
     <SidebarProvider>
@@ -52,11 +54,11 @@ export default function AdminLayout({
                   href="/admin"
                   asChild
                   isActive={isActive("/admin")}
-                  tooltip="Painel de Controlo"
+                  tooltip={t('admin_layout.dashboard')}
                 >
                   <Link href="/admin">
                     <Home />
-                    <span>Painel de Controlo</span>
+                    <span>{t('admin_layout.dashboard')}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -65,11 +67,11 @@ export default function AdminLayout({
                   href="/admin/books"
                   asChild
                   isActive={isActive("/admin/books")}
-                  tooltip="Livros"
+                  tooltip={t('admin_layout.books')}
                 >
                   <Link href="/admin/books">
                     <Book />
-                    <span>Livros</span>
+                    <span>{t('admin_layout.books')}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -78,11 +80,11 @@ export default function AdminLayout({
                   href="/admin/games"
                   asChild
                   isActive={isActive("/admin/games")}
-                  tooltip="Jogos"
+                  tooltip={t('admin_layout.games')}
                 >
                   <Link href="/admin/games">
                     <Gamepad2 />
-                    <span>Jogos</span>
+                    <span>{t('admin_layout.games')}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -91,11 +93,11 @@ export default function AdminLayout({
                   href="/admin/schools"
                   asChild
                   isActive={isActive("/admin/schools")}
-                  tooltip="Escolas"
+                  tooltip={t('admin_layout.schools')}
                 >
                   <Link href="/admin/schools">
                     <School />
-                    <span>Escolas</span>
+                    <span>{t('admin_layout.schools')}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -104,11 +106,11 @@ export default function AdminLayout({
                   href="/admin/categories"
                   asChild
                   isActive={isActive("/admin/categories")}
-                  tooltip="Categorias"
+                  tooltip={t('admin_layout.categories')}
                 >
                   <Link href="/admin/categories">
                     <Tags />
-                    <span>Categorias</span>
+                    <span>{t('admin_layout.categories')}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -117,11 +119,11 @@ export default function AdminLayout({
                   href="/admin/publishers"
                   asChild
                   isActive={isActive("/admin/publishers")}
-                  tooltip="Editoras"
+                  tooltip={t('admin_layout.publishers')}
                 >
                   <Link href="/admin/publishers">
                     <Building />
-                    <span>Editoras</span>
+                    <span>{t('admin_layout.publishers')}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -130,11 +132,11 @@ export default function AdminLayout({
                   href="/admin/orders"
                   asChild
                   isActive={isActive("/admin/orders")}
-                  tooltip="Encomendas"
+                  tooltip={t('admin_layout.orders')}
                 >
                   <Link href="/admin/orders">
                     <ShoppingCart />
-                    <span>Encomendas</span>
+                    <span>{t('admin_layout.orders')}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -144,7 +146,7 @@ export default function AdminLayout({
         <SidebarInset>
           <header className="flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
             <SidebarTrigger className="sm:hidden" />
-            <h1 className="font-headline text-2xl font-semibold">Painel de Administração</h1>
+            <h1 className="font-headline text-2xl font-semibold">{t('admin_layout.admin_panel')}</h1>
           </header>
           <div className="overflow-x-auto">
             <main className="flex-1 p-4 sm:p-6">{children}</main>

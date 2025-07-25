@@ -2,7 +2,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { orders as initialOrders, products as initialProducts, schools } from "@/lib/data";
 import {
   Card,
   CardHeader,
@@ -30,15 +29,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { OrderReceiptSheet } from "@/components/admin/order-receipt";
-import type { Order, Product, School, PaymentStatus, DeliveryStatus } from "@/lib/types";
+import type { Order, PaymentStatus, DeliveryStatus } from "@/lib/types";
 import { ChevronDown, Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useData } from "@/context/data-context";
+import { useLanguage } from "@/context/language-context";
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState(initialOrders);
-  const [products, setProducts] = useState(initialProducts);
+  const { orders, schools, updateOrderPaymentStatus, updateOrderDeliveryStatus } = useData();
+  const { t, language } = useLanguage();
+
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isReceiptOpen, setReceiptOpen] = useState(false);
   
@@ -48,19 +50,19 @@ export default function OrdersPage() {
   const [deliveryStatusFilter, setDeliveryStatusFilter] = useState<DeliveryStatus | "all">("all");
 
   const paymentStatusOptions: { value: PaymentStatus; label: string }[] = [
-    { value: 'paid', label: 'Pago' },
-    { value: 'unpaid', label: 'Não Pago' },
-    { value: 'partially_paid', label: 'Pago em Parte' },
-    { value: 'cancelled', label: 'Anulado' },
-    { value: 'cod', label: 'Pago na Entrega' },
+    { value: 'paid', label: t('payment_status.paid') },
+    { value: 'unpaid', label: t('payment_status.unpaid') },
+    { value: 'partially_paid', label: t('payment_status.partially_paid') },
+    { value: 'cancelled', label: t('payment_status.cancelled') },
+    { value: 'cod', label: t('payment_status.cod') },
   ];
 
   const deliveryStatusOptions: { value: DeliveryStatus; label: string }[] = [
-    { value: 'delivered', label: 'Entregue' },
-    { value: 'not_delivered', label: 'Não Entregue' },
-    { value: 'school_pickup', label: 'Entregar na Escola' },
-    { value: 'out_of_stock', label: 'Fora de Stock' },
-    { value: 'cancelled', label: 'Anulado' },
+    { value: 'delivered', label: t('delivery_status.delivered') },
+    { value: 'not_delivered', label: t('delivery_status.not_delivered') },
+    { value: 'school_pickup', label: t('delivery_status.school_pickup') },
+    { value: 'out_of_stock', label: t('delivery_status.out_of_stock') },
+    { value: 'cancelled', label: t('delivery_status.cancelled') },
   ];
   
   const filteredOrders = useMemo(() => {
@@ -85,48 +87,25 @@ export default function OrdersPage() {
   };
   
   const handlePaymentStatusChange = (orderReference: string, newStatus: PaymentStatus) => {
-     setOrders(prevOrders => prevOrders.map(order => 
-      order.reference === orderReference ? { ...order, paymentStatus: newStatus } : order
-    ));
+     updateOrderPaymentStatus(orderReference, newStatus);
   };
   
   const handleDeliveryStatusChange = (orderReference: string, newStatus: DeliveryStatus) => {
-    const order = orders.find(o => o.reference === orderReference);
-    if (!order) return;
-
-    const originalStatus = order.deliveryStatus;
-    
-    setOrders(prevOrders => prevOrders.map(o => 
-      o.reference === orderReference ? { ...o, deliveryStatus: newStatus } : o
-    ));
-
-    if (newStatus === 'delivered' && originalStatus !== 'delivered') {
-        setProducts(prevProducts => {
-          const newProducts = [...prevProducts];
-          order.items.forEach(item => {
-            const productIndex = newProducts.findIndex(p => p.id === item.id);
-            if (productIndex > -1 && newProducts[productIndex].stock !== undefined) {
-              newProducts[productIndex].stock! -= item.quantity;
-            }
-          });
-          return newProducts;
-        });
-    }
+    updateOrderDeliveryStatus(orderReference, newStatus);
   };
 
   const getSchoolName = (schoolId: string | undefined) => {
-    if (!schoolId || schoolId === 'livraria') return 'Livraria (LIV)';
-    return schools.find(s => s.id === schoolId)?.name || schoolId;
+    if (!schoolId || schoolId === 'livraria') return t('orders_page.bookstore_client');
+    const school = schools.find(s => s.id === schoolId)
+    return school ? (school.name[language] || school.name.pt) : schoolId;
   }
 
   return (
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Encomendas</CardTitle>
-          <CardDescription>
-            Veja e faça a gestão das suas encomendas.
-          </CardDescription>
+          <CardTitle>{t('orders_page.title')}</CardTitle>
+          <CardDescription>{t('orders_page.description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -134,7 +113,7 @@ export default function OrdersPage() {
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Pesquisar por ref, aluno..."
+                placeholder={t('orders_page.search_placeholder')}
                 className="w-full rounded-lg bg-background pl-8"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -143,35 +122,35 @@ export default function OrdersPage() {
             <div className="flex flex-col gap-4 sm:flex-row">
                  <Select value={schoolFilter} onValueChange={setSchoolFilter}>
                     <SelectTrigger className="w-full sm:w-[200px]">
-                        <SelectValue placeholder="Filtrar por cliente" />
+                        <SelectValue placeholder={t('orders_page.filter_by_client')} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">Todos os Clientes</SelectItem>
+                        <SelectItem value="all">{t('orders_page.all_clients')}</SelectItem>
                         {schools.map(school => (
-                            <SelectItem key={school.id} value={school.id}>{school.name}</SelectItem>
+                            <SelectItem key={school.id} value={school.id}>{school.name[language] || school.name.pt}</SelectItem>
                         ))}
-                        <SelectItem value="livraria">Livraria (LIV)</SelectItem>
+                        <SelectItem value="livraria">{t('orders_page.bookstore_client')}</SelectItem>
                     </SelectContent>
                 </Select>
                  <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="w-full sm:w-auto">
                             <Filter className="mr-2 h-4 w-4" />
-                            Filtrar por Estado
+                            {t('orders_page.filter_by_status')}
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-[240px]">
                         <ScrollArea className="h-72">
                             <div className="p-2">
-                                <DropdownMenuLabel>Estado do Pagamento</DropdownMenuLabel>
+                                <DropdownMenuLabel>{t('orders_page.payment_status')}</DropdownMenuLabel>
                                 <DropdownMenuRadioGroup value={paymentStatusFilter} onValueChange={(val) => setPaymentStatusFilter(val as any)}>
-                                    <DropdownMenuRadioItem value="all">Todos</DropdownMenuRadioItem>
+                                    <DropdownMenuRadioItem value="all">{t('common.all')}</DropdownMenuRadioItem>
                                     {paymentStatusOptions.map(opt => <DropdownMenuRadioItem key={opt.value} value={opt.value}>{opt.label}</DropdownMenuRadioItem>)}
                                 </DropdownMenuRadioGroup>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuLabel>Estado da Entrega</DropdownMenuLabel>
+                                <DropdownMenuLabel>{t('orders_page.delivery_status')}</DropdownMenuLabel>
                                 <DropdownMenuRadioGroup value={deliveryStatusFilter} onValueChange={(val) => setDeliveryStatusFilter(val as any)}>
-                                    <DropdownMenuRadioItem value="all">Todos</DropdownMenuRadioItem>
+                                    <DropdownMenuRadioItem value="all">{t('common.all')}</DropdownMenuRadioItem>
                                     {deliveryStatusOptions.map(opt => <DropdownMenuRadioItem key={opt.value} value={opt.value}>{opt.label}</DropdownMenuRadioItem>)}
                                 </DropdownMenuRadioGroup>
                             </div>
@@ -184,14 +163,14 @@ export default function OrdersPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Ref. Encomenda</TableHead>
-                <TableHead>Aluno / Escola</TableHead>
-                <TableHead>Data</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Estado Pagamento</TableHead>
-                <TableHead>Estado Entrega</TableHead>
+                <TableHead>{t('orders_page.order_ref')}</TableHead>
+                <TableHead>{t('orders_page.student_school')}</TableHead>
+                <TableHead>{t('common.date')}</TableHead>
+                <TableHead>{t('common.total')}</TableHead>
+                <TableHead>{t('orders_page.payment_status')}</TableHead>
+                <TableHead>{t('orders_page.delivery_status')}</TableHead>
                 <TableHead className="text-right">
-                  <span className="sr-only">Ações</span>
+                  <span className="sr-only">{t('common.actions')}</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -204,7 +183,7 @@ export default function OrdersPage() {
                     <div className="text-sm text-muted-foreground">{getSchoolName(order.schoolId)}</div>
                   </TableCell>
                   <TableCell>
-                    {new Date(order.date).toLocaleDateString("pt-PT")}
+                    {new Date(order.date).toLocaleDateString(language)}
                   </TableCell>
                   <TableCell>
                     {order.total.toLocaleString("pt-PT", {
@@ -254,7 +233,7 @@ export default function OrdersPage() {
                       size="sm"
                       onClick={() => viewReceipt(order)}
                     >
-                      Ver Recibo
+                      {t('orders_page.view_receipt')}
                     </Button>
                   </TableCell>
                 </TableRow>

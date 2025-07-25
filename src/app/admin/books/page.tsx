@@ -30,13 +30,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import type { Product, ReadingPlanItem } from "@/lib/types";
+import type { Product } from "@/lib/types";
 import { AddEditBookSheet } from "@/components/admin/add-edit-book-sheet";
 import { Input } from "@/components/ui/input";
 import { useData } from "@/context/data-context";
+import { useLanguage } from "@/context/language-context";
 
 export default function BooksPage() {
   const { products, addProduct, updateProduct, deleteProduct, readingPlan, updateReadingPlanForProduct, schools, publishers } = useData();
+  const { t, language } = useLanguage();
 
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Product | undefined>(
@@ -50,12 +52,13 @@ export default function BooksPage() {
 
   const filteredProducts = useMemo(() => {
     return bookProducts.filter((product) => {
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const name = product.name[language] || product.name.pt;
+      const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStock = stockFilter === 'all' || product.stockStatus === stockFilter;
       const matchesPublisher = publisherFilter === 'all' || product.publisher === publisherFilter;
       return matchesSearch && matchesStock && matchesPublisher;
     });
-  }, [bookProducts, searchQuery, stockFilter, publisherFilter]);
+  }, [bookProducts, searchQuery, stockFilter, publisherFilter, language]);
 
   const handleAddBook = () => {
     setSelectedBook(undefined);
@@ -88,18 +91,26 @@ export default function BooksPage() {
   const getBookReadingPlan = (productId: string) => {
     return readingPlan.filter(item => item.productId === productId);
   }
+  
+  const getStatusLabel = (status: Product['stockStatus']) => {
+    if (status === 'sold_out') return t('stock_status.sold_out');
+    if (status === 'in_stock') return t('stock_status.in_stock');
+    if (status === 'out_of_stock') return t('stock_status.out_of_stock');
+    return '';
+  }
+
 
   return (
     <>
       <Card>
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <CardTitle>Livros</CardTitle>
+            <CardTitle>{t('books_page.title')}</CardTitle>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
                 <div className="relative">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                         type="search"
-                        placeholder="Pesquisar livros..."
+                        placeholder={t('books_page.search_placeholder')}
                         className="w-full rounded-lg bg-background pl-8 sm:w-[200px] lg:w-[300px]"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -109,21 +120,21 @@ export default function BooksPage() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="shrink-0">
                       <Filter className="mr-2" />
-                      Filtrar
+                      {t('common.filter')}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-[200px]">
-                    <DropdownMenuLabel>Filtrar por Stock</DropdownMenuLabel>
+                    <DropdownMenuLabel>{t('books_page.filter_by_stock')}</DropdownMenuLabel>
                     <DropdownMenuRadioGroup value={stockFilter} onValueChange={setStockFilter}>
-                        <DropdownMenuRadioItem value="all">Todos</DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="in_stock">Em Stock</DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="out_of_stock">Atraso na Entrega</DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="sold_out">Esgotado</DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="all">{t('common.all')}</DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="in_stock">{t('stock_status.in_stock')}</DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="out_of_stock">{t('stock_status.out_of_stock')}</DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="sold_out">{t('stock_status.sold_out')}</DropdownMenuRadioItem>
                     </DropdownMenuRadioGroup>
                     <DropdownMenuSeparator />
-                     <DropdownMenuLabel>Filtrar por Editora</DropdownMenuLabel>
+                     <DropdownMenuLabel>{t('books_page.filter_by_publisher')}</DropdownMenuLabel>
                      <DropdownMenuRadioGroup value={publisherFilter} onValueChange={setPublisherFilter}>
-                        <DropdownMenuRadioItem value="all">Todas</DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="all">{t('common.all_publishers')}</DropdownMenuRadioItem>
                         {publishers.map(publisher => (
                             <DropdownMenuRadioItem key={publisher} value={publisher}>{publisher}</DropdownMenuRadioItem>
                         ))}
@@ -132,7 +143,7 @@ export default function BooksPage() {
                 </DropdownMenu>
                 <Button onClick={handleAddBook} className="shrink-0">
                     <PlusCircle className="mr-2" />
-                    Adicionar Novo Livro
+                    {t('books_page.add_new_book')}
                 </Button>
             </div>
         </CardHeader>
@@ -141,16 +152,16 @@ export default function BooksPage() {
             <TableHeader>
               <TableRow>
                 <TableHead className="hidden w-[100px] sm:table-cell">
-                  <span className="sr-only">Imagem</span>
+                  <span className="sr-only">{t('common.image')}</span>
                 </TableHead>
-                <TableHead>Nome</TableHead>
-                <TableHead>Editora</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Stock</TableHead>
-                <TableHead>Preço</TableHead>
-                <TableHead className="hidden md:table-cell">Plano de Leitura</TableHead>
+                <TableHead>{t('common.name')}</TableHead>
+                <TableHead>{t('common.publisher')}</TableHead>
+                <TableHead>{t('common.status')}</TableHead>
+                <TableHead>{t('common.stock')}</TableHead>
+                <TableHead>{t('common.price')}</TableHead>
+                <TableHead className="hidden md:table-cell">{t('common.reading_plan')}</TableHead>
                 <TableHead>
-                  <span className="sr-only">Ações</span>
+                  <span className="sr-only">{t('common.actions')}</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -159,22 +170,20 @@ export default function BooksPage() {
                 <TableRow key={product.id}>
                   <TableCell className="hidden sm:table-cell">
                     <Image
-                      alt={product.name}
+                      alt={product.name[language] || product.name.pt}
                       className="aspect-square rounded-md object-cover"
                       height="64"
                       src={product.image || 'https://placehold.co/64x64.png'}
                       width="64"
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{product.name}</TableCell>
+                  <TableCell className="font-medium">{product.name[language] || product.name.pt}</TableCell>
                    <TableCell className="text-muted-foreground">{product.publisher || 'N/A'}</TableCell>
                    <TableCell>
                       <Badge 
                         variant={product.stockStatus === 'sold_out' ? 'destructive' : product.stockStatus === 'out_of_stock' ? 'secondary' : 'default'}
                       >
-                         {product.stockStatus === 'sold_out' && 'Esgotado'}
-                         {product.stockStatus === 'in_stock' && 'Em Stock'}
-                         {product.stockStatus === 'out_of_stock' && 'Atraso na Entrega'}
+                         {getStatusLabel(product.stockStatus)}
                       </Badge>
                    </TableCell>
                    <TableCell>
@@ -190,7 +199,7 @@ export default function BooksPage() {
                             </Badge>
                         ))
                       ): (
-                        <Badge variant="outline">Fora do plano</Badge>
+                        <Badge variant="outline">{t('books_page.not_in_plan')}</Badge>
                       )}
                     </div>
                   </TableCell>
@@ -203,19 +212,19 @@ export default function BooksPage() {
                           variant="ghost"
                         >
                           <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Alternar menu</span>
+                          <span className="sr-only">{t('common.toggle_menu')}</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                        <DropdownMenuLabel>{t('common.actions')}</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => handleEditBook(product)}>
-                          Editar
+                          {t('common.edit')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive"
                           onClick={() => handleDeleteBook(product.id)}
                         >
-                          Eliminar
+                          {t('common.delete')}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

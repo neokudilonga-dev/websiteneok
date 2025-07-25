@@ -4,7 +4,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 
@@ -22,7 +21,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { useCart } from "@/context/cart-context";
 import { useToast } from "@/hooks/use-toast";
-import { readingPlan, schools } from "@/lib/data";
+import { useData } from "@/context/data-context";
+import { useLanguage } from "@/context/language-context";
 
 const checkoutSchema = z.object({
   studentName: z.string().optional(),
@@ -46,18 +46,20 @@ export default function CheckoutForm() {
     const router = useRouter();
     const { toast } = useToast();
     const { cartItems, cartTotal, clearCart } = useCart();
+    const { readingPlan, schools } = useData();
+    const { t, language } = useLanguage();
 
     const readingPlanProductIdsInCart = useMemo(() => {
         const readingPlanProductIds = new Set(readingPlan.map(item => item.productId));
         return cartItems.filter(item => readingPlanProductIds.has(item.id));
-    }, [cartItems]);
+    }, [cartItems, readingPlan]);
 
     const requiresStudentInfo = readingPlanProductIdsInCart.length > 0;
     
     const schoolsInCart = useMemo(() => {
         const schoolIdsInCart = new Set(readingPlan.filter(rp => readingPlanProductIdsInCart.some(ci => ci.id === rp.productId)).map(rp => rp.schoolId));
         return schools.filter(school => schoolIdsInCart.has(school.id));
-    }, [readingPlanProductIdsInCart]);
+    }, [readingPlanProductIdsInCart, schools]);
 
     const allowPickupAtSchool = useMemo(() => {
         return requiresStudentInfo && schoolsInCart.some(school => school.allowPickup);
@@ -74,7 +76,7 @@ export default function CheckoutForm() {
         }
         return true;
     }, {
-        message: "O nome do aluno e a classe são obrigatórios para itens do plano de leitura.",
+        message: t('checkout_form.errors.student_info_required'),
         path: ["studentName"], // You can choose which field to show the error on
     }).refine(data => {
         if (data.deliveryOption !== 'levantamento' && data.deliveryOption !== 'levantamento-local' && !data.deliveryAddress) {
@@ -82,7 +84,7 @@ export default function CheckoutForm() {
         }
         return true;
     }, {
-        message: "A morada é obrigatória para entrega ao domicílio.",
+        message: t('checkout_form.errors.address_required'),
         path: ["deliveryAddress"],
     });
 
@@ -120,7 +122,6 @@ export default function CheckoutForm() {
     const generateOrderReference = () => {
         let prefix = "LIV"; // Default prefix
         if (schoolsInCart.length > 0) {
-            // If there are school items, use the first school's abbreviation
             const school = schools.find(s => s.id === schoolsInCart[0].id);
             if (school) {
                 prefix = school.abbreviation;
@@ -132,14 +133,16 @@ export default function CheckoutForm() {
     const onSubmit = (data: CheckoutFormValues) => {
         if(cartItems.length === 0){
             toast({
-                title: "Carrinho Vazio",
-                description: "Não pode fazer uma encomenda com o carrinho vazio.",
+                title: t('checkout_form.toast.cart_empty_title'),
+                description: t('checkout_form.toast.cart_empty_description'),
                 variant: "destructive"
             });
             return;
         }
 
         const orderReference = generateOrderReference();
+        const schoolInCart = schoolsInCart.length > 0 ? schoolsInCart[0] : undefined;
+        const schoolName = schoolInCart ? (schoolInCart.name[language] || schoolInCart.name.pt) : undefined;
         
         // In a real app, you would send this data to your backend API
         const orderData = {
@@ -150,6 +153,8 @@ export default function CheckoutForm() {
             reference: orderReference,
             date: new Date().toISOString(),
             status: "pending",
+            schoolId: schoolInCart?.id,
+            schoolName: schoolName
         };
         console.log("Order Submitted:", orderData);
 
@@ -161,8 +166,8 @@ export default function CheckoutForm() {
         router.push(`/order-confirmation?${urlParams.toString()}`);
 
         toast({
-            title: "Encomenda Submetida!",
-            description: "A sua encomenda foi enviada com sucesso."
+            title: t('checkout_form.toast.order_submitted_title'),
+            description: t('checkout_form.toast.order_submitted_description')
         });
     };
 
@@ -170,7 +175,7 @@ export default function CheckoutForm() {
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 <div className="space-y-4 rounded-lg border bg-card p-6">
-                     <h3 className="text-xl font-semibold">Detalhes de Contacto</h3>
+                     <h3 className="text-xl font-semibold">{t('checkout_form.contact_details')}</h3>
                      { requiresStudentInfo && (
                         <>
                              <FormField
@@ -178,7 +183,7 @@ export default function CheckoutForm() {
                                 name="studentName"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Nome da/o Aluna/o</FormLabel>
+                                        <FormLabel>{t('checkout_form.student_name')}</FormLabel>
                                         <FormControl><Input {...field} /></FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -189,7 +194,7 @@ export default function CheckoutForm() {
                                 name="classAndGrade"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Classe e Turma</FormLabel>
+                                        <FormLabel>{t('checkout_form.class_and_grade')}</FormLabel>
                                         <FormControl><Input {...field} /></FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -202,7 +207,7 @@ export default function CheckoutForm() {
                         name="guardianName"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Nome do/a Responsável pela Encomenda</FormLabel>
+                                <FormLabel>{t('checkout_form.guardian_name')}</FormLabel>
                                 <FormControl><Input {...field} /></FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -213,8 +218,8 @@ export default function CheckoutForm() {
                         name="phone"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Número Telefónico de Contacto</FormLabel>
-                                <FormControl><Input {...field} placeholder="Com WhatsApp activo" /></FormControl>
+                                <FormLabel>{t('checkout_form.phone')}</FormLabel>
+                                <FormControl><Input {...field} placeholder={t('checkout_form.phone_placeholder')} /></FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -233,7 +238,7 @@ export default function CheckoutForm() {
                 </div>
 
                 <div className="space-y-4 rounded-lg border bg-card p-6">
-                    <h3 className="text-xl font-semibold">Opções de Entrega</h3>
+                    <h3 className="text-xl font-semibold">{t('checkout_form.delivery_options')}</h3>
                     <FormField
                         control={form.control}
                         name="deliveryOption"
@@ -243,26 +248,26 @@ export default function CheckoutForm() {
                                     <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex flex-col space-y-2">
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl><RadioGroupItem value="tala-morro" /></FormControl>
-                                            <FormLabel className="font-normal">Sim - em Talatona e Morro Bento (distrito urbano) - acresce 2000 AKZ</FormLabel>
+                                            <FormLabel className="font-normal">{t('checkout_form.delivery_option_1')}</FormLabel>
                                         </FormItem>
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl><RadioGroupItem value="fora-tala" /></FormControl>
-                                            <FormLabel className="font-normal">Sim - fora de Talatona - acresce 2500 AKZ</FormLabel>
+                                            <FormLabel className="font-normal">{t('checkout_form.delivery_option_2')}</FormLabel>
                                         </FormItem>
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl><RadioGroupItem value="outras" /></FormControl>
-                                            <FormLabel className="font-normal">Sim - fora das Zonas acima referidas - acresce 4000 AKZ</FormLabel>
+                                            <FormLabel className="font-normal">{t('checkout_form.delivery_option_3')}</FormLabel>
                                         </FormItem>
                                         {allowPickupAtSchool && (
                                             <FormItem className="flex items-center space-x-3 space-y-0">
                                                 <FormControl><RadioGroupItem value="levantamento" /></FormControl>
-                                                <FormLabel className="font-normal">Não - levantamento no Colégio em data a confirmar</FormLabel>
+                                                <FormLabel className="font-normal">{t('checkout_form.delivery_option_4')}</FormLabel>
                                             </FormItem>
                                         )}
                                         {allowPickupAtLocation && (
                                             <FormItem className="flex items-center space-x-3 space-y-0">
                                                 <FormControl><RadioGroupItem value="levantamento-local" /></FormControl>
-                                                <FormLabel className="font-normal">Não - levantamento no Condomínio BCI 6 Casas, Casa No. 6 (Sujeito a marcação prévia)</FormLabel>
+                                                <FormLabel className="font-normal">{t('checkout_form.delivery_option_5')}</FormLabel>
                                             </FormItem>
                                         )}
                                     </RadioGroup>
@@ -277,7 +282,7 @@ export default function CheckoutForm() {
                             name="deliveryAddress"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Morada (se optou por entrega domiciliária)</FormLabel>
+                                    <FormLabel>{t('checkout_form.delivery_address')}</FormLabel>
                                     <FormControl><Textarea {...field} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -287,7 +292,7 @@ export default function CheckoutForm() {
                 </div>
 
                  <div className="space-y-4 rounded-lg border bg-card p-6">
-                    <h3 className="text-xl font-semibold">Forma de Pagamento</h3>
+                    <h3 className="text-xl font-semibold">{t('checkout_form.payment_method')}</h3>
                      <FormField
                         control={form.control}
                         name="paymentMethod"
@@ -297,17 +302,17 @@ export default function CheckoutForm() {
                                     <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex flex-col space-y-2">
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl><RadioGroupItem value="numerario" /></FormControl>
-                                            <FormLabel className="font-normal">Pagamento em numerário</FormLabel>
+                                            <FormLabel className="font-normal">{t('checkout_form.payment_method_1')}</FormLabel>
                                         </FormItem>
                                         { (deliveryOption === 'levantamento' || deliveryOption === 'levantamento-local') && (
                                             <FormItem className="flex items-center space-x-3 space-y-0">
                                                 <FormControl><RadioGroupItem value="multicaixa" /></FormControl>
-                                                <FormLabel className="font-normal">Pagamento com Multicaixa (não disponível para entregas)</FormLabel>
+                                                <FormLabel className="font-normal">{t('checkout_form.payment_method_2')}</FormLabel>
                                             </FormItem>
                                         )}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl><RadioGroupItem value="transferencia" /></FormControl>
-                                            <FormLabel className="font-normal">Pagamento por transferência bancária ou depósito</FormLabel>
+                                            <FormLabel className="font-normal">{t('checkout_form.payment_method_3')}</FormLabel>
                                         </FormItem>
                                     </RadioGroup>
                                 </FormControl>
@@ -318,7 +323,7 @@ export default function CheckoutForm() {
                 </div>
 
                 <Button type="submit" size="lg" className="w-full">
-                    Enviar Encomenda e Pagar {finalTotal.toLocaleString("pt-PT", { style: "currency", currency: "AOA", minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                    {t('checkout_form.submit_button')} {finalTotal.toLocaleString("pt-PT", { style: "currency", currency: "AOA", minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                 </Button>
             </form>
         </Form>

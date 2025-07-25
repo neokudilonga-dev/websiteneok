@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useCart } from "@/context/cart-context";
 import type { CartItem as CartItemType } from "@/lib/types";
 import { Minus, Plus, X } from "lucide-react";
+import { useLanguage } from "@/context/language-context";
 
 interface CartItemProps {
   item: CartItemType;
@@ -15,6 +16,7 @@ interface CartItemProps {
 
 export default function CartItem({ item, isKitItem = false }: CartItemProps) {
   const { updateQuantity, removeFromCart } = useCart();
+  const { t, language } = useLanguage();
 
   const handleQuantityChange = (change: number) => {
     // For kit items, we don't allow quantity change from the cart view
@@ -23,14 +25,14 @@ export default function CartItem({ item, isKitItem = false }: CartItemProps) {
   };
   
   const displayImage = item.type === 'book' ? item.image : (item.images?.[0] || 'https://placehold.co/600x400.png');
-
+  const displayName = item.name[language] || item.name.pt;
 
   return (
     <div className="flex items-start gap-4">
       <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border">
         <Image
           src={displayImage}
-          alt={item.name}
+          alt={displayName}
           fill
           className="object-cover"
           data-ai-hint={item.dataAiHint}
@@ -38,14 +40,14 @@ export default function CartItem({ item, isKitItem = false }: CartItemProps) {
       </div>
       <div className="flex flex-1 flex-col gap-1">
         <div className="flex justify-between">
-          <h3 className="font-semibold">{item.name}</h3>
+          <h3 className="font-semibold">{displayName}</h3>
           <p className="font-semibold">{(item.price * item.quantity).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
         </div>
-        <p className="text-sm text-muted-foreground">{item.price.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })} cada</p>
+        <p className="text-sm text-muted-foreground">{item.price.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })} {t('cart.each')}</p>
         <div className="mt-2 flex items-center justify-between">
             {isKitItem ? (
                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">Quantidade: {item.quantity}</span>
+                    <span className="text-sm font-medium">{t('cart.quantity')}: {item.quantity}</span>
                  </div>
             ) : (
                 <div className="flex items-center gap-2">

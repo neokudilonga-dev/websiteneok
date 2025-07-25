@@ -1,19 +1,23 @@
 
+export type TranslatedString = {
+  pt: string;
+  en: string;
+};
 
 export interface Product {
   id: string;
-  name: string;
-  description: string;
+  name: TranslatedString;
+  description: TranslatedString;
   price: number;
   stock?: number;
   image: string; // For books
   images: string[]; // For games
   type: "book" | "game";
   dataAiHint?: string;
-  category?: string; // e.g., 'Ficção', 'Manual Escolar', 'Ciência'
+  category?: string;
   publisher?: string;
   stockStatus?: 'in_stock' | 'out_of_stock' | 'sold_out';
-  status?: "mandatory" | "recommended"; // used for reading plan view
+  status?: "mandatory" | "recommended";
 }
 
 export interface ReadingPlanItem {
@@ -26,7 +30,7 @@ export interface ReadingPlanItem {
 
 export interface School {
   id: string;
-  name: string;
+  name: TranslatedString;
   abbreviation: string;
   allowPickup?: boolean;
   allowPickupAtLocation?: boolean;

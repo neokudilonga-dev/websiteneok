@@ -32,10 +32,12 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input";
 import { useData } from "@/context/data-context";
+import { useLanguage } from "@/context/language-context";
 
 
 export default function PublishersPage() {
   const { publishers, addPublisher, deletePublisher } = useData();
+  const { t } = useLanguage();
   const [newPublisher, setNewPublisher] = useState('');
 
   const handleAddPublisher = () => {
@@ -55,31 +57,31 @@ export default function PublishersPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-4">
           <div className="space-y-1">
-            <CardTitle>Editoras de Livros</CardTitle>
-            <CardDescription>Faça a gestão das editoras para os livros.</CardDescription>
+            <CardTitle>{t('publishers_page.title')}</CardTitle>
+            <CardDescription>{t('publishers_page.description')}</CardDescription>
           </div>
           <AlertDialog>
             <AlertDialogTrigger asChild>
                 <Button>
                     <PlusCircle className="mr-2" />
-                    Adicionar Editora
+                    {t('publishers_page.add_publisher')}
                 </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                <AlertDialogTitle>Adicionar Nova Editora</AlertDialogTitle>
+                <AlertDialogTitle>{t('publishers_page.dialog_title')}</AlertDialogTitle>
                 <AlertDialogDescription>
-                    Digite o nome da nova editora de livro.
+                    {t('publishers_page.dialog_description')}
                 </AlertDialogDescription>
                 </AlertDialogHeader>
                 <Input 
                     value={newPublisher} 
                     onChange={(e) => setNewPublisher(e.target.value)} 
-                    placeholder="Ex: Editora Angola"
+                    placeholder={t('publishers_page.publisher_name_placeholder')}
                 />
                 <AlertDialogFooter>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={handleAddPublisher}>Adicionar</AlertDialogAction>
+                <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                <AlertDialogAction onClick={handleAddPublisher}>{t('common.add')}</AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
@@ -89,9 +91,9 @@ export default function PublishersPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nome da Editora</TableHead>
+                <TableHead>{t('publishers_page.publisher_name')}</TableHead>
                 <TableHead className="w-[100px] text-right">
-                  <span className="sr-only">Ações</span>
+                  <span className="sr-only">{t('common.actions')}</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -109,19 +111,19 @@ export default function PublishersPage() {
                                 className="text-destructive hover:text-destructive"
                             >
                                 <Trash2 className="h-4 w-4" />
-                                <span className="sr-only">Eliminar Editora</span>
+                                <span className="sr-only">{t('publishers_page.delete_publisher')}</span>
                             </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                             <AlertDialogHeader>
-                            <AlertDialogTitle>Tem a certeza?</AlertDialogTitle>
+                            <AlertDialogTitle>{t('common.are_you_sure')}</AlertDialogTitle>
                             <AlertDialogDescription>
-                                Esta ação não pode ser desfeita. Isto irá eliminar permanentemente a editora.
+                                {t('common.action_cannot_be_undone_publisher')}
                             </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDeletePublisher(publisher)} className="bg-destructive hover:bg-destructive/90">Eliminar</AlertDialogAction>
+                            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeletePublisher(publisher)} className="bg-destructive hover:bg-destructive/90">{t('common.delete')}</AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>

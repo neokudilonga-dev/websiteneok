@@ -1,9 +1,14 @@
 
+"use client";
+
 import Image from "next/image";
 import Header from "@/components/header";
 import { NeokudilongaLogo } from "@/components/logo";
+import { useLanguage } from "@/context/language-context";
 
 export default function QuemSomosPage() {
+  const { t } = useLanguage();
+
   return (
     <div className="flex min-h-screen w-full flex-col">
       <Header />
@@ -12,21 +17,21 @@ export default function QuemSomosPage() {
             <div className="space-y-12">
                 <div className="text-center">
                     <h1 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">
-                        Sobre a Neokudilonga
+                        {t('about_us.title')}
                     </h1>
                     <p className="mt-4 text-lg text-muted-foreground">
-                        Conectando conhecimento e futuro através de livros e tecnologia.
+                        {t('about_us.subtitle')}
                     </p>
                 </div>
 
                 <div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:items-center">
                     <div>
-                        <h2 className="font-headline text-2xl font-semibold">A Nossa Missão</h2>
+                        <h2 className="font-headline text-2xl font-semibold">{t('about_us.mission_title')}</h2>
                         <p className="mt-4 text-muted-foreground">
-                            A nossa missão é fornecer materiais educativos de alta qualidade, desde livros escolares a jogos didáticos, para apoiar o percurso de aprendizagem dos estudantes em Angola. Acreditamos que o acesso ao conhecimento é a chave para o desenvolvimento e um futuro mais próspero.
+                            {t('about_us.mission_p1')}
                         </p>
                         <p className="mt-4 text-muted-foreground">
-                            Na Neokudilonga, combinamos a tradição das livrarias com a conveniência da tecnologia moderna, criando uma plataforma fácil de usar para pais, estudantes e escolas.
+                            {t('about_us.mission_p2')}
                         </p>
                     </div>
                      <div className="flex items-center justify-center rounded-lg bg-primary/10 p-8">
@@ -46,9 +51,9 @@ export default function QuemSomosPage() {
                         />
                     </div>
                     <div className="order-first md:order-last">
-                        <h2 className="font-headline text-2xl font-semibold">A Nossa História</h2>
+                        <h2 className="font-headline text-2xl font-semibold">{t('about_us.history_title')}</h2>
                         <p className="mt-4 text-muted-foreground">
-                           Fundada com a paixão pela educação, a Neokudilonga nasceu da vontade de simplificar o acesso a materiais escolares em Angola. Começámos como uma pequena livraria e, com o tempo, crescemos para nos tornarmos uma referência no setor, sempre focados nas necessidades das nossas comunidades escolares.
+                           {t('about_us.history_p1')}
                         </p>
                     </div>
                 </div>

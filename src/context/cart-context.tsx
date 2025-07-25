@@ -5,7 +5,7 @@ import { createContext, useContext, useState, ReactNode } from "react";
 import type { CartItem, Product } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from 'uuid';
-
+import { useLanguage } from "./language-context";
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -23,6 +23,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const { toast } = useToast();
+  const { t, language } = useLanguage();
 
   const addToCart = (product: Product) => {
     setCartItems((prevItems) => {
@@ -37,8 +38,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       return [...prevItems, { ...product, quantity: 1 }];
     });
     toast({
-      title: "Adicionado ao carrinho",
-      description: `${product.name} foi adicionado ao seu carrinho.`,
+      title: t('cart.toast.added_title'),
+      description: t('cart.toast.added_description', { name: product.name[language] || product.name.pt }),
     });
   };
 
@@ -53,25 +54,26 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       return newItems;
     });
 
-    const productNames = products.map(p => p.name).join(', ');
+    const productNames = products.map(p => p.name[language] || p.name.pt).join(', ');
     toast({
-      title: "Kit adicionado ao carrinho",
+      title: t('cart.toast.kit_added_title'),
       description: (
         <div>
             <p className="font-semibold">{kitName}</p>
-            <p>Os seguintes itens foram adicionados: {productNames}.</p>
+            <p>{t('cart.toast.kit_added_description')} {productNames}.</p>
         </div>
       )
     });
   };
 
   const removeFromCart = (productId: string) => {
+    const itemToRemove = cartItems.find(item => item.id === productId);
     setCartItems((prevItems) =>
       prevItems.filter((item) => item.id !== productId)
     );
      toast({
-      title: "Removido do carrinho",
-      description: `O item foi removido do seu carrinho.`,
+      title: t('cart.toast.removed_title'),
+      description: t('cart.toast.removed_description', { name: itemToRemove?.name[language] || itemToRemove?.name.pt || '' }),
       variant: 'destructive'
     });
   };
@@ -120,7 +122,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 export const useCart = () => {
   const context = useContext(CartContext);
   if (context === undefined) {
-    throw new Error("useCart deve ser usado dentro de um CartProvider");
+    throw new Error("useCart must be used within a CartProvider");
   }
   return context;
 };

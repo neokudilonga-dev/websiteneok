@@ -18,9 +18,11 @@ import { useCart } from "@/context/cart-context";
 import CartItem from "./cart-item";
 import type { CartItem as CartItemType } from "@/lib/types";
 import Link from "next/link";
+import { useLanguage } from "@/context/language-context";
 
 export default function Cart() {
   const { cartItems, cartCount, cartTotal } = useCart();
+  const { t, language } = useLanguage();
 
   const individualItems = cartItems.filter(item => !item.kitId);
   const kitItems: Record<string, CartItemType[]> = cartItems.reduce((acc, item) => {
@@ -39,7 +41,7 @@ export default function Cart() {
       <SheetTrigger asChild>
         <Button variant="default" size="lg" className="relative shrink-0">
           <ShoppingCart className="mr-2 h-5 w-5" />
-          <span className="hidden sm:inline">Carrinho</span>
+          <span className="hidden sm:inline">{t('header.cart')}</span>
           {cartCount > 0 && (
             <Badge className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full p-0">
               {cartCount}
@@ -49,7 +51,7 @@ export default function Cart() {
       </SheetTrigger>
       <SheetContent className="flex w-full flex-col pr-0 sm:max-w-lg">
         <SheetHeader className="px-6">
-          <SheetTitle className="font-headline">Carrinho de Compras ({cartCount})</SheetTitle>
+          <SheetTitle className="font-headline">{t('cart.title')} ({cartCount})</SheetTitle>
         </SheetHeader>
         {cartCount > 0 ? (
           <>
@@ -73,13 +75,13 @@ export default function Cart() {
             <SheetFooter className="mt-auto flex flex-col gap-4 bg-background p-6">
               <Separator />
               <div className="flex items-center justify-between text-lg font-semibold">
-                <span>Total</span>
+                <span>{t('common.total')}</span>
                 <span>{cartTotal.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
               </div>
               <SheetClose asChild>
                  <Link href="/checkout" className="w-full">
                     <Button size="lg" className="w-full">
-                        Finalizar Compra
+                        {t('cart.checkout')}
                     </Button>
                 </Link>
               </SheetClose>
@@ -89,10 +91,10 @@ export default function Cart() {
           <div className="flex h-full flex-col items-center justify-center gap-2">
             <ShoppingCart className="h-16 w-16 text-muted-foreground/50" />
             <p className="text-xl font-semibold text-muted-foreground">
-              O seu carrinho está vazio
+              {t('cart.empty_cart_message')}
             </p>
             <SheetClose asChild>
-              <Button variant="link">Começar a comprar</Button>
+              <Button variant="link">{t('cart.start_shopping')}</Button>
             </SheetClose>
           </div>
         )}
