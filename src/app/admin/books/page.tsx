@@ -50,15 +50,20 @@ export default function BooksPage() {
 
   const bookProducts = useMemo(() => products.filter(p => p.type === 'book'), [products]);
 
+  const getProductName = (product: Product) => {
+    if (!product || !product.name) return 'No Name';
+    return product.name[language] || product.name.pt || 'Unnamed Product';
+  }
+
   const filteredProducts = useMemo(() => {
     return bookProducts.filter((product) => {
-      const name = product.name ? (product.name[language] || product.name.pt) : '';
+      const name = getProductName(product);
       const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStock = stockFilter === 'all' || product.stockStatus === stockFilter;
       const matchesPublisher = publisherFilter === 'all' || product.publisher === publisherFilter;
       return matchesSearch && matchesStock && matchesPublisher;
     });
-  }, [bookProducts, searchQuery, stockFilter, publisherFilter, language]);
+  }, [bookProducts, searchQuery, stockFilter, publisherFilter, language, getProductName]);
 
   const handleAddBook = () => {
     setSelectedBook(undefined);
@@ -98,12 +103,6 @@ export default function BooksPage() {
     if (status === 'out_of_stock') return t('stock_status.out_of_stock');
     return '';
   }
-
-  const getProductName = (product: Product) => {
-    if (!product.name) return 'No Name';
-    return product.name[language] || product.name.pt;
-  }
-
 
   return (
     <>

@@ -46,15 +46,20 @@ export default function GamesPage() {
   const [showSoldOut, setShowSoldOut] = useState(false);
 
   const gameProducts = useMemo(() => products.filter(p => p.type === 'game'), [products]);
+  
+  const getProductName = (product: Product) => {
+    if (!product || !product.name) return 'No Name';
+    return product.name[language] || product.name.pt || 'Unnamed Product';
+  }
 
   const filteredProducts = useMemo(() => {
     return gameProducts.filter((product) => {
-      const name = product.name ? (product.name[language] || product.name.pt) : '';
+      const name = getProductName(product);
       const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStock = showSoldOut || product.stockStatus !== 'sold_out';
       return matchesSearch && matchesStock;
     });
-  }, [gameProducts, searchQuery, showSoldOut, language]);
+  }, [gameProducts, searchQuery, showSoldOut, language, getProductName]);
 
   const handleAddGame = () => {
     setSelectedGame(undefined);
@@ -85,11 +90,6 @@ export default function GamesPage() {
     if (status === 'in_stock') return t('stock_status.in_stock');
     if (status === 'out_of_stock') return t('stock_status.out_of_stock');
     return '';
-  }
-  
-  const getProductName = (product: Product) => {
-    if (!product.name) return 'No Name';
-    return product.name[language] || product.name.pt;
   }
 
   return (

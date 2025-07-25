@@ -68,6 +68,11 @@ export default function SchoolsPage() {
         <XCircle className="h-5 w-5 text-destructive" />
     )
   }
+  
+  const getSchoolName = (school: School) => {
+    if (!school || !school.name) return 'No Name';
+    return school.name[language] || school.name.pt || 'Unnamed School';
+  }
 
   return (
     <>
@@ -97,7 +102,7 @@ export default function SchoolsPage() {
             <TableBody>
               {schools.map((school) => (
                 <TableRow key={school.id}>
-                  <TableCell className="font-medium">{school.name[language] || school.name.pt}</TableCell>
+                  <TableCell className="font-medium">{getSchoolName(school)}</TableCell>
                   <TableCell className="font-mono text-sm text-muted-foreground">{school.id}</TableCell>
                    <TableCell>
                       <Badge variant="secondary">{school.abbreviation}</Badge>

@@ -26,6 +26,8 @@ import {
 import { NeokudilongaLogoAbbr } from "@/components/logo";
 import { useLanguage } from "@/context/language-context";
 
+export const dynamic = 'force-dynamic';
+
 export default function AdminLayout({
   children,
 }: {
