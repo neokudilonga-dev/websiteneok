@@ -15,9 +15,9 @@ import { useToast } from "@/hooks/use-toast";
 interface DataContextType {
   // Schools
   schools: School[];
-  addSchool: (school: School) => void;
-  updateSchool: (school: School) => void;
-  deleteSchool: (schoolId: string) => void;
+  addSchool: (school: School) => Promise<void>;
+  updateSchool: (school: School) => Promise<void>;
+  deleteSchool: (schoolId: string) => Promise<void>;
   loadingSchools: boolean;
 
   // Products
@@ -85,19 +85,52 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   }, [toast]);
 
   // School mutations
-  const addSchool = (school: School) => {
-    // This will be replaced with an API call
-    const newSchool = { ...school, id: `school-${Date.now()}` };
-    setSchools(prev => [...prev, newSchool]);
+  const addSchool = async (school: School) => {
+    try {
+      const response = await fetch('/api/schools', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(school),
+      });
+      if (!response.ok) throw new Error('Failed to add school');
+      const newSchool = await response.json();
+      setSchools(prev => [...prev, newSchool]);
+       toast({ title: "School Added", description: `${school.name.pt} was added successfully.` });
+    } catch (error) {
+      console.error(error);
+      toast({ title: "Error", description: "Could not add school.", variant: "destructive" });
+    }
   };
-  const updateSchool = (updatedSchool: School) => {
-    // This will be replaced with an API call
-    setSchools(prev => prev.map(s => s.id === updatedSchool.id ? updatedSchool : s));
+  const updateSchool = async (updatedSchool: School) => {
+    try {
+        const response = await fetch(`/api/schools/${updatedSchool.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedSchool),
+        });
+        if (!response.ok) throw new Error('Failed to update school');
+        const savedSchool = await response.json();
+        setSchools(prev => prev.map(s => s.id === savedSchool.id ? savedSchool : s));
+        toast({ title: "School Updated", description: `${savedSchool.name.pt} was updated successfully.` });
+    } catch (error) {
+        console.error(error);
+        toast({ title: "Error", description: "Could not update school.", variant: "destructive" });
+    }
   };
-  const deleteSchool = (schoolId: string) => {
-    // This will be replaced with an API call
-    setSchools(prev => prev.filter(s => s.id !== schoolId));
-    setReadingPlan(prev => prev.filter(rp => rp.schoolId !== schoolId));
+  const deleteSchool = async (schoolId: string) => {
+     try {
+        const response = await fetch(`/api/schools/${schoolId}`, {
+            method: 'DELETE',
+        });
+        if (!response.ok) throw new Error('Failed to delete school');
+        setSchools(prev => prev.filter(s => s.id !== schoolId));
+        // We can keep the local reading plan update for immediate UI feedback
+        setReadingPlan(prev => prev.filter(rp => rp.schoolId !== schoolId));
+        toast({ title: "School Deleted", description: `School was deleted successfully.` });
+    } catch (error) {
+        console.error(error);
+        toast({ title: "Error", description: "Could not delete school.", variant: "destructive" });
+    }
   };
 
   // Product mutations
