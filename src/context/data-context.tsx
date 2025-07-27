@@ -8,35 +8,42 @@ import { useToast } from "@/hooks/use-toast";
 interface DataContextType {
   // Loading state
   loading: boolean;
+  setLoading: (loading: boolean) => void;
   fetchData: () => Promise<void>;
 
   // Schools
   schools: School[];
+  setSchools: (schools: School[]) => void;
   addSchool: (school: School) => Promise<void>;
   updateSchool: (school: School) => Promise<void>;
   deleteSchool: (schoolId: string) => Promise<void>;
 
   // Products
   products: Product[];
+  setProducts: (products: Product[]) => void;
   addProduct: (product: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => Promise<void>;
   updateProduct: (product: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => Promise<void>;
   deleteProduct: (productId: string) => Promise<void>;
 
   // Reading Plan
   readingPlan: ReadingPlanItem[];
+  setReadingPlan: (readingPlan: ReadingPlanItem[]) => void;
   
   // Categories
   categories: Category[];
+  setCategories: (categories: Category[]) => void;
   addCategory: (category: Category) => Promise<void>;
   deleteCategory: (categoryName: string) => Promise<void>;
 
   // Publishers
   publishers: string[];
+  setPublishers: (publishers: string[]) => void;
   addPublisher: (publisher: string) => Promise<void>;
   deletePublisher: (publisherName: string) => Promise<void>;
 
   // Orders
   orders: Order[];
+  setOrders: (orders: Order[]) => void;
   addOrder: (order: Omit<Order, 'paymentStatus' | 'deliveryStatus'>) => Promise<void>;
   updateOrderPaymentStatus: (orderReference: string, status: PaymentStatus) => Promise<void>;
   updateOrderDeliveryStatus: (orderReference: string, status: DeliveryStatus) => Promise<void>;
@@ -55,13 +62,6 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
   const fetchData = useCallback(async () => {
-    // This check prevents re-fetching if data is already loaded.
-    // The individual page components will trigger this fetch.
-    if (!loading && schools.length > 0 && products.length > 0) {
-        setLoading(false);
-        return;
-    }
-
     setLoading(true);
     try {
       const [
@@ -104,7 +104,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  }, [toast, loading, schools.length, products.length]);
+  }, [toast]);
 
   // School mutations
   const addSchool = async (school: School) => {
@@ -308,13 +308,14 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     <DataContext.Provider
       value={{
         loading,
+        setLoading,
         fetchData,
-        schools, addSchool, updateSchool, deleteSchool,
-        products, addProduct, updateProduct, deleteProduct,
-        readingPlan,
-        categories, addCategory, deleteCategory,
-        publishers, addPublisher, deletePublisher,
-        orders, addOrder, updateOrderPaymentStatus, updateOrderDeliveryStatus,
+        schools, setSchools, addSchool, updateSchool, deleteSchool,
+        products, setProducts, addProduct, updateProduct, deleteProduct,
+        readingPlan, setReadingPlan,
+        categories, setCategories, addCategory, deleteCategory,
+        publishers, setPublishers, addPublisher, deletePublisher,
+        orders, setOrders, addOrder, updateOrderPaymentStatus, updateOrderDeliveryStatus,
       }}
     >
       {children}
