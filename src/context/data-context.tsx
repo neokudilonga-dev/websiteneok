@@ -1,7 +1,7 @@
 
 "use client";
 
-import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, ReactNode, useCallback } from "react";
 import type { School, Product, ReadingPlanItem, Order, Category, PaymentStatus, DeliveryStatus } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 
@@ -56,13 +56,14 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchData = useCallback(async () => {
     // Only fetch if data is not already loaded or is stale.
-    // This simple check prevents re-fetching on every navigation in the admin panel.
+    // This simple check prevents re-fetching on every navigation.
     if (!loading && schools.length > 0) {
+      setLoading(false);
       return;
     }
 
+    setLoading(true);
     try {
-      setLoading(true);
       const [
         schoolsRes, 
         productsRes, 
@@ -93,11 +94,11 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       setPublishers(await publishersRes.json());
       setOrders(await ordersRes.json());
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to fetch initial data", error);
       toast({
           title: "Error fetching data",
-          description: "Could not load data from the database. Please try refreshing.",
+          description: error.message || "Could not load data from the database. Please try refreshing.",
           variant: "destructive"
       });
     } finally {
