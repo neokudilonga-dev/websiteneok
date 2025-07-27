@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from 'firebase-admin';
 import { cookies } from 'next/headers';
+import { firestore } from '@/lib/firebase-admin';
 
 export async function GET() {
   const session = cookies().get('session')?.value || '';
@@ -19,7 +20,7 @@ export async function GET() {
       return NextResponse.json({ isLogged: false }, { status: 401 });
     }
 
-    return NextResponse.json({ isLogged: true }, { status: 200 });
+    return NextResponse.json({ isLogged: true, uid: decodedClaims.uid }, { status: 200 });
   } catch (error) {
     return NextResponse.json({ isLogged: false }, { status: 401 });
   }
