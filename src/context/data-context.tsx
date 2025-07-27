@@ -55,11 +55,11 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
   const fetchData = useCallback(async () => {
-    // Only fetch if data is not already loaded or is stale.
-    // This simple check prevents re-fetching on every navigation.
-    if (!loading && schools.length > 0) {
-      setLoading(false);
-      return;
+    // This check prevents re-fetching if data is already loaded.
+    // The individual page components will trigger this fetch.
+    if (!loading && schools.length > 0 && products.length > 0) {
+        setLoading(false);
+        return;
     }
 
     setLoading(true);
@@ -104,7 +104,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  }, [toast, loading, schools.length]);
+  }, [toast, loading, schools.length, products.length]);
 
   // School mutations
   const addSchool = async (school: School) => {
