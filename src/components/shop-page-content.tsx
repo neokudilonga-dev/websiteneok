@@ -24,10 +24,14 @@ interface GradeProducts {
 }
 
 export default function ShopPageContent() {
-  const { schools, products: allProducts, readingPlan, categories } = useData();
+  const { schools, products: allProducts, readingPlan, categories, loading, fetchData } = useData();
   const { t, language } = useLanguage();
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') || 'planos';
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
   
   const [selectedSchool, setSelectedSchool] = useState<School | undefined>(
     undefined
@@ -189,6 +193,17 @@ export default function ShopPageContent() {
     if (String(grade).toLowerCase() === 'outros') return t('grades.others');
     return `${grade}${t('grades.grade')}`;
   };
+
+  if (loading) {
+    return (
+        <div className="flex min-h-screen w-full flex-col">
+          <Header />
+          <main className="flex-1 flex items-center justify-center">
+              <div className="font-headline text-xl text-muted-foreground">A carregar a loja...</div>
+          </main>
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-h-screen w-full flex-col">

@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 interface DataContextType {
   // Loading state
   loading: boolean;
+  fetchData: () => Promise<void>;
 
   // Schools
   schools: School[];
@@ -54,6 +55,12 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
   const fetchData = useCallback(async () => {
+    // Only fetch if data is not already loaded or is stale.
+    // This simple check prevents re-fetching on every navigation in the admin panel.
+    if (!loading && schools.length > 0) {
+      return;
+    }
+
     try {
       setLoading(true);
       const [
@@ -96,12 +103,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
-
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  }, [toast, loading, schools.length]);
 
   // School mutations
   const addSchool = async (school: School) => {
@@ -305,6 +307,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     <DataContext.Provider
       value={{
         loading,
+        fetchData,
         schools, addSchool, updateSchool, deleteSchool,
         products, addProduct, updateProduct, deleteProduct,
         readingPlan,

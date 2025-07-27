@@ -66,6 +66,7 @@ export default function OrdersPage() {
   ];
   
   const filteredOrders = useMemo(() => {
+    if (!orders) return [];
     return orders.filter(order => {
       const searchMatch = 
         order.reference.toLowerCase().includes(searchQuery.toLowerCase()) ||

@@ -29,6 +29,8 @@ import { NeokudilongaLogoAbbr } from "@/components/logo";
 import { useLanguage } from "@/context/language-context";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useData } from "@/context/data-context";
+import { useEffect } from "react";
 
 
 export const dynamic = 'force-dynamic';
@@ -41,6 +43,12 @@ export default function AdminLayout({
   const pathname = usePathname();
   const router = useRouter();
   const { toast } = useToast();
+  const { loading, fetchData } = useData();
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   const isActive = (path: string) => pathname === path;
   const { t } = useLanguage();
 
@@ -191,7 +199,9 @@ export default function AdminLayout({
             <h1 className="font-headline text-2xl font-semibold">{t('admin_layout.admin_panel')}</h1>
           </header>
           <div className="overflow-x-auto">
-            <main className="flex-1 p-4 sm:p-6">{children}</main>
+            <main className="flex-1 p-4 sm:p-6">
+              {loading ? <div className="flex justify-center items-center h-full"><p>Loading admin data...</p></div> : children}
+            </main>
           </div>
         </SidebarInset>
       </div>

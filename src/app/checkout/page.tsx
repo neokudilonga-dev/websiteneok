@@ -8,10 +8,28 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import { useLanguage } from "@/context/language-context";
+import { useData } from "@/context/data-context";
+import { useEffect } from "react";
 
 export default function CheckoutPage() {
   const { cartItems, cartTotal } = useCart();
   const { t, language } = useLanguage();
+  const { loading, fetchData } = useData();
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen w-full flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+            <p>Loading checkout...</p>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen w-full flex-col">
