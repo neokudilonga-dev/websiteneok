@@ -21,8 +21,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
   DropdownMenuLabel,
+  DropdownMenuTrigger,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
@@ -69,7 +69,7 @@ export default function OrdersPage() {
     return orders.filter(order => {
       const searchMatch = 
         order.reference.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.studentName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (order.studentName && order.studentName.toLowerCase().includes(searchQuery.toLowerCase())) ||
         order.guardianName.toLowerCase().includes(searchQuery.toLowerCase());
       
       const schoolMatch = schoolFilter === 'all' || order.schoolId === schoolFilter;

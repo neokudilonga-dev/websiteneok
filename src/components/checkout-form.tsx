@@ -46,7 +46,7 @@ export default function CheckoutForm() {
     const router = useRouter();
     const { toast } = useToast();
     const { cartItems, cartTotal, clearCart } = useCart();
-    const { readingPlan, schools } = useData();
+    const { readingPlan, schools, addOrder } = useData();
     const { t, language } = useLanguage();
 
     const readingPlanProductIdsInCart = useMemo(() => {
@@ -130,7 +130,7 @@ export default function CheckoutForm() {
         return `${prefix}-${new Date().getFullYear()}${(Math.random() * 90000 + 10000).toFixed(0)}`;
     }
 
-    const onSubmit = (data: CheckoutFormValues) => {
+    const onSubmit = async (data: CheckoutFormValues) => {
         if(cartItems.length === 0){
             toast({
                 title: t('checkout_form.toast.cart_empty_title'),
@@ -144,31 +144,34 @@ export default function CheckoutForm() {
         const schoolInCart = schoolsInCart.length > 0 ? schoolsInCart[0] : undefined;
         const schoolName = schoolInCart ? (schoolInCart.name[language] || schoolInCart.name.pt) : undefined;
         
-        // In a real app, you would send this data to your backend API
-        const orderData = {
-            ...data,
-            items: cartItems,
-            total: finalTotal,
-            deliveryFee,
-            reference: orderReference,
-            date: new Date().toISOString(),
-            status: "pending",
-            schoolId: schoolInCart?.id,
-            schoolName: schoolName
-        };
-        console.log("Order Submitted:", orderData);
+        try {
+            await addOrder({
+                ...data,
+                deliveryAddress: data.deliveryAddress || null,
+                items: cartItems,
+                total: finalTotal,
+                deliveryFee,
+                reference: orderReference,
+                date: new Date().toISOString(),
+                schoolId: schoolInCart?.id,
+                schoolName: schoolName
+            });
 
-        // For demo purposes, we clear the cart and redirect.
-        clearCart();
-        const urlParams = new URLSearchParams();
-        urlParams.set("ref", orderReference);
-        urlParams.set("payment", data.paymentMethod);
-        router.push(`/order-confirmation?${urlParams.toString()}`);
+            clearCart();
+            const urlParams = new URLSearchParams();
+            urlParams.set("ref", orderReference);
+            urlParams.set("payment", data.paymentMethod);
+            router.push(`/order-confirmation?${urlParams.toString()}`);
 
-        toast({
-            title: t('checkout_form.toast.order_submitted_title'),
-            description: t('checkout_form.toast.order_submitted_description')
-        });
+            toast({
+                title: t('checkout_form.toast.order_submitted_title'),
+                description: t('checkout_form.toast.order_submitted_description')
+            });
+
+        } catch (error) {
+            // Error toast is handled in DataContext
+            console.error("Failed to submit order:", error);
+        }
     };
 
     return (
@@ -325,7 +328,3 @@ export default function CheckoutForm() {
                 <Button type="submit" size="lg" className="w-full">
                     {t('checkout_form.submit_button')} {finalTotal.toLocaleString("pt-PT", { style: "currency", currency: "AOA", minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                 </Button>
-            </form>
-        </Form>
-    );
-}

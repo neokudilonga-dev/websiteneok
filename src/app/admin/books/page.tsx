@@ -37,7 +37,7 @@ import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
 
 export default function BooksPage() {
-  const { products, addProduct, updateProduct, deleteProduct, readingPlan, updateReadingPlanForProduct, schools, publishers } = useData();
+  const { products, deleteProduct, readingPlan, schools, publishers } = useData();
   const { t, language } = useLanguage();
 
   const [isSheetOpen, setSheetOpen] = useState(false);
@@ -57,13 +57,13 @@ export default function BooksPage() {
 
   const filteredProducts = useMemo(() => {
     return bookProducts.filter((product) => {
-      const name = getProductName(product);
+      const name = getProductName(product) || '';
       const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStock = stockFilter === 'all' || product.stockStatus === stockFilter;
       const matchesPublisher = publisherFilter === 'all' || product.publisher === publisherFilter;
       return matchesSearch && matchesStock && matchesPublisher;
     });
-  }, [bookProducts, searchQuery, stockFilter, publisherFilter, language, getProductName]);
+  }, [bookProducts, searchQuery, stockFilter, publisherFilter, language]);
 
   const handleAddBook = () => {
     setSelectedBook(undefined);
@@ -77,16 +77,6 @@ export default function BooksPage() {
 
   const handleDeleteBook = (bookId: string) => {
     deleteProduct(bookId);
-  };
-
-  const handleSaveChanges = (bookData: Product, newReadingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => {
-    let book = bookData;
-    if (selectedBook) {
-      updateProduct(book);
-    } else {
-      book = addProduct(book);
-    }
-    updateReadingPlanForProduct(book.id, newReadingPlan);
   };
 
   const getSchoolAbbreviation = (schoolId: string) => {
@@ -243,7 +233,6 @@ export default function BooksPage() {
         isOpen={isSheetOpen}
         setIsOpen={setSheetOpen}
         book={selectedBook}
-        onSaveChanges={handleSaveChanges}
       />
     </>
   );

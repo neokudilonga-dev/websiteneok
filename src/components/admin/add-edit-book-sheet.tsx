@@ -40,7 +40,6 @@ interface AddEditBookSheetProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   book?: Product;
-  onSaveChanges: (book: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => void;
 }
 
 const readingPlanItemSchema = z.object({
@@ -69,9 +68,8 @@ export function AddEditBookSheet({
   isOpen,
   setIsOpen,
   book,
-  onSaveChanges,
 }: AddEditBookSheetProps) {
-    const { schools, categories, publishers, readingPlan } = useData();
+    const { schools, categories, publishers, readingPlan, addProduct, updateProduct } = useData();
     const { t, language } = useLanguage();
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const bookCategories = useMemo(() => categories.filter(c => c.type === 'book'), [categories]);
@@ -141,7 +139,7 @@ export function AddEditBookSheet({
 
 
   const onSubmit = (data: BookFormValues) => {
-    onSaveChanges({
+    const productData: Product = {
         id: book?.id || '',
         type: 'book',
         name: { pt: data.name_pt, en: data.name_en },
@@ -153,7 +151,16 @@ export function AddEditBookSheet({
         category: data.category,
         publisher: data.publisher,
         stockStatus: data.stockStatus
-    }, data.readingPlan || []);
+    };
+    
+    const readingPlanData = data.readingPlan || [];
+
+    if (book) {
+      updateProduct(productData, readingPlanData);
+    } else {
+      addProduct(productData, readingPlanData);
+    }
+
     setIsOpen(false);
   };
   

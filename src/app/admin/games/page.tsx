@@ -35,7 +35,7 @@ import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
 
 export default function GamesPage() {
-  const { products, addProduct, updateProduct, deleteProduct, updateReadingPlanForProduct } = useData();
+  const { products, deleteProduct } = useData();
   const { t, language } = useLanguage();
 
   const [isSheetOpen, setSheetOpen] = useState(false);
@@ -54,12 +54,12 @@ export default function GamesPage() {
 
   const filteredProducts = useMemo(() => {
     return gameProducts.filter((product) => {
-      const name = getProductName(product);
+      const name = getProductName(product) || '';
       const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStock = showSoldOut || product.stockStatus !== 'sold_out';
       return matchesSearch && matchesStock;
     });
-  }, [gameProducts, searchQuery, showSoldOut, language, getProductName]);
+  }, [gameProducts, searchQuery, showSoldOut, language]);
 
   const handleAddGame = () => {
     setSelectedGame(undefined);
@@ -73,16 +73,6 @@ export default function GamesPage() {
 
   const handleDeleteGame = (gameId: string) => {
     deleteProduct(gameId);
-  };
-
-  const handleSaveChanges = (gameData: Product, newReadingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => {
-    let game = gameData;
-    if (selectedGame) {
-      updateProduct(game);
-    } else {
-      game = addProduct(game);
-    }
-    updateReadingPlanForProduct(game.id, newReadingPlan);
   };
 
   const getStatusLabel = (status: Product['stockStatus']) => {
@@ -220,7 +210,6 @@ export default function GamesPage() {
         isOpen={isSheetOpen}
         setIsOpen={setSheetOpen}
         game={selectedGame}
-        onSaveChanges={handleSaveChanges}
       />
     </>
   );

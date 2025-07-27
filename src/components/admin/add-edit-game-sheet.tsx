@@ -26,8 +26,8 @@ import {
   FormMessage,
   FormDescription,
 } from "@/components/ui/form";
-import type { Product, ReadingPlanItem } from "@/lib/types";
-import { useEffect, useState, ChangeEvent } from "react";
+import type { Product } from "@/lib/types";
+import { useEffect, ChangeEvent } from "react";
 import { PlusCircle, Trash2, Upload } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -39,7 +39,6 @@ interface AddEditGameSheetProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   game?: Product;
-  onSaveChanges: (game: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => void;
 }
 
 const readingPlanItemSchema = z.object({
@@ -67,9 +66,8 @@ export function AddEditGameSheet({
   isOpen,
   setIsOpen,
   game,
-  onSaveChanges,
 }: AddEditGameSheetProps) {
-  const { schools, readingPlan } = useData();
+  const { schools, readingPlan, addProduct, updateProduct } = useData();
   const { language } = useLanguage();
 
   const form = useForm<GameFormValues>({
@@ -132,7 +130,7 @@ export function AddEditGameSheet({
   }, [game, form, isOpen, readingPlan]);
 
   const onSubmit = (data: GameFormValues) => {
-    onSaveChanges({
+    const productData: Product = {
       id: game?.id || "",
       type: "game",
       name: { pt: data.name_pt, en: data.name_en },
@@ -142,7 +140,16 @@ export function AddEditGameSheet({
       images: data.images,
       stockStatus: data.stockStatus,
       image: "",
-    }, data.readingPlan || []);
+    };
+    
+    const readingPlanData = data.readingPlan || [];
+    
+    if (game) {
+        updateProduct(productData, readingPlanData);
+    } else {
+        addProduct(productData, readingPlanData);
+    }
+    
     setIsOpen(false);
   };
 
