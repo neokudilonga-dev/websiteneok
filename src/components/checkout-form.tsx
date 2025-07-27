@@ -328,3 +328,7 @@ export default function CheckoutForm() {
                 <Button type="submit" size="lg" className="w-full">
                     {t('checkout_form.submit_button')} {finalTotal.toLocaleString("pt-PT", { style: "currency", currency: "AOA", minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                 </Button>
+            </form>
+        </Form>
+    );
+}
