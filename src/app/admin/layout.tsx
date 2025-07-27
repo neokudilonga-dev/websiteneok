@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Book,
   Building,
@@ -11,6 +11,7 @@ import {
   School,
   ShoppingCart,
   Tags,
+  LogOut,
 } from "lucide-react";
 import {
   SidebarProvider,
@@ -22,9 +23,13 @@ import {
   SidebarMenuButton,
   SidebarTrigger,
   SidebarInset,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 import { NeokudilongaLogoAbbr } from "@/components/logo";
 import { useLanguage } from "@/context/language-context";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+
 
 export const dynamic = 'force-dynamic';
 
@@ -34,8 +39,33 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { toast } = useToast();
   const isActive = (path: string) => pathname === path;
   const { t } = useLanguage();
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        toast({ title: "Logged out successfully." });
+        router.push('/admin/login');
+      } else {
+        throw new Error('Logout failed');
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        title: "Logout failed",
+        description: "An error occurred during logout. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
 
   return (
     <SidebarProvider>
@@ -144,6 +174,16 @@ export default function AdminLayout({
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>
+           <SidebarFooter>
+              <SidebarMenu>
+                 <SidebarMenuItem>
+                   <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
+                      <LogOut />
+                      <span>Logout</span>
+                   </SidebarMenuButton>
+                 </SidebarMenuItem>
+              </SidebarMenu>
+           </SidebarFooter>
         </Sidebar>
         <SidebarInset>
           <header className="flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
