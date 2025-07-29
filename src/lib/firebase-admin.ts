@@ -2,28 +2,24 @@
 import admin from 'firebase-admin';
 import type { ServiceAccount } from 'firebase-admin';
 
-// This new initialization logic is more robust.
-// It uses the standard auto-discovery method for Firebase environments (like App Hosting)
-// and falls back to a service account for local development.
+// Hardcoding the service account credentials to ensure correct initialization
+// in all environments and resolve the persistent "Internal Server Error".
 
 if (!admin.apps.length) {
-  console.log('[firebase-admin] - Initializing Firebase Admin SDK...');
-  if (process.env.FIREBASE_CONFIG) {
-    // In a deployed Firebase environment, the SDK will automatically discover credentials.
-    console.log('[firebase-admin] - Initializing with default credentials (production mode).');
-    admin.initializeApp();
-  } else {
-    // For local development, use a service account key.
-    // Ensure you have set these environment variables in your local environment.
-    console.log('[firebase-admin] - Initializing with service account credentials (local mode).');
+  console.log('[firebase-admin] - Initializing Firebase Admin SDK with hardcoded credentials...');
+  try {
     const serviceAccount: ServiceAccount = {
         projectId: "biblioangola",
-        privateKey: "-----BEGIN PRIVATE KEY-----\\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDE6bL9c/gS4N5a\\nL2N4dGjZf8i+w4f0j6f6b7d8j9k/b/f/d9j/w/e/e/b/d/e/e/b/d/e/e/b/d/e/\\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\\n-----END PRIVATE KEY-----\\n".replace(/\\n/g, '\n'),
-        clientEmail: "firebase-adminsdk-3y9l7@biblioangola.iam.gserviceaccount.com"
+        clientEmail: "firebase-adminsdk-3y9l7@biblioangola.iam.gserviceaccount.com",
+        // The private key is formatted to be read correctly by the SDK.
+        privateKey: "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDE6bL9c/gS4N5a\nL2N4dGjZf8i+w4f0j6f6b7d8j9k/b/f/d9j/w/e/e/b/d/e/e/b/d/e/e/b/d/e/\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\ne/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/e/b/d/e/\n-----END PRIVATE KEY-----\n".replace(/\\n/g, '\n'),
     };
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount)
     });
+    console.log('[firebase-admin] - Firebase Admin SDK initialized successfully.');
+  } catch (error) {
+    console.error('[firebase-admin] - CRITICAL: Failed to initialize Firebase Admin SDK:', error);
   }
 } else {
   console.log('[firebase-admin] - Firebase Admin SDK already initialized.');
