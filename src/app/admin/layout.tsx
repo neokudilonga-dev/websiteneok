@@ -1,31 +1,34 @@
 
+"use client";
+
 import Link from "next/link";
-import {
-  LogOut,
-} from "lucide-react";
+import { usePathname } from "next/navigation";
 import {
   SidebarProvider,
   Sidebar,
   SidebarHeader,
   SidebarContent,
-  SidebarMenu,
-  SidebarMenuItem,
   SidebarTrigger,
   SidebarInset,
   SidebarFooter,
+  SidebarMenu,
+  SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { NeokudilongaLogoAbbr } from "@/components/logo";
 import { LogoutButton } from "./logout-button";
 import { AdminSidebarMenu } from "./client";
-
-
-export const dynamic = 'force-dynamic';
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen">
