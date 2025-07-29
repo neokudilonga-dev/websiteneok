@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword } from "firebase/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,51 +15,76 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { NeokudilongaLogo } from "@/components/logo";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+
+// This function must be called within a client component or hook.
+const getClientAuth = () => {
+    const firebaseConfig = {
+      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    };
+    const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    return getAuth(app);
+}
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const router = useRouter();
   const { toast } = useToast();
-  const provider = new GoogleAuthProvider();
 
-  // Define the config object and auth getter inside the component function
-  // to ensure it runs only on the client where env vars are available.
-  const getClientAuth = () => {
-      const firebaseConfig = {
-        apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-        authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-        storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-        messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-        appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-      };
+  const handleLoginSuccess = async (idToken: string) => {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`,
+      },
+    });
 
-      const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-      return getAuth(app);
-  }
+    if (response.ok) {
+      router.push("/admin");
+    } else {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Login failed after authentication.');
+    }
+  };
+
+  const handleEmailSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const auth = getClientAuth();
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const idToken = await userCredential.user.getIdToken();
+      await handleLoginSuccess(idToken);
+    } catch (error: any) {
+      console.error("Authentication error:", error);
+      toast({
+        title: "Login Failed",
+        description: error.message || "An error occurred during sign-in. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
     try {
-      const auth = getClientAuth(); // Get auth instance here
+      const auth = getClientAuth();
+      const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
       const idToken = await userCredential.user.getIdToken();
-
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`,
-        },
-      });
-
-      if (response.ok) {
-        router.push("/admin");
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Login failed');
-      }
-
+      await handleLoginSuccess(idToken);
     } catch (error: any) {
       console.error("Authentication error:", error);
       toast({
@@ -76,18 +101,46 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <div className="flex justify-center">
-            <NeokudilongaLogo className="h-20" />
-          </div>
-          <CardTitle className="text-2xl">Admin Login</CardTitle>
+          <NeokudilongaLogo className="mx-auto h-20" />
+          <CardTitle className="pt-4 text-2xl">Admin Login</CardTitle>
           <CardDescription>
-            Sign in with your Google account to access the admin panel.
+            Sign in to access the admin panel.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button 
-            onClick={handleGoogleSignIn} 
-            className="w-full" 
+          <form onSubmit={handleEmailSignIn} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Signing In..." : "Sign in"}
+            </Button>
+          </form>
+          <Separator className="my-6" />
+          <Button
+            onClick={handleGoogleSignIn}
+            variant="outline"
+            className="w-full"
             disabled={loading}
           >
             {loading ? "Signing In..." : "Sign in with Google"}
