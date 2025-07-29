@@ -1,4 +1,3 @@
-
 // src/lib/firebase-client.ts
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
@@ -14,5 +13,6 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const firebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const auth = getAuth(firebaseApp);
 
-export { firebaseApp };
+export { firebaseApp, auth };
