@@ -27,13 +27,15 @@ export default function LoginPage() {
   const { toast } = useToast();
 
   const getClientAuth = () => {
+    // Hardcoded Firebase config provided by the user
     const firebaseConfig = {
-      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+      apiKey: "AIzaSyBnTpglZ_7KnlZxDb30aRKMikHBzb6rzF4",
+      authDomain: "biblioangola.firebaseapp.com",
+      projectId: "biblioangola",
+      storageBucket: "biblioangola.firebasestorage.app",
+      messagingSenderId: "965265307414",
+      appId: "1:965265307414:web:c32050e53982f9d8f70237",
+      measurementId: "G-31QQ4L2L27"
     };
     const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     return getAuth(app);
