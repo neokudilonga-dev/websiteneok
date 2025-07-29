@@ -19,27 +19,28 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 
+// Hardcoded Firebase config provided by the user
+const firebaseConfig = {
+  apiKey: "AIzaSyBnTpglZ_7KnlZxDb30aRKMikHBzb6rzF4",
+  authDomain: "biblioangola.firebaseapp.com",
+  projectId: "biblioangola",
+  storageBucket: "biblioangola.firebasestorage.app",
+  messagingSenderId: "965265307414",
+  appId: "1:965265307414:web:c32050e53982f9d8f70237",
+  measurementId: "G-31QQ4L2L27"
+};
+
+// Initialize Firebase App and Auth once
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const auth = getAuth(app);
+
+
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
   const { toast } = useToast();
-
-  const getClientAuth = () => {
-    // Hardcoded Firebase config provided by the user
-    const firebaseConfig = {
-      apiKey: "AIzaSyBnTpglZ_7KnlZxDb30aRKMikHBzb6rzF4",
-      authDomain: "biblioangola.firebaseapp.com",
-      projectId: "biblioangola",
-      storageBucket: "biblioangola.firebasestorage.app",
-      messagingSenderId: "965265307414",
-      appId: "1:965265307414:web:c32050e53982f9d8f70237",
-      measurementId: "G-31QQ4L2L27"
-    };
-    const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-    return getAuth(app);
-  }
 
   const handleLoginSuccess = async (idToken: string) => {
     const response = await fetch('/api/auth/login', {
@@ -62,7 +63,6 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const auth = getClientAuth();
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const idToken = await userCredential.user.getIdToken();
       await handleLoginSuccess(idToken);
@@ -81,7 +81,6 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     setLoading(true);
     try {
-      const auth = getClientAuth();
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
       const idToken = await userCredential.user.getIdToken();
