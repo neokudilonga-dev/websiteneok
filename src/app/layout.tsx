@@ -6,7 +6,6 @@ import { CartProvider } from "@/context/cart-context";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { DataProvider } from "@/context/data-context";
 import { LanguageProvider } from "@/context/language-context";
-import { AdminButton } from "@/components/admin-button";
 
 export const metadata: Metadata = {
   title: "Neokudilonga",
@@ -32,7 +31,6 @@ export default function RootLayout({
             {children}
             <Toaster />
             <WhatsAppButton />
-            <AdminButton />
             </CartProvider>
           </DataProvider>
         </LanguageProvider>

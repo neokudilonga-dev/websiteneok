@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, BookOpen, Gamepad2, ShoppingBag } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
+import { AdminButton } from "@/components/admin-button";
 
 export default function LandingPage() {
   const { t } = useLanguage();
@@ -127,8 +128,9 @@ export default function LandingPage() {
 
       </main>
       <footer className="border-t">
-        <div className="container py-6 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Neokudilonga. {t('landing.footer_rights')}
+        <div className="container flex items-center justify-between py-6 text-sm text-muted-foreground">
+          <span>© {new Date().getFullYear()} Neokudilonga. {t('landing.footer_rights')}</span>
+          <AdminButton />
         </div>
       </footer>
     </div>
