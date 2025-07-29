@@ -4,6 +4,22 @@ import { firestore } from '@/lib/firebase-admin';
 import type { Product, ReadingPlanItem } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
 
+export async function GET() {
+    try {
+        const productsCollection = firestore.collection('products');
+        const snapshot = await productsCollection.get();
+        const products: Product[] = [];
+        snapshot.forEach(doc => {
+            products.push(doc.data() as Product);
+        });
+        return NextResponse.json(products, { status: 200 });
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
+    }
+}
+
+
 export async function POST(request: Request) {
   try {
     const { product, readingPlan }: { product: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[] } = await request.json();

@@ -4,7 +4,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from 'next/navigation';
 import type { School, Product, ReadingPlanItem, Category } from "@/lib/types";
-import Header from "@/components/header";
 import ProductGrid from "@/components/product-grid";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -41,6 +40,8 @@ export default function ShopPageContent({
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') || 'planos';
   
+  // This useEffect is no longer necessary as data is passed as props
+  // but we keep it to populate the global context if needed.
   useEffect(() => {
     setSchools(initialSchools);
     setProducts(initialProducts);
@@ -212,179 +213,176 @@ export default function ShopPageContent({
   };
 
   return (
-    <div className="flex min-h-screen w-full flex-col">
-      <Header />
-      <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
-        <div className="mx-auto w-full max-w-7xl">
-          <Tabs value={activeTab} className="w-full" onValueChange={setActiveTab}>
-            <TabsList className="grid h-auto w-full grid-cols-1 sm:grid-cols-3">
-              <TabsTrigger value="planos" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">{t('shop.tabs.reading_plans')}</TabsTrigger>
-              <TabsTrigger value="catalogo" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">{t('shop.tabs.all_books')}</TabsTrigger>
-              <TabsTrigger value="jogos" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">{t('shop.tabs.games_and_others')}</TabsTrigger>
-            </TabsList>
+    <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+      <div className="mx-auto w-full max-w-7xl">
+        <Tabs value={activeTab} className="w-full" onValueChange={setActiveTab}>
+          <TabsList className="grid h-auto w-full grid-cols-1 sm:grid-cols-3">
+            <TabsTrigger value="planos" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">{t('shop.tabs.reading_plans')}</TabsTrigger>
+            <TabsTrigger value="catalogo" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">{t('shop.tabs.all_books')}</TabsTrigger>
+            <TabsTrigger value="jogos" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">{t('shop.tabs.games_and_others')}</TabsTrigger>
+          </TabsList>
 
-             <div className="mt-6">
-                <h1 className="font-headline text-2xl font-bold tracking-tight sm:text-3xl">
-                    {renderTitle()}
-                </h1>
-                <p className="mt-2 text-lg text-muted-foreground">
-                    {renderDescription()}
-                </p>
-             </div>
+           <div className="mt-6">
+              <h1 className="font-headline text-2xl font-bold tracking-tight sm:text-3xl">
+                  {renderTitle()}
+              </h1>
+              <p className="mt-2 text-lg text-muted-foreground">
+                  {renderDescription()}
+              </p>
+           </div>
 
-            <TabsContent value="planos" className="mt-6">
-                {selectedSchool ? (
-                    <>
-                    <div className="mb-4">
-                        <Button variant="outline" onClick={handleGoBackToSchoolSelection}>
-                            <ArrowLeft className="mr-2" />
-                            {t('common.back')}
-                        </Button>
-                    </div>
-                   {Object.keys(productsByGrade).length > 0 ? (
-                    <Accordion type="single" collapsible className="w-full" defaultValue={`item-${Object.keys(productsByGrade).sort((a,b) => customGradeSort([a,0],[b,0]))[0]}`} onValueChange={() => setShowIndividual(null)}>
-                      {Object.entries(productsByGrade).sort(customGradeSort).map(([grade, gradeProducts]) => (
-                        <AccordionItem value={`item-${grade}`} key={grade}>
-                          <AccordionTrigger className="text-xl font-semibold">
-                            {getGradeDisplayName(grade)}
-                          </AccordionTrigger>
-                          <AccordionContent>
-                             {String(grade).toLowerCase() === 'outros' || showIndividual === grade ? (
-                                renderProductGridWithBadges(gradeProducts.all, grade)
-                             ) : (
-                                <div className="space-y-6">
-                                    <div className="grid gap-6 lg:grid-cols-2">
-                                        {selectedSchool.hasRecommendedPlan ? (
-                                            <>
-                                                {gradeProducts.mandatory.length > 0 && (
-                                                    <div className="rounded-lg border bg-card p-6">
-                                                        <h3 className="font-headline text-2xl font-semibold">{t('shop.mandatory_kit', { count: gradeProducts.mandatory.length })}</h3>
-                                                        <p className="mt-2 text-muted-foreground">{t('shop.buy_all_mandatory')}</p>
-                                                        <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.mandatory, t('shop.mandatory_kit_name', { grade: getGradeDisplayName(grade), school: selectedSchool.name[language] || selectedSchool.name.pt }))}>
-                                                            <ShoppingCart className="mr-2 h-5 w-5" /> 
-                                                            {t('common.add_for')} {calculateKitPrice(gradeProducts.mandatory).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                                                        </Button>
-                                                    </div>
-                                                )}
-                                                {gradeProducts.recommended.length > 0 && (
-                                                    <div className="rounded-lg border bg-card p-6">
-                                                        <h3 className="font-headline text-2xl font-semibold">{t('shop.recommended_kit', { count: gradeProducts.recommended.length })}</h3>
-                                                        <p className="mt-2 text-muted-foreground">{t('shop.buy_all_recommended')}</p>
-                                                        <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.recommended, t('shop.recommended_kit_name', { grade: getGradeDisplayName(grade), school: selectedSchool.name[language] || selectedSchool.name.pt }))}>
-                                                            <ShoppingCart className="mr-2 h-5 w-5" /> 
-                                                            {t('common.add_for')} {calculateKitPrice(gradeProducts.recommended).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                                                        </Button>
-                                                    </div>
-                                                )}
-                                            </>
-                                        ) : (
-                                            gradeProducts.all.length > 0 &&
-                                            <div className="rounded-lg border bg-card p-6 lg:col-span-2">
-                                                <h3 className="font-headline text-2xl font-semibold">{t('shop.complete_kit', { grade: getGradeDisplayName(grade), count: gradeProducts.all.length })}</h3>
-                                                <p className="mt-2 text-muted-foreground">{t('shop.buy_all_for_school_year')}</p>
-                                                <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.all, t('shop.complete_kit_name', { grade: getGradeDisplayName(grade), school: selectedSchool.name[language] || selectedSchool.name.pt }))}>
-                                                    <ShoppingCart className="mr-2 h-5 w-5" /> 
-                                                    {t('common.add_for')} {calculateKitPrice(gradeProducts.all).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                                                </Button>
-                                            </div>
-                                        )}
-                                    </div>
+          <TabsContent value="planos" className="mt-6">
+              {selectedSchool ? (
+                  <>
+                  <div className="mb-4">
+                      <Button variant="outline" onClick={handleGoBackToSchoolSelection}>
+                          <ArrowLeft className="mr-2" />
+                          {t('common.back')}
+                      </Button>
+                  </div>
+                 {Object.keys(productsByGrade).length > 0 ? (
+                  <Accordion type="single" collapsible className="w-full" defaultValue={`item-${Object.keys(productsByGrade).sort((a,b) => customGradeSort([a,0],[b,0]))[0]}`} onValueChange={() => setShowIndividual(null)}>
+                    {Object.entries(productsByGrade).sort(customGradeSort).map(([grade, gradeProducts]) => (
+                      <AccordionItem value={`item-${grade}`} key={grade}>
+                        <AccordionTrigger className="text-xl font-semibold">
+                          {getGradeDisplayName(grade)}
+                        </AccordionTrigger>
+                        <AccordionContent>
+                           {String(grade).toLowerCase() === 'outros' || showIndividual === grade ? (
+                              renderProductGridWithBadges(gradeProducts.all, grade)
+                           ) : (
+                              <div className="space-y-6">
+                                  <div className="grid gap-6 lg:grid-cols-2">
+                                      {selectedSchool.hasRecommendedPlan ? (
+                                          <>
+                                              {gradeProducts.mandatory.length > 0 && (
+                                                  <div className="rounded-lg border bg-card p-6">
+                                                      <h3 className="font-headline text-2xl font-semibold">{t('shop.mandatory_kit', { count: gradeProducts.mandatory.length })}</h3>
+                                                      <p className="mt-2 text-muted-foreground">{t('shop.buy_all_mandatory')}</p>
+                                                      <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.mandatory, t('shop.mandatory_kit_name', { grade: getGradeDisplayName(grade), school: selectedSchool.name[language] || selectedSchool.name.pt }))}>
+                                                          <ShoppingCart className="mr-2 h-5 w-5" /> 
+                                                          {t('common.add_for')} {calculateKitPrice(gradeProducts.mandatory).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                                                      </Button>
+                                                  </div>
+                                              )}
+                                              {gradeProducts.recommended.length > 0 && (
+                                                  <div className="rounded-lg border bg-card p-6">
+                                                      <h3 className="font-headline text-2xl font-semibold">{t('shop.recommended_kit', { count: gradeProducts.recommended.length })}</h3>
+                                                      <p className="mt-2 text-muted-foreground">{t('shop.buy_all_recommended')}</p>
+                                                      <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.recommended, t('shop.recommended_kit_name', { grade: getGradeDisplayName(grade), school: selectedSchool.name[language] || selectedSchool.name.pt }))}>
+                                                          <ShoppingCart className="mr-2 h-5 w-5" /> 
+                                                          {t('common.add_for')} {calculateKitPrice(gradeProducts.recommended).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                                                      </Button>
+                                                  </div>
+                                              )}
+                                          </>
+                                      ) : (
+                                          gradeProducts.all.length > 0 &&
+                                          <div className="rounded-lg border bg-card p-6 lg:col-span-2">
+                                              <h3 className="font-headline text-2xl font-semibold">{t('shop.complete_kit', { grade: getGradeDisplayName(grade), count: gradeProducts.all.length })}</h3>
+                                              <p className="mt-2 text-muted-foreground">{t('shop.buy_all_for_school_year')}</p>
+                                              <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.all, t('shop.complete_kit_name', { grade: getGradeDisplayName(grade), school: selectedSchool.name[language] || selectedSchool.name.pt }))}>
+                                                  <ShoppingCart className="mr-2 h-5 w-5" /> 
+                                                  {t('common.add_for')} {calculateKitPrice(gradeProducts.all).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                                              </Button>
+                                          </div>
+                                      )}
+                                  </div>
 
-                                    {showIndividual !== grade && (
-                                        <div className="text-center mt-6">
-                                            <Button variant="outline" onClick={() => setShowIndividual(grade)}>
-                                                {t('shop.buy_separately')}
-                                                <ChevronRight className="ml-2 h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    )}
-                                </div>
-                             )}
-                          </AccordionContent>
-                        </AccordionItem>
+                                  {showIndividual !== grade && (
+                                      <div className="text-center mt-6">
+                                          <Button variant="outline" onClick={() => setShowIndividual(grade)}>
+                                              {t('shop.buy_separately')}
+                                              <ChevronRight className="ml-2 h-4 w-4" />
+                                          </Button>
+                                      </div>
+                                  )}
+                              </div>
+                           )}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                 ) : (
+                   <div className="mx-auto flex max-w-7xl flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/20 p-12 text-center">
+                      <h3 className="font-headline text-2xl font-semibold tracking-tight">{t('shop.no_books_found_title')}</h3>
+                      <p className="text-muted-foreground">{t('shop.no_books_found_description')}</p>
+                  </div>
+                 )}
+                 </>
+              ) : (
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                      {initialSchools.map(school => (
+                          <button
+                              key={school.id}
+                              onClick={() => handleSchoolSelect(school.id)}
+                              className="h-auto w-full transform-gpu rounded-lg border bg-accent/80 p-6 text-left shadow-sm transition-all hover:scale-[1.02] hover:bg-accent hover:shadow-md focus:scale-[1.02] focus:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                          >
+                              <div className="flex flex-col">
+                                  <span className="font-headline text-lg font-semibold text-primary">{school.name[language] || school.name.pt}</span>
+                                  <span className="mt-1 text-sm text-primary/80">{t('shop.view_reading_plan')}</span>
+                              </div>
+                          </button>
                       ))}
-                    </Accordion>
-                   ) : (
-                     <div className="mx-auto flex max-w-7xl flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/20 p-12 text-center">
-                        <h3 className="font-headline text-2xl font-semibold tracking-tight">{t('shop.no_books_found_title')}</h3>
-                        <p className="text-muted-foreground">{t('shop.no_books_found_description')}</p>
-                    </div>
-                   )}
-                   </>
-                ) : (
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                        {initialSchools.map(school => (
-                            <button
-                                key={school.id}
-                                onClick={() => handleSchoolSelect(school.id)}
-                                className="h-auto w-full transform-gpu rounded-lg border bg-accent/80 p-6 text-left shadow-sm transition-all hover:scale-[1.02] hover:bg-accent hover:shadow-md focus:scale-[1.02] focus:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                            >
-                                <div className="flex flex-col">
-                                    <span className="font-headline text-lg font-semibold text-primary">{school.name[language] || school.name.pt}</span>
-                                    <span className="mt-1 text-sm text-primary/80">{t('shop.view_reading_plan')}</span>
-                                </div>
-                            </button>
-                        ))}
-                    </div>
-                )}
-            </TabsContent>
+                  </div>
+              )}
+          </TabsContent>
 
-            <TabsContent value="catalogo" className="mt-6 space-y-6">
-               <div className="flex flex-col gap-4 sm:flex-row">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                            type="search"
-                            placeholder={t('shop.search_books_placeholder')}
-                            className="w-full rounded-lg bg-background pl-8"
-                            value={bookSearchQuery}
-                            onChange={(e) => setBookSearchQuery(e.target.value)}
-                        />
-                    </div>
-                    <Select value={selectedBookCategory} onValueChange={setSelectedBookCategory}>
-                        <SelectTrigger className="w-full sm:w-[280px]">
-                            <SelectValue placeholder={t('shop.filter_by_category')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">{t('shop.all_categories')}</SelectItem>
-                            {bookCategories.map(category => (
-                                <SelectItem key={category.name} value={category.name}>{category.name}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-              <ProductGrid products={filteredBooks} />
-            </TabsContent>
+          <TabsContent value="catalogo" className="mt-6 space-y-6">
+             <div className="flex flex-col gap-4 sm:flex-row">
+                  <div className="relative flex-1">
+                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                          type="search"
+                          placeholder={t('shop.search_books_placeholder')}
+                          className="w-full rounded-lg bg-background pl-8"
+                          value={bookSearchQuery}
+                          onChange={(e) => setBookSearchQuery(e.target.value)}
+                      />
+                  </div>
+                  <Select value={selectedBookCategory} onValueChange={setSelectedBookCategory}>
+                      <SelectTrigger className="w-full sm:w-[280px]">
+                          <SelectValue placeholder={t('shop.filter_by_category')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                          <SelectItem value="all">{t('shop.all_categories')}</SelectItem>
+                          {bookCategories.map(category => (
+                              <SelectItem key={category.name} value={category.name}>{category.name}</SelectItem>
+                          ))}
+                      </SelectContent>
+                  </Select>
+              </div>
+            <ProductGrid products={filteredBooks} />
+          </TabsContent>
 
-            <TabsContent value="jogos" className="mt-6 space-y-6">
-                <div className="flex flex-col gap-4 sm:flex-row">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                            type="search"
-                            placeholder={t('shop.search_games_placeholder')}
-                            className="w-full rounded-lg bg-background pl-8"
-                            value={gameSearchQuery}
-                            onChange={(e) => setGameSearchQuery(e.target.value)}
-                        />
-                    </div>
-                    <Select value={selectedGameCategory} onValueChange={setSelectedGameCategory}>
-                        <SelectTrigger className="w-full sm:w-[280px]">
-                            <SelectValue placeholder={t('shop.filter_by_category')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">{t('shop.all_categories')}</SelectItem>
-                            {gameCategories.map(category => (
-                                <SelectItem key={category.name} value={category.name}>{category.name}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-              <ProductGrid products={filteredGames} />
-            </TabsContent>
-          </Tabs>
-        </div>
-      </main>
-    </div>
+          <TabsContent value="jogos" className="mt-6 space-y-6">
+              <div className="flex flex-col gap-4 sm:flex-row">
+                  <div className="relative flex-1">
+                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                          type="search"
+                          placeholder={t('shop.search_games_placeholder')}
+                          className="w-full rounded-lg bg-background pl-8"
+                          value={gameSearchQuery}
+                          onChange={(e) => setGameSearchQuery(e.target.value)}
+                      />
+                  </div>
+                  <Select value={selectedGameCategory} onValueChange={setSelectedGameCategory}>
+                      <SelectTrigger className="w-full sm:w-[280px]">
+                          <SelectValue placeholder={t('shop.filter_by_category')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                          <SelectItem value="all">{t('shop.all_categories')}</SelectItem>
+                          {gameCategories.map(category => (
+                              <SelectItem key={category.name} value={category.name}>{category.name}</SelectItem>
+                          ))}
+                      </SelectContent>
+                  </Select>
+              </div>
+            <ProductGrid products={filteredGames} />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </main>
   );
 }

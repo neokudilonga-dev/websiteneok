@@ -1,30 +1,64 @@
 
-"use server";
+"use client";
 
+import { useEffect, useState } from 'react';
 import Header from "@/components/header";
-import { firestore } from "@/lib/firebase-admin";
 import type { School, ReadingPlanItem } from "@/lib/types";
 import CheckoutClient from "./client";
+import { useData } from '@/context/data-context';
 
-async function getCheckoutData() {
-    const schoolsCollection = firestore.collection('schools');
-    const schoolsSnapshot = await schoolsCollection.get();
-    const schools = schoolsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as School));
-
-    const readingPlanCollection = firestore.collection('readingPlan');
-    const readingPlanSnapshot = await readingPlanCollection.get();
-    const readingPlan = readingPlanSnapshot.docs.map(doc => doc.data() as ReadingPlanItem);
-
-    return { schools, readingPlan };
+function CheckoutLoading() {
+    return (
+        <div className="flex-1 flex items-center justify-center">
+            <div className="font-headline text-xl text-muted-foreground">A carregar...</div>
+        </div>
+    )
 }
 
-export default async function CheckoutPage() {
-  const { schools, readingPlan } = await getCheckoutData();
+export default function CheckoutPage() {
+  const [schools, setSchoolsState] = useState<School[]>([]);
+  const [readingPlan, setReadingPlanState] = useState<ReadingPlanItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { setSchools, setReadingPlan } = useData();
+
+  useEffect(() => {
+    async function getCheckoutData() {
+        try {
+            setIsLoading(true);
+            const [schoolsRes, readingPlanRes] = await Promise.all([
+                fetch('/api/schools'),
+                fetch('/api/reading-plan')
+            ]);
+            
+            if (!schoolsRes.ok) throw new Error('Failed to fetch schools');
+            if (!readingPlanRes.ok) throw new Error('Failed to fetch reading plan');
+
+            const schoolsData = await schoolsRes.json();
+            const readingPlanData = await readingPlanRes.json();
+
+            setSchoolsState(schoolsData);
+            setReadingPlanState(readingPlanData);
+
+            // Also update context
+            setSchools(schoolsData);
+            setReadingPlan(readingPlanData);
+        } catch (error) {
+            console.error("Error fetching checkout data:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+    getCheckoutData();
+  }, [setSchools, setReadingPlan]);
 
   return (
     <div className="flex min-h-screen w-full flex-col">
       <Header />
-      <CheckoutClient schools={schools} readingPlan={readingPlan} />
+      {isLoading ? (
+          <CheckoutLoading />
+      ) : (
+          <CheckoutClient schools={schools} readingPlan={readingPlan} />
+      )}
     </div>
   );
 }
