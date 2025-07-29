@@ -1,14 +1,10 @@
 import admin from 'firebase-admin';
 
+// Check if the app is already initialized to prevent errors in development environments
+// where the module might be re-loaded.
 if (!admin.apps.length) {
-  try {
-    // Explicitly initialize with the project ID for App Hosting environment
-    admin.initializeApp({
-      projectId: process.env.GCP_PROJECT,
-    });
-  } catch (error) {
-    console.error('Firebase admin initialization error', error);
-  }
+  admin.initializeApp();
 }
 
 export const firestore = admin.firestore();
+export const auth = admin.auth();
