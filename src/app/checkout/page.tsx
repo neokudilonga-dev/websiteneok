@@ -1,9 +1,8 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import Header from "@/components/header";
-import type { School, ReadingPlanItem } from "@/lib/types";
 import CheckoutClient from "./client";
 import { useData } from '@/context/data-context';
 
@@ -15,14 +14,12 @@ function CheckoutLoading() {
     )
 }
 
-export default function CheckoutPage() {
-  const [isLoading, setIsLoading] = useState(true);
+function CheckoutContent() {
   const { setSchools, setReadingPlan } = useData();
 
   useEffect(() => {
     async function getCheckoutData() {
         try {
-            setIsLoading(true);
             const [schoolsRes, readingPlanRes] = await Promise.all([
                 fetch('/api/schools'),
                 fetch('/api/reading-plan')
@@ -34,26 +31,25 @@ export default function CheckoutPage() {
             const schoolsData = await schoolsRes.json();
             const readingPlanData = await readingPlanRes.json();
 
-            // Populate the context
             setSchools(schoolsData);
             setReadingPlan(readingPlanData);
         } catch (error) {
             console.error("Error fetching checkout data:", error);
-        } finally {
-            setIsLoading(false);
         }
     }
     getCheckoutData();
   }, [setSchools, setReadingPlan]);
+  
+  return <CheckoutClient />;
+}
 
+export default function CheckoutPage() {
   return (
     <div className="flex min-h-screen w-full flex-col">
       <Header />
-      {isLoading ? (
-          <CheckoutLoading />
-      ) : (
-          <CheckoutClient />
-      )}
+      <Suspense fallback={<CheckoutLoading />}>
+        <CheckoutContent />
+      </Suspense>
     </div>
   );
 }
