@@ -134,7 +134,7 @@ export default function LandingPage() {
 
       </main>
       <footer className="border-t">
-        <div className="container flex items-center justify-between py-6 text-sm text-muted-foreground">
+        <div className="container flex flex-col items-center justify-center gap-2 py-6 text-sm text-muted-foreground sm:flex-row sm:gap-4">
           <span>© {year} Neokudilonga. {t('landing.footer_rights')}</span>
           <AdminButton />
         </div>
