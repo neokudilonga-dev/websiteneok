@@ -70,7 +70,7 @@ export default function LoginPage() {
       console.error("Authentication error:", error);
       toast({
         title: "Login Failed",
-        description: error.message || "An error occurred during sign-in. Please try again.",
+        description: "Invalid credentials. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -89,7 +89,7 @@ export default function LoginPage() {
       console.error("Authentication error:", error);
       toast({
         title: "Login Failed",
-        description: error.message || "An error occurred during Google Sign-In. Please try again.",
+        description: "Could not sign in with Google. Please try again.",
         variant: "destructive",
       });
     } finally {
