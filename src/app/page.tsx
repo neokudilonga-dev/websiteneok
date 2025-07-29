@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useState, useEffect } from 'react';
 import Link from "next/link";
 import Image from "next/image";
 import Header from "@/components/header";
@@ -12,6 +13,11 @@ import { AdminButton } from "@/components/admin-button";
 
 export default function LandingPage() {
   const { t } = useLanguage();
+  const [year, setYear] = useState(new Date().getFullYear());
+
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
 
   return (
     <div className="flex min-h-dvh w-full flex-col">
@@ -129,7 +135,7 @@ export default function LandingPage() {
       </main>
       <footer className="border-t">
         <div className="container flex items-center justify-between py-6 text-sm text-muted-foreground">
-          <span>© {new Date().getFullYear()} Neokudilonga. {t('landing.footer_rights')}</span>
+          <span>© {year} Neokudilonga. {t('landing.footer_rights')}</span>
           <AdminButton />
         </div>
       </footer>
