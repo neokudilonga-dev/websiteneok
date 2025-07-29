@@ -16,6 +16,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { NeokudilongaLogo } from "@/components/logo";
 
+// Define the config object structure
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -25,9 +26,11 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const auth = getAuth(app);
-
+// Initialize app and auth inside the component or a function that runs on the client
+const getClientAuth = () => {
+    const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    return getAuth(app);
+}
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -38,6 +41,7 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     setLoading(true);
     try {
+      const auth = getClientAuth(); // Get auth instance here
       const userCredential = await signInWithPopup(auth, provider);
       const idToken = await userCredential.user.getIdToken();
 
