@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { auth } from 'firebase-admin';
+import { auth as adminAuth } from 'firebase-admin';
 import { firestore } from '@/lib/firebase-admin';
 
 export async function POST(request: Request) {
@@ -8,10 +8,10 @@ export async function POST(request: Request) {
     const authorization = request.headers.get('Authorization');
     if (authorization?.startsWith('Bearer ')) {
       const idToken = authorization.split('Bearer ')[1];
-      const decodedToken = await auth().verifyIdToken(idToken);
+      const decodedToken = await adminAuth().verifyIdToken(idToken);
       
       const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
-      const sessionCookie = await auth().createSessionCookie(idToken, { expiresIn });
+      const sessionCookie = await adminAuth().createSessionCookie(idToken, { expiresIn });
 
       const options = {
         name: 'session',
