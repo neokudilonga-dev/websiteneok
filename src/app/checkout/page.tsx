@@ -2,7 +2,6 @@
 "use server";
 
 import Header from "@/components/header";
-import CheckoutForm from "@/components/checkout-form";
 import { firestore } from "@/lib/firebase-admin";
 import type { School, ReadingPlanItem } from "@/lib/types";
 import CheckoutClient from "./client";
@@ -29,4 +28,3 @@ export default async function CheckoutPage() {
     </div>
   );
 }
-

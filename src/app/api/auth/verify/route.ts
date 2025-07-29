@@ -1,8 +1,7 @@
 
 import { NextResponse } from 'next/server';
-import { auth } from 'firebase-admin';
 import { cookies } from 'next/headers';
-import { firestore } from '@/lib/firebase-admin';
+import { auth } from '@/lib/firebase-admin';
 
 export async function GET() {
   const session = cookies().get('session')?.value || '';
@@ -14,7 +13,7 @@ export async function GET() {
 
   //Use Firebase Admin to verify the session cookie.
   try {
-    const decodedClaims = await auth().verifySessionCookie(session, true);
+    const decodedClaims = await auth.verifySessionCookie(session, true);
 
     if (!decodedClaims) {
       return NextResponse.json({ isLogged: false }, { status: 401 });
