@@ -14,11 +14,17 @@ import { useEffect } from "react";
 export default function CheckoutPage() {
   const { cartItems, cartTotal } = useCart();
   const { t, language } = useLanguage();
-  const { loading, fetchData } = useData();
+  const { loading, setLoading, refetchData } = useData();
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    const loadPageData = async () => {
+        setLoading(true);
+        await refetchData();
+        setLoading(false);
+    }
+    loadPageData();
+  }, [refetchData, setLoading]);
+
 
   if (loading) {
     return (

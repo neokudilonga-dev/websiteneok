@@ -9,7 +9,6 @@ interface DataContextType {
   // Loading state
   loading: boolean;
   setLoading: (loading: boolean) => void;
-  fetchData: () => Promise<void>;
 
   // Schools
   schools: School[];
@@ -47,6 +46,9 @@ interface DataContextType {
   addOrder: (order: Omit<Order, 'paymentStatus' | 'deliveryStatus'>) => Promise<void>;
   updateOrderPaymentStatus: (orderReference: string, status: PaymentStatus) => Promise<void>;
   updateOrderDeliveryStatus: (orderReference: string, status: DeliveryStatus) => Promise<void>;
+
+  // Function to refetch all data
+  refetchData: () => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -61,8 +63,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const { toast } = useToast();
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
+  const refetchData = useCallback(async () => {
     try {
       const [
         schoolsRes, 
@@ -95,16 +96,15 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       setOrders(await ordersRes.json());
 
     } catch (error: any) {
-      console.error("Failed to fetch initial data", error);
+      console.error("Failed to refetch data", error);
       toast({
           title: "Error fetching data",
           description: error.message || "Could not load data from the database. Please try refreshing.",
           variant: "destructive"
       });
-    } finally {
-      setLoading(false);
     }
   }, [toast]);
+
 
   // School mutations
   const addSchool = async (school: School) => {
@@ -115,7 +115,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify(school),
       });
       if (!response.ok) throw new Error('Failed to add school');
-      await fetchData(); // Refetch all data
+      await refetchData(); // Refetch all data
       toast({ title: "School Added", description: `${school.name.pt} was added successfully.` });
     } catch (error) {
       console.error(error);
@@ -130,7 +130,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             body: JSON.stringify(updatedSchool),
         });
         if (!response.ok) throw new Error('Failed to update school');
-        await fetchData(); // Refetch all data
+        await refetchData(); // Refetch all data
         toast({ title: "School Updated", description: `${updatedSchool.name.pt} was updated successfully.` });
     } catch (error) {
         console.error(error);
@@ -143,7 +143,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             method: 'DELETE',
         });
         if (!response.ok) throw new Error('Failed to delete school');
-        await fetchData(); // Refetch all data
+        await refetchData(); // Refetch all data
         toast({ title: "School Deleted", description: `School was deleted successfully.` });
     } catch (error) {
         console.error(error);
@@ -160,7 +160,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify({ product, readingPlan }),
       });
       if (!response.ok) throw new Error('Failed to add product');
-      await fetchData(); // Refetch all data
+      await refetchData(); // Refetch all data
       toast({ title: "Product Added", description: `${product.name.pt} was added successfully.` });
     } catch (error) {
       console.error(error);
@@ -175,7 +175,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify({ product, readingPlan }),
       });
       if (!response.ok) throw new Error('Failed to update product');
-      await fetchData(); // Refetch all data
+      await refetchData(); // Refetch all data
       toast({ title: "Product Updated", description: `${product.name.pt} was updated successfully.` });
     } catch (error) {
       console.error(error);
@@ -188,7 +188,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete product');
-      await fetchData(); // Refetch all data
+      await refetchData(); // Refetch all data
       toast({ title: "Product Deleted", description: "Product was deleted successfully." });
     } catch (error) {
       console.error(error);
@@ -205,7 +205,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify(category),
       });
       if (!response.ok) throw new Error('Failed to add category');
-      await fetchData();
+      await refetchData();
       toast({ title: "Category Added", description: `${category.name} was added successfully.` });
     } catch (error) {
       console.error(error);
@@ -218,7 +218,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete category');
-      await fetchData();
+      await refetchData();
       toast({ title: "Category Deleted", description: `${categoryName} was deleted successfully.` });
     } catch (error) {
       console.error(error);
@@ -235,7 +235,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify({ name: publisher }),
       });
       if (!response.ok) throw new Error('Failed to add publisher');
-      await fetchData();
+      await refetchData();
       toast({ title: "Publisher Added", description: `${publisher} was added successfully.` });
     } catch (error) {
       console.error(error);
@@ -248,7 +248,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete publisher');
-      await fetchData();
+      await refetchData();
       toast({ title: "Publisher Deleted", description: `${publisherName} was deleted successfully.` });
     } catch (error) {
       console.error(error);
@@ -265,7 +265,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify(order),
       });
       if (!response.ok) throw new Error('Failed to add order');
-      await fetchData();
+      await refetchData();
       // No toast here, as it's handled on the checkout page
     } catch (error) {
       console.error(error);
@@ -281,7 +281,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify({ paymentStatus: status }),
       });
       if (!response.ok) throw new Error('Failed to update payment status');
-      await fetchData();
+      await refetchData();
       toast({ title: "Payment Status Updated" });
     } catch (error) {
       console.error(error);
@@ -296,7 +296,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify({ deliveryStatus: status }),
       });
       if (!response.ok) throw new Error('Failed to update delivery status');
-      await fetchData();
+      await refetchData();
       toast({ title: "Delivery Status Updated" });
     } catch (error) {
       console.error(error);
@@ -309,7 +309,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       value={{
         loading,
         setLoading,
-        fetchData,
+        refetchData,
         schools, setSchools, addSchool, updateSchool, deleteSchool,
         products, setProducts, addProduct, updateProduct, deleteProduct,
         readingPlan, setReadingPlan,

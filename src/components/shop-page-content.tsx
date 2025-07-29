@@ -24,14 +24,19 @@ interface GradeProducts {
 }
 
 export default function ShopPageContent() {
-  const { schools, products: allProducts, readingPlan, categories, loading, fetchData } = useData();
+  const { schools, products: allProducts, readingPlan, categories, loading, setLoading, refetchData } = useData();
   const { t, language } = useLanguage();
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') || 'planos';
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    const loadPageData = async () => {
+        setLoading(true);
+        await refetchData();
+        setLoading(false);
+    }
+    loadPageData();
+  }, [refetchData, setLoading]);
   
   const [selectedSchool, setSelectedSchool] = useState<School | undefined>(
     undefined

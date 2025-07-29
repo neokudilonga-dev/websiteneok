@@ -43,11 +43,16 @@ export default function AdminLayout({
   const pathname = usePathname();
   const router = useRouter();
   const { toast } = useToast();
-  const { loading, fetchData } = useData();
+  const { loading, setLoading, refetchData } = useData();
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    const loadAdminData = async () => {
+        setLoading(true);
+        await refetchData();
+        setLoading(false);
+    }
+    loadAdminData();
+  }, [refetchData, setLoading]);
 
   const isActive = (path: string) => pathname === path;
   const { t } = useLanguage();
