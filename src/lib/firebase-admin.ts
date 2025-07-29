@@ -2,8 +2,9 @@ import admin from 'firebase-admin';
 
 if (!admin.apps.length) {
   try {
+    // Explicitly initialize with the project ID for App Hosting environment
     admin.initializeApp({
-      credential: admin.credential.applicationDefault(),
+      projectId: process.env.GCP_PROJECT,
     });
   } catch (error) {
     console.error('Firebase admin initialization error', error);
