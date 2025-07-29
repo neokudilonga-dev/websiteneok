@@ -24,18 +24,7 @@ export default function LandingPage() {
       <Header />
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative flex min-h-dvh w-full flex-col justify-center bg-primary/10">
-          <div className="absolute inset-0 z-0">
-             <Image
-                src="https://placehold.co/1920x1080.png"
-                alt="Cartoon of books"
-                fill
-                className="object-cover"
-                priority
-                data-ai-hint="books cartoon"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
-          </div>
+        <section className="relative flex min-h-dvh w-full flex-col justify-center bg-muted/20">
           <div className="container relative z-10 flex h-full flex-col justify-center gap-12 text-center">
             <div className="flex flex-col items-center">
                 <h1 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">
