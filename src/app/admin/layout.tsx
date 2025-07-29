@@ -1,13 +1,6 @@
 
 import Link from "next/link";
 import {
-  Book,
-  Building,
-  Gamepad2,
-  Home,
-  School,
-  ShoppingCart,
-  Tags,
   LogOut,
 } from "lucide-react";
 import {
@@ -17,14 +10,13 @@ import {
   SidebarContent,
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuButton,
   SidebarTrigger,
   SidebarInset,
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { NeokudilongaLogoAbbr } from "@/components/logo";
 import { LogoutButton } from "./logout-button";
-import AdminLayoutClient from "./client";
+import { AdminSidebarMenu } from "./client";
 
 
 export const dynamic = 'force-dynamic';
@@ -47,101 +39,7 @@ export default function AdminLayout({
                 <NeokudilongaLogoAbbr className="size-8" />
               </Link>
             </SidebarHeader>
-            <AdminLayoutClient>
-              <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      href="/admin"
-                      asChild
-                      // isActive={isActive("/admin")}
-                      tooltip={'Dashboard'}
-                    >
-                      <Link href="/admin">
-                        <Home />
-                        <span>{'Dashboard'}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      href="/admin/books"
-                      asChild
-                      // isActive={isActive("/admin/books")}
-                      tooltip={'Books'}
-                    >
-                      <Link href="/admin/books">
-                        <Book />
-                        <span>{'Books'}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      href="/admin/games"
-                      asChild
-                      // isActive={isActive("/admin/games")}
-                      tooltip={'Games'}
-                    >
-                      <Link href="/admin/games">
-                        <Gamepad2 />
-                        <span>{'Games'}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      href="/admin/schools"
-                      asChild
-                      // isActive={isActive("/admin/schools")}
-                      tooltip={'Schools'}
-                    >
-                      <Link href="/admin/schools">
-                        <School />
-                        <span>{'Schools'}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      href="/admin/categories"
-                      asChild
-                      // isActive={isActive("/admin/categories")}
-                      tooltip={'Categories'}
-                    >
-                      <Link href="/admin/categories">
-                        <Tags />
-                        <span>{'Categories'}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      href="/admin/publishers"
-                      asChild
-                      // isActive={isActive("/admin/publishers")}
-                      tooltip={'Publishers'}
-                    >
-                      <Link href="/admin/publishers">
-                        <Building />
-                        <span>{'Publishers'}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      href="/admin/orders"
-                      asChild
-                      // isActive={isActive("/admin/orders")}
-                      tooltip={'Orders'}
-                    >
-                      <Link href="/admin/orders">
-                        <ShoppingCart />
-                        <span>{'Orders'}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-            </AdminLayoutClient>
+            <AdminSidebarMenu />
           </SidebarContent>
            <SidebarFooter>
               <SidebarMenu>

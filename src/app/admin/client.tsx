@@ -1,25 +1,123 @@
-
 "use client";
 
-import * as React from "react";
-import { useLanguage } from "@/context/language-context";
 import { usePathname } from "next/navigation";
+import {
+  Book,
+  Building,
+  Gamepad2,
+  Home,
+  School,
+  ShoppingCart,
+  Tags,
+} from "lucide-react";
+import {
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+} from "@/components/ui/sidebar";
+import Link from "next/link";
+import { useLanguage } from "@/context/language-context";
 
-export default function AdminLayoutClient({ children }: { children: React.ReactNode }) {
+export function AdminSidebarMenu() {
     const pathname = usePathname();
     const { t } = useLanguage();
 
     const isActive = (path: string) => pathname === path;
+    const isPartiallyActive = (path: string) => pathname.startsWith(path);
 
-    // This is a bit of a hack to add isActive to the children
-    // A better approach might be to use a different pattern for the sidebar
-    const childrenWithProps = React.Children.map(children, child => {
-        if (React.isValidElement(child)) {
-            // @ts-ignore
-            return React.cloneElement(child, { t: t, isActive: isActive });
-        }
-        return child;
-    });
-
-    return <>{childrenWithProps}</>;
+    return (
+        <SidebarMenu>
+            <SidebarMenuItem>
+                <SidebarMenuButton
+                href="/admin"
+                asChild
+                isActive={isActive("/admin")}
+                tooltip={'Dashboard'}
+                >
+                <Link href="/admin">
+                    <Home />
+                    <span>{'Dashboard'}</span>
+                </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton
+                href="/admin/books"
+                asChild
+                isActive={isPartiallyActive("/admin/books")}
+                tooltip={'Books'}
+                >
+                <Link href="/admin/books">
+                    <Book />
+                    <span>{'Books'}</span>
+                </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton
+                href="/admin/games"
+                asChild
+                isActive={isPartiallyActive("/admin/games")}
+                tooltip={'Games'}
+                >
+                <Link href="/admin/games">
+                    <Gamepad2 />
+                    <span>{'Games'}</span>
+                </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton
+                href="/admin/schools"
+                asChild
+                isActive={isPartiallyActive("/admin/schools")}
+                tooltip={'Schools'}
+                >
+                <Link href="/admin/schools">
+                    <School />
+                    <span>{'Schools'}</span>
+                </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton
+                href="/admin/categories"
+                asChild
+                isActive={isPartiallyActive("/admin/categories")}
+                tooltip={'Categories'}
+                >
+                <Link href="/admin/categories">
+                    <Tags />
+                    <span>{'Categories'}</span>
+                </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton
+                href="/admin/publishers"
+                asChild
+                isActive={isPartiallyActive("/admin/publishers")}
+                tooltip={'Publishers'}
+                >
+                <Link href="/admin/publishers">
+                    <Building />
+                    <span>{'Publishers'}</span>
+                </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton
+                href="/admin/orders"
+                asChild
+                isActive={isPartiallyActive("/admin/orders")}
+                tooltip={'Orders'}
+                >
+                <Link href="/admin/orders">
+                    <ShoppingCart />
+                    <span>{'Orders'}</span>
+                </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+        </SidebarMenu>
+    );
 }
