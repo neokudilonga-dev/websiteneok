@@ -19,8 +19,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 
-// This function must be called within a client component or hook.
-const getClientAuth = () => {
+export default function LoginPage() {
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const getClientAuth = () => {
     const firebaseConfig = {
       apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
       authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -31,14 +37,7 @@ const getClientAuth = () => {
     };
     const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     return getAuth(app);
-}
-
-export default function LoginPage() {
-  const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const router = useRouter();
-  const { toast } = useToast();
+  }
 
   const handleLoginSuccess = async (idToken: string) => {
     const response = await fetch('/api/auth/login', {
@@ -101,7 +100,9 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <NeokudilongaLogo className="mx-auto h-20" />
+          <div className="flex justify-center">
+            <NeokudilongaLogo className="h-20" />
+          </div>
           <CardTitle className="pt-4 text-2xl">Admin Login</CardTitle>
           <CardDescription>
             Sign in to access the admin panel.
