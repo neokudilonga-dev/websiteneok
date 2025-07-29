@@ -54,7 +54,8 @@ export default function LoginPage() {
     if (response.ok) {
       router.push("/admin");
     } else {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({ error: 'An unknown error occurred on the server.' }));
+      console.error('Server login error:', errorData);
       throw new Error(errorData.error || 'Login failed after authentication.');
     }
   };
@@ -70,7 +71,7 @@ export default function LoginPage() {
       console.error("Authentication error:", error);
       toast({
         title: "Login Failed",
-        description: "Invalid credentials. Please try again.",
+        description: error.message || "Invalid credentials. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -89,7 +90,7 @@ export default function LoginPage() {
       console.error("Authentication error:", error);
       toast({
         title: "Login Failed",
-        description: "Could not sign in with Google. Please try again.",
+        description: error.message || "Could not sign in with Google. Please try again.",
         variant: "destructive",
       });
     } finally {
