@@ -3,27 +3,6 @@ import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
 import type { Order } from '@/lib/types';
 
-export async function GET() {
-  try {
-    const ordersCollection = firestore.collection('orders');
-    const snapshot = await ordersCollection.orderBy('date', 'desc').get();
-    
-    if (snapshot.empty) {
-      return NextResponse.json([], { status: 200 });
-    }
-
-    const orders: Order[] = [];
-    snapshot.forEach(doc => {
-      orders.push(doc.data() as Order);
-    });
-
-    return NextResponse.json(orders, { status: 200 });
-  } catch (error) {
-    console.error('Error fetching orders:', error);
-    return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 });
-  }
-}
-
 export async function POST(request: Request) {
   try {
     const body: Order = await request.json();

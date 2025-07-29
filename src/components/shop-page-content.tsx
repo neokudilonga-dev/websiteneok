@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from 'next/navigation';
-import type { School, Product } from "@/lib/types";
+import type { School, Product, ReadingPlanItem, Category } from "@/lib/types";
 import Header from "@/components/header";
 import ProductGrid from "@/components/product-grid";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,20 +23,31 @@ interface GradeProducts {
   all: Product[];
 }
 
-export default function ShopPageContent() {
-  const { schools, products: allProducts, readingPlan, categories, loading, setLoading, refetchData } = useData();
+interface ShopPageContentProps {
+  schools: School[];
+  products: Product[];
+  readingPlan: ReadingPlanItem[];
+  categories: Category[];
+}
+
+export default function ShopPageContent({ 
+  schools: initialSchools, 
+  products: initialProducts, 
+  readingPlan: initialReadingPlan, 
+  categories: initialCategories 
+}: ShopPageContentProps) {
+  const { setSchools, setProducts, setReadingPlan, setCategories } = useData();
   const { t, language } = useLanguage();
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') || 'planos';
-
+  
   useEffect(() => {
-    const loadPageData = async () => {
-        setLoading(true);
-        await refetchData();
-        setLoading(false);
-    }
-    loadPageData();
-  }, [refetchData, setLoading]);
+    setSchools(initialSchools);
+    setProducts(initialProducts);
+    setReadingPlan(initialReadingPlan);
+    setCategories(initialCategories);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialSchools, initialProducts, initialReadingPlan, initialCategories]);
   
   const [selectedSchool, setSelectedSchool] = useState<School | undefined>(
     undefined
@@ -59,7 +70,8 @@ export default function ShopPageContent() {
     }
   }, [searchParams, activeTab]);
 
-  const handleSchoolSelect = (school: School) => {
+  const handleSchoolSelect = (schoolId: string) => {
+    const school = initialSchools.find(s => s.id === schoolId);
     setSelectedSchool(school);
     setShowIndividual(null); // Reset when school changes
   };
@@ -69,15 +81,15 @@ export default function ShopPageContent() {
   }
   
   const productsById = useMemo(() => {
-    return allProducts.reduce((acc, product) => {
+    return initialProducts.reduce((acc, product) => {
       acc[product.id] = product;
       return acc;
     }, {} as Record<string, Product>);
-  }, [allProducts]);
+  }, [initialProducts]);
 
   const schoolReadingPlan = useMemo(() => selectedSchool
-    ? readingPlan.filter((item) => item.schoolId === selectedSchool.id)
-    : [], [selectedSchool, readingPlan]);
+    ? initialReadingPlan.filter((item) => item.schoolId === selectedSchool.id)
+    : [], [selectedSchool, initialReadingPlan]);
 
   const productsByGrade = useMemo(() => {
     const grades: { [key: string]: GradeProducts } = {};
@@ -99,26 +111,26 @@ export default function ShopPageContent() {
   }, [schoolReadingPlan, productsById]);
   
   const filteredGames = useMemo(() => {
-    return allProducts.filter(p => 
+    return initialProducts.filter(p => 
         p.type === 'game' && 
         p.stockStatus !== 'sold_out' &&
         (p.name[language] || p.name.pt).toLowerCase().includes(gameSearchQuery.toLowerCase()) &&
         (selectedGameCategory === 'all' || p.category === selectedGameCategory)
     )
-  }, [allProducts, gameSearchQuery, selectedGameCategory, language]);
+  }, [initialProducts, gameSearchQuery, selectedGameCategory, language]);
 
-  const bookCategories = useMemo(() => categories.filter(c => c.type === 'book'), [categories]);
-  const gameCategories = useMemo(() => categories.filter(c => c.type === 'game'), [categories]);
+  const bookCategories = useMemo(() => initialCategories.filter(c => c.type === 'book'), [initialCategories]);
+  const gameCategories = useMemo(() => initialCategories.filter(c => c.type === 'game'), [initialCategories]);
 
 
   const filteredBooks = useMemo(() => {
-    return allProducts.filter(p => 
+    return initialProducts.filter(p => 
         p.type === 'book' && 
         p.stockStatus !== 'sold_out' &&
         (p.name[language] || p.name.pt).toLowerCase().includes(bookSearchQuery.toLowerCase()) &&
         (selectedBookCategory === 'all' || p.category === selectedBookCategory)
     )
-  }, [allProducts, bookSearchQuery, selectedBookCategory, language]);
+  }, [initialProducts, bookSearchQuery, selectedBookCategory, language]);
 
 
   const renderTitle = () => {
@@ -198,17 +210,6 @@ export default function ShopPageContent() {
     if (String(grade).toLowerCase() === 'outros') return t('grades.others');
     return `${grade}${t('grades.grade')}`;
   };
-
-  if (loading) {
-    return (
-        <div className="flex min-h-screen w-full flex-col">
-          <Header />
-          <main className="flex-1 flex items-center justify-center">
-              <div className="font-headline text-xl text-muted-foreground">A carregar a loja...</div>
-          </main>
-      </div>
-    )
-  }
 
   return (
     <div className="flex min-h-screen w-full flex-col">
@@ -312,10 +313,10 @@ export default function ShopPageContent() {
                    </>
                 ) : (
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                        {schools.map(school => (
+                        {initialSchools.map(school => (
                             <button
                                 key={school.id}
-                                onClick={() => handleSchoolSelect(school)}
+                                onClick={() => handleSchoolSelect(school.id)}
                                 className="h-auto w-full transform-gpu rounded-lg border bg-accent/80 p-6 text-left shadow-sm transition-all hover:scale-[1.02] hover:bg-accent hover:shadow-md focus:scale-[1.02] focus:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                             >
                                 <div className="flex flex-col">

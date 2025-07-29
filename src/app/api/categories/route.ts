@@ -3,27 +3,6 @@ import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
 import type { Category } from '@/lib/types';
 
-export async function GET() {
-  try {
-    const categoriesCollection = firestore.collection('categories');
-    const snapshot = await categoriesCollection.get();
-    
-    if (snapshot.empty) {
-      return NextResponse.json([], { status: 200 });
-    }
-
-    const categories: Category[] = [];
-    snapshot.forEach(doc => {
-      categories.push(doc.data() as Category);
-    });
-
-    return NextResponse.json(categories, { status: 200 });
-  } catch (error) {
-    console.error('Error fetching categories:', error);
-    return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 });
-  }
-}
-
 export async function POST(request: Request) {
   try {
     const body: Category = await request.json();
