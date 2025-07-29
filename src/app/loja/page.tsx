@@ -3,7 +3,6 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import ShopPageContent from '@/components/shop-page-content';
-import type { School, Product, ReadingPlanItem, Category } from '@/lib/types';
 import { useData } from '@/context/data-context';
 import Header from '@/components/header';
 
@@ -17,10 +16,6 @@ function ShopPageLoading() {
 }
 
 export default function LojaPage() {
-  const [schools, setSchoolsState] = useState<School[]>([]);
-  const [products, setProductsState] = useState<Product[]>([]);
-  const [readingPlan, setReadingPlanState] = useState<ReadingPlanItem[]>([]);
-  const [categories, setCategoriesState] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { setSchools, setProducts, setReadingPlan, setCategories } = useData();
 
@@ -44,13 +39,8 @@ export default function LojaPage() {
         const productsData = await productsRes.json();
         const readingPlanData = await readingPlanRes.json();
         const categoriesData = await categoriesRes.json();
-
-        setSchoolsState(schoolsData);
-        setProductsState(productsData);
-        setReadingPlanState(readingPlanData);
-        setCategoriesState(categoriesData);
-
-        // Also update context
+        
+        // Populate the context with the fetched data
         setSchools(schoolsData);
         setProducts(productsData);
         setReadingPlan(readingPlanData);
@@ -72,15 +62,9 @@ export default function LojaPage() {
         {isLoading ? (
             <ShopPageLoading />
         ) : (
-            <ShopPageContent 
-                schools={schools} 
-                products={products} 
-                readingPlan={readingPlan} 
-                categories={categories} 
-            />
+            <ShopPageContent />
         )}
         </Suspense>
     </div>
   );
 }
-

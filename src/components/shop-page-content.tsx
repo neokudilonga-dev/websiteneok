@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from 'next/navigation';
-import type { School, Product, ReadingPlanItem, Category } from "@/lib/types";
+import type { School, Product } from "@/lib/types";
 import ProductGrid from "@/components/product-grid";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -22,33 +22,11 @@ interface GradeProducts {
   all: Product[];
 }
 
-interface ShopPageContentProps {
-  schools: School[];
-  products: Product[];
-  readingPlan: ReadingPlanItem[];
-  categories: Category[];
-}
-
-export default function ShopPageContent({ 
-  schools: initialSchools, 
-  products: initialProducts, 
-  readingPlan: initialReadingPlan, 
-  categories: initialCategories 
-}: ShopPageContentProps) {
-  const { setSchools, setProducts, setReadingPlan, setCategories } = useData();
+export default function ShopPageContent() {
+  const { schools, products, readingPlan, categories } = useData();
   const { t, language } = useLanguage();
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') || 'planos';
-  
-  // This useEffect is no longer necessary as data is passed as props
-  // but we keep it to populate the global context if needed.
-  useEffect(() => {
-    setSchools(initialSchools);
-    setProducts(initialProducts);
-    setReadingPlan(initialReadingPlan);
-    setCategories(initialCategories);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialSchools, initialProducts, initialReadingPlan, initialCategories]);
   
   const [selectedSchool, setSelectedSchool] = useState<School | undefined>(
     undefined
@@ -72,7 +50,7 @@ export default function ShopPageContent({
   }, [searchParams, activeTab]);
 
   const handleSchoolSelect = (schoolId: string) => {
-    const school = initialSchools.find(s => s.id === schoolId);
+    const school = schools.find(s => s.id === schoolId);
     setSelectedSchool(school);
     setShowIndividual(null); // Reset when school changes
   };
@@ -82,15 +60,15 @@ export default function ShopPageContent({
   }
   
   const productsById = useMemo(() => {
-    return initialProducts.reduce((acc, product) => {
+    return products.reduce((acc, product) => {
       acc[product.id] = product;
       return acc;
     }, {} as Record<string, Product>);
-  }, [initialProducts]);
+  }, [products]);
 
   const schoolReadingPlan = useMemo(() => selectedSchool
-    ? initialReadingPlan.filter((item) => item.schoolId === selectedSchool.id)
-    : [], [selectedSchool, initialReadingPlan]);
+    ? readingPlan.filter((item) => item.schoolId === selectedSchool.id)
+    : [], [selectedSchool, readingPlan]);
 
   const productsByGrade = useMemo(() => {
     const grades: { [key: string]: GradeProducts } = {};
@@ -112,26 +90,26 @@ export default function ShopPageContent({
   }, [schoolReadingPlan, productsById]);
   
   const filteredGames = useMemo(() => {
-    return initialProducts.filter(p => 
+    return products.filter(p => 
         p.type === 'game' && 
         p.stockStatus !== 'sold_out' &&
         (p.name[language] || p.name.pt).toLowerCase().includes(gameSearchQuery.toLowerCase()) &&
         (selectedGameCategory === 'all' || p.category === selectedGameCategory)
     )
-  }, [initialProducts, gameSearchQuery, selectedGameCategory, language]);
+  }, [products, gameSearchQuery, selectedGameCategory, language]);
 
-  const bookCategories = useMemo(() => initialCategories.filter(c => c.type === 'book'), [initialCategories]);
-  const gameCategories = useMemo(() => initialCategories.filter(c => c.type === 'game'), [initialCategories]);
+  const bookCategories = useMemo(() => categories.filter(c => c.type === 'book'), [categories]);
+  const gameCategories = useMemo(() => categories.filter(c => c.type === 'game'), [categories]);
 
 
   const filteredBooks = useMemo(() => {
-    return initialProducts.filter(p => 
+    return products.filter(p => 
         p.type === 'book' && 
         p.stockStatus !== 'sold_out' &&
         (p.name[language] || p.name.pt).toLowerCase().includes(bookSearchQuery.toLowerCase()) &&
         (selectedBookCategory === 'all' || p.category === selectedBookCategory)
     )
-  }, [initialProducts, bookSearchQuery, selectedBookCategory, language]);
+  }, [products, bookSearchQuery, selectedBookCategory, language]);
 
 
   const renderTitle = () => {
@@ -312,7 +290,7 @@ export default function ShopPageContent({
                  </>
               ) : (
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                      {initialSchools.map(school => (
+                      {schools.map(school => (
                           <button
                               key={school.id}
                               onClick={() => handleSchoolSelect(school.id)}

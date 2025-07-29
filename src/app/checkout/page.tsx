@@ -16,8 +16,6 @@ function CheckoutLoading() {
 }
 
 export default function CheckoutPage() {
-  const [schools, setSchoolsState] = useState<School[]>([]);
-  const [readingPlan, setReadingPlanState] = useState<ReadingPlanItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { setSchools, setReadingPlan } = useData();
 
@@ -36,10 +34,7 @@ export default function CheckoutPage() {
             const schoolsData = await schoolsRes.json();
             const readingPlanData = await readingPlanRes.json();
 
-            setSchoolsState(schoolsData);
-            setReadingPlanState(readingPlanData);
-
-            // Also update context
+            // Populate the context
             setSchools(schoolsData);
             setReadingPlan(readingPlanData);
         } catch (error) {
@@ -57,7 +52,7 @@ export default function CheckoutPage() {
       {isLoading ? (
           <CheckoutLoading />
       ) : (
-          <CheckoutClient schools={schools} readingPlan={readingPlan} />
+          <CheckoutClient />
       )}
     </div>
   );

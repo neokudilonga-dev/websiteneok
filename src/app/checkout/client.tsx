@@ -6,27 +6,12 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import { useLanguage } from "@/context/language-context";
-import { useData } from "@/context/data-context";
-import { useEffect } from "react";
-import type { School, ReadingPlanItem } from "@/lib/types";
 import CheckoutForm from "@/components/checkout-form";
 
-interface CheckoutClientProps {
-    schools: School[];
-    readingPlan: ReadingPlanItem[];
-}
 
-export default function CheckoutClient({ schools, readingPlan }: CheckoutClientProps) {
+export default function CheckoutClient() {
   const { cartItems, cartTotal } = useCart();
   const { t, language } = useLanguage();
-  const { setSchools, setReadingPlan } = useData();
-  
-  useEffect(() => {
-    setSchools(schools);
-    setReadingPlan(readingPlan);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [schools, readingPlan]);
-
 
   return (
     <main className="flex-1 bg-muted/20">
