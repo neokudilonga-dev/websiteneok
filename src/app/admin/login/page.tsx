@@ -76,7 +76,9 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <NeokudilongaLogo className="mx-auto h-20" />
+          <div className="flex justify-center">
+            <NeokudilongaLogo className="h-20" />
+          </div>
           <CardTitle className="text-2xl">Admin Login</CardTitle>
           <CardDescription>
             Sign in with your Google account to access the admin panel.
