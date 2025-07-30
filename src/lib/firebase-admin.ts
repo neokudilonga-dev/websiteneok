@@ -11,7 +11,6 @@ const serviceAccount = {
   "client_email": "firebase-adminsdk-fbsvc@biblioangola.iam.gserviceaccount.com",
 };
 
-
 // Initialize Firebase Admin SDK
 if (!getApps().length) {
   console.log('[firebase-admin] Initializing Firebase Admin SDK...');
