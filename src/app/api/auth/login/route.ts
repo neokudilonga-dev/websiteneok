@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { auth as adminAuth } from 'firebase-admin';
+import { auth } from '@/lib/firebase-admin'; // Corrected import
 import { firestore } from '@/lib/firebase-admin';
 
 export async function POST(request: Request) {
@@ -16,12 +16,14 @@ export async function POST(request: Request) {
     console.log('[/api/auth/login] - ID Token received.');
 
     console.log('[/api/auth/login] - Verifying ID token...');
-    const decodedToken = await adminAuth().verifyIdToken(idToken);
+    // Corrected usage of the imported auth instance
+    const decodedToken = await auth.verifyIdToken(idToken);
     console.log('[/api/auth/login] - ID Token verified successfully for UID:', decodedToken.uid);
     
     const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
     console.log('[/api/auth/login] - Creating session cookie...');
-    const sessionCookie = await adminAuth().createSessionCookie(idToken, { expiresIn });
+     // Corrected usage of the imported auth instance
+    const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn });
     console.log('[/api/auth/login] - Session cookie created successfully.');
 
     const options = {
