@@ -42,12 +42,21 @@ export async function POST(request: Request) {
     return response;
 
   } catch (error: any) {
-    console.error('[/api/auth/login] - CRITICAL ERROR:', error);
+    console.error('[/api/auth/login] - CRITICAL ERROR:', {
+        message: error?.message,
+        code: error?.code,
+        name: error?.name,
+        stack: error?.stack,
+        raw: error,
+    });
     // Return a detailed error response to the client
     return NextResponse.json({ 
       error: 'Internal Server Error during authentication.', 
-      details: error.message, 
-      code: error.code 
+      debug: {
+        message: error?.message,
+        code: error?.code,
+        name: error?.name,
+      }
     }, { status: 500 });
   }
 }
