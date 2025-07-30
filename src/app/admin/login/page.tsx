@@ -19,7 +19,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 
-// Hardcoded Firebase config provided by the user
 const firebaseConfig = {
   apiKey: "AIzaSyBnTpglZ_7KnlZxDb30aRKMikHBzb6rzF4",
   authDomain: "biblioangola.firebaseapp.com",
@@ -30,7 +29,6 @@ const firebaseConfig = {
   measurementId: "G-31QQ4L2L27"
 };
 
-// Initialize Firebase App and Auth once
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 
