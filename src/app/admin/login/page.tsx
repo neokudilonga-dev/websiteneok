@@ -94,19 +94,25 @@ export default function LoginPage() {
   };
 
   const handleGoogleSignIn = async () => {
-    setLoading(true);
+    const provider = new GoogleAuthProvider();
     try {
-      const provider = new GoogleAuthProvider();
-      const userCredential = await signInWithPopup(auth, provider);
+      // Trigger the popup immediately, then set loading state.
+      const userCredentialPromise = signInWithPopup(auth, provider);
+      setLoading(true); 
+      
+      const userCredential = await userCredentialPromise;
       const idToken = await userCredential.user.getIdToken();
       await handleLoginSuccess(idToken);
     } catch (error: any) {
       console.error("Authentication error:", error);
-      toast({
-        title: "Login Failed",
-        description: error.message || "Could not sign in with Google. Please try again.",
-        variant: "destructive",
-      });
+      // Don't show a toast for user-closed popups
+      if (error.code !== 'auth/popup-closed-by-user') {
+          toast({
+            title: "Login Failed",
+            description: error.message || "Could not sign in with Google. Please try again.",
+            variant: "destructive",
+          });
+      }
       setLoading(false);
     }
   };
