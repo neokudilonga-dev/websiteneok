@@ -54,43 +54,12 @@ export default function LoginPage() {
     } else {
       const errorData = await response.json().catch(() => ({ error: 'An unknown error occurred on the server.' }));
       console.error('Server login error:', errorData);
-
-      const detailedMessage = errorData.debug?.message || '';
       
-      // Handle incorrect audience claim specifically
-      if (detailedMessage.includes('Firebase ID token has incorrect "aud" (audience) claim')) {
-         toast({
-            title: "Login Failed: Project Mismatch",
-            description: (
-            <div>
-                <p>The ID token is for a different project than the server is configured for. Please ensure both client and server are using the same Firebase project credentials.</p>
-                <p className="mt-2 text-xs text-muted-foreground">Details: {detailedMessage}</p>
-            </div>),
-            variant: "destructive",
-            duration: 20000,
-        });
-      }
-      // Handle Service Usage permission error
-      else if (detailedMessage.includes('serviceusage.services.use')) {
-         toast({
-            title: "Login Failed: Server Permission Missing",
-            description: (
-            <div>
-                <p>The server lacks permission to use Firebase Authentication. Please grant the "Service Usage Consumer" role to the service account in your Google Cloud project's IAM settings.</p>
-                <a href={`https://console.cloud.google.com/iam-admin/iam?project=biblioangola`} target="_blank" rel="noopener noreferrer" className="mt-2 text-primary underline">
-                    Go to IAM Settings
-                </a>
-            </div>),
-            variant: "destructive",
-            duration: 20000,
-        });
-      } else {
-         toast({
-            title: "Login Failed",
-            description: errorData.debug?.message || errorData.error || 'Login failed after authentication.',
-            variant: "destructive",
-        });
-      }
+      toast({
+        title: "Login Failed",
+        description: errorData.debug?.message || errorData.error || 'Login failed after authentication.',
+        variant: "destructive",
+      });
 
       setLoading(false);
     }
