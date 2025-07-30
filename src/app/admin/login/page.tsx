@@ -54,8 +54,31 @@ export default function LoginPage() {
     } else {
       const errorData = await response.json().catch(() => ({ error: 'An unknown error occurred on the server.' }));
       console.error('Server login error:', errorData);
-      const errorMessage = errorData.debug?.message || errorData.error || 'Login failed after authentication.';
-      throw new Error(errorMessage);
+
+      // Check for the specific permission error
+      const detailedMessage = errorData.debug?.message || '';
+      if (detailedMessage.includes('serviceusage.services.use')) {
+         toast({
+            title: "Login Failed: Server Permission Missing",
+            description: (
+            <div>
+                <p>The server lacks permission to use Firebase Authentication. Please grant the "Service Usage Consumer" role to the service account in your Google Cloud project's IAM settings.</p>
+                <a href={`https://console.cloud.google.com/iam-admin/iam?project=biblioangola`} target="_blank" rel="noopener noreferrer" className="mt-2 text-primary underline">
+                    Go to IAM Settings
+                </a>
+            </div>),
+            variant: "destructive",
+            duration: 20000,
+        });
+      } else {
+         toast({
+            title: "Login Failed",
+            description: errorData.debug?.message || errorData.error || 'Login failed after authentication.',
+            variant: "destructive",
+        });
+      }
+
+      setLoading(false);
     }
   };
 
@@ -73,7 +96,6 @@ export default function LoginPage() {
         description: error.message || "Invalid credentials. Please try again.",
         variant: "destructive",
       });
-    } finally {
       setLoading(false);
     }
   };
@@ -92,7 +114,6 @@ export default function LoginPage() {
         description: error.message || "Could not sign in with Google. Please try again.",
         variant: "destructive",
       });
-    } finally {
       setLoading(false);
     }
   };
