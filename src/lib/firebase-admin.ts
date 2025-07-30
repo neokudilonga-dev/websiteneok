@@ -20,11 +20,17 @@ if (!getApps().length) {
         });
         console.log('[firebase-admin] - Firebase Admin SDK initialized successfully.');
     } catch(error: any) {
-        console.error('[firebase-admin] - CRITICAL: Error initializing Firebase Admin SDK:', error);
+        console.error('[firebase-admin] - CRITICAL: Error initializing Firebase Admin SDK:', {
+            message: error?.message,
+            code: error?.code,
+            name: error?.name,
+        });
     }
 } else {
     console.log('[firebase-admin] - Firebase Admin SDK already initialized.');
 }
 
+// These are now initialized and exported, but the main logic is moved to the route
+// to ensure errors are caught during the request lifecycle.
 export const auth = getAuth();
 export const firestore = getFirestore();

@@ -56,7 +56,8 @@ export default function LoginPage() {
     } else {
       const errorData = await response.json().catch(() => ({ error: 'An unknown error occurred on the server.' }));
       console.error('Server login error:', errorData);
-      throw new Error(errorData.error || 'Login failed after authentication.');
+      const errorMessage = errorData.debug?.message || errorData.error || 'Login failed after authentication.';
+      throw new Error(errorMessage);
     }
   };
 

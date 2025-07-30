@@ -1,11 +1,33 @@
 
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/firebase-admin'; // Corrected import
-import { firestore } from '@/lib/firebase-admin';
+import admin from 'firebase-admin';
+
+// Service account credentials from environment variables
+const serviceAccount = {
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+  privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+};
+
+function initializeFirebaseAdmin() {
+  if (!admin.apps.length) {
+    console.log('[api/auth/login] Initializing Firebase Admin SDK...');
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
+    console.log('[api/auth/login] Firebase Admin SDK initialized successfully.');
+  } else {
+    console.log('[api/auth/login] Firebase Admin SDK already initialized.');
+  }
+  return admin;
+}
 
 export async function POST(request: Request) {
   console.log('[/api/auth/login] - POST request received.');
   try {
+    const adminApp = initializeFirebaseAdmin();
+    const auth = adminApp.auth();
+
     const authorization = request.headers.get('Authorization');
     if (!authorization?.startsWith('Bearer ')) {
       console.log('[/api/auth/login] - Unauthorized: No Bearer token found.');
@@ -16,13 +38,11 @@ export async function POST(request: Request) {
     console.log('[/api/auth/login] - ID Token received.');
 
     console.log('[/api/auth/login] - Verifying ID token...');
-    // Corrected usage of the imported auth instance
     const decodedToken = await auth.verifyIdToken(idToken);
     console.log('[/api/auth/login] - ID Token verified successfully for UID:', decodedToken.uid);
     
     const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
     console.log('[/api/auth/login] - Creating session cookie...');
-     // Corrected usage of the imported auth instance
     const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn });
     console.log('[/api/auth/login] - Session cookie created successfully.');
 
@@ -49,7 +69,6 @@ export async function POST(request: Request) {
         stack: error?.stack,
         raw: error,
     });
-    // Return a detailed error response to the client
     return NextResponse.json({ 
       error: 'Internal Server Error during authentication.', 
       debug: {
