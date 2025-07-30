@@ -1,23 +1,15 @@
 
-import { initializeApp, cert, getApps } from 'firebase-admin/app';
+import { initializeApp, getApps } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 
-// When deployed to App Hosting, these env vars will be automatically populated.
-// For local development, they need to be set in an .env.local file.
-const serviceAccount = {
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-  // The private key must be a single line in the .env file, with \n for newlines.
-  privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-};
-
+// When running in a Firebase environment (like App Hosting), the SDK will
+// automatically discover the necessary credentials. No need to manually
+// configure with service account details.
 if (!getApps().length) {
     console.log('[firebase-admin] Initializing Firebase Admin SDK...');
     try {
-        initializeApp({
-            credential: cert(serviceAccount),
-        });
+        initializeApp();
         console.log('[firebase-admin] Firebase Admin SDK initialized successfully.');
     } catch(error: any) {
         console.error('[firebase-admin] CRITICAL: Error initializing Firebase Admin SDK:', {
@@ -25,6 +17,8 @@ if (!getApps().length) {
             code: error?.code,
             name: error?.name,
         });
+        // Throwing the error is important to prevent the app from running with a misconfigured SDK.
+        throw new Error('Failed to initialize Firebase Admin SDK.');
     }
 } else {
     console.log('[firebase-admin] Firebase Admin SDK already initialized.');
