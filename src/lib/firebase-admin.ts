@@ -1,47 +1,39 @@
 
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { initializeApp, getApps, cert, getApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 
-// When running in a Firebase environment (like App Hosting), the SDK will
-// automatically discover the necessary credentials. For local development,
-// you would typically use a service account file.
-// Since we are moving initialization to the API routes to catch errors,
-// this file can be simplified or used only for non-API route server-side logic.
+// This file is now primarily for server-side logic outside of API routes.
+// The main authentication API route handles its own initialization to ensure
+// the correct credentials are used and to provide better error handling.
+
 if (!getApps().length) {
-    console.log('[firebase-admin] Initializing Firebase Admin SDK in lib...');
+    console.log('[firebase-admin] Initializing default Firebase Admin SDK in lib...');
     try {
-        // This will work in a deployed App Hosting environment.
-        // For local development, it requires GOOGLE_APPLICATION_CREDENTIALS to be set.
+        // This initialization will use Application Default Credentials.
+        // It's used by server components and other API routes.
         initializeApp();
-        console.log('[firebase-admin] Firebase Admin SDK initialized successfully in lib.');
+        console.log('[firebase-admin] Default Firebase Admin SDK initialized successfully in lib.');
     } catch(error: any) {
-        console.error('[firebase-admin] CRITICAL: Error initializing Firebase Admin SDK in lib:', {
+        console.error('[firebase-admin] CRITICAL: Error initializing default Firebase Admin SDK in lib:', {
             message: error?.message,
             code: error?.code,
             name: error?.name,
         });
-        // We don't throw an error here to allow the application to start,
-        // but API routes that depend on an initialized app will fail.
     }
 } else {
-    console.log('[firebase-admin] Firebase Admin SDK already initialized in lib.');
+    console.log('[firebase-admin] Default Firebase Admin SDK already initialized in lib.');
 }
 
-// Exporting the services will now throw an error if the app isn't initialized.
-// It's safer to get the services only after ensuring initialization.
-let auth: ReturnType<typeof getAuth>;
-let firestore: ReturnType<typeof getFirestore>;
-
-try {
-    auth = getAuth();
-    firestore = getFirestore();
-} catch (error) {
-    console.error('[firebase-admin] Failed to get services. App might not be initialized.');
-    // @ts-ignore
-    auth = {};
-    // @ts-ignore
-    firestore = {};
+const getDefaultApp = () => {
+    // Ensure we don't crash if the app failed to initialize.
+    return getApps().length > 0 ? getApp() : null;
 }
+
+const app = getDefaultApp();
+
+const auth = app ? getAuth(app) : ({} as ReturnType<typeof getAuth>);
+const firestore = app ? getFirestore(app) : ({} as ReturnType<typeof getFirestore>);
+
 
 export { auth, firestore };

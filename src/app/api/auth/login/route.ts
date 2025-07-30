@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { initializeApp, getApps, cert, getApp, deleteApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 
 const serviceAccount = {
@@ -11,23 +11,25 @@ const serviceAccount = {
   "client_email": "firebase-adminsdk-fbsvc@biblioangola.iam.gserviceaccount.com",
 };
 
+const adminAppName = 'biblioangola-admin';
 
 export async function POST(request: Request) {
   console.log('[/api/auth/login] - POST request received.');
+
   try {
-    // Initialize Firebase Admin SDK inside the try block
-    if (!getApps().length) {
-        console.log('[firebase-admin] Initializing Firebase Admin SDK...');
+    // Ensure only one instance of the app is initialized
+    if (!getApps().some(app => app.name === adminAppName)) {
+        console.log(`[firebase-admin] Initializing Firebase Admin SDK for ${adminAppName}...`);
         initializeApp({
             credential: cert(serviceAccount)
-        });
+        }, adminAppName);
         console.log('[firebase-admin] Firebase Admin SDK initialized successfully.');
     } else {
         console.log('[firebase-admin] Firebase Admin SDK already initialized.');
     }
     
-    const auth = getAuth();
-
+    const auth = getAuth(getApp(adminAppName));
+    
     const authorization = request.headers.get('Authorization');
     if (!authorization?.startsWith('Bearer ')) {
       console.log('[/api/auth/login] - Unauthorized: No Bearer token found.');
@@ -64,8 +66,6 @@ export async function POST(request: Request) {
         message: error?.message,
         code: error?.code,
         name: error?.name,
-        stack: error?.stack,
-        raw: error,
     });
     return NextResponse.json({ 
       error: 'Internal Server Error during authentication.', 
