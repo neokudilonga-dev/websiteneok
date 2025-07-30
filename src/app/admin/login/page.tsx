@@ -41,27 +41,37 @@ export default function LoginPage() {
   const { toast } = useToast();
 
   const handleLoginSuccess = async (idToken: string) => {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${idToken}`,
-      },
-    });
-
-    if (response.ok) {
-      router.push("/admin");
-    } else {
-      const errorData = await response.json().catch(() => ({ error: 'An unknown error occurred on the server.' }));
-      console.error('Server login error:', errorData);
-      
-      toast({
-        title: "Login Failed",
-        description: errorData.debug?.message || errorData.error || 'Login failed after authentication.',
-        variant: "destructive",
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`,
+        },
       });
 
-      setLoading(false);
+      if (response.ok) {
+        // On success, redirect to the admin dashboard.
+        router.push("/admin");
+      } else {
+        // If the server returns an error, display it.
+        const errorData = await response.json().catch(() => ({ error: 'An unknown server error occurred.' }));
+        console.error('Server login error:', errorData);
+        toast({
+          title: "Login Failed",
+          description: errorData.error || 'The server returned an error.',
+          variant: "destructive",
+        });
+        setLoading(false); // Reset loading state on failure
+      }
+    } catch (error) {
+      console.error("Failed to call login API:", error);
+       toast({
+        title: "Login Failed",
+        description: "Could not connect to the login service. Please try again.",
+        variant: "destructive",
+      });
+      setLoading(false); // Reset loading state on failure
     }
   };
 
