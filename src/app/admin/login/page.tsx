@@ -23,7 +23,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyBnTpglZ_7KnlZxDb30aRKMikHBzb6rzF4",
   authDomain: "biblioangola.firebaseapp.com",
   projectId: "biblioangola",
-  storageBucket: "biblioangola.firebasestorage.app",
+  storageBucket: "biblioangola.appspot.com",
   messagingSenderId: "965265307414",
   appId: "1:965265307414:web:c32050e53982f9d8f70237",
   measurementId: "G-31QQ4L2L27"
@@ -55,9 +55,23 @@ export default function LoginPage() {
       const errorData = await response.json().catch(() => ({ error: 'An unknown error occurred on the server.' }));
       console.error('Server login error:', errorData);
 
-      // Check for the specific permission error
       const detailedMessage = errorData.debug?.message || '';
-      if (detailedMessage.includes('serviceusage.services.use')) {
+      
+      // Handle incorrect audience claim specifically
+      if (detailedMessage.includes('Firebase ID token has incorrect "aud" (audience) claim')) {
+         toast({
+            title: "Login Failed: Project Mismatch",
+            description: (
+            <div>
+                <p>The ID token is for a different project than the server is configured for. Please ensure both client and server are using the same Firebase project credentials.</p>
+                <p className="mt-2 text-xs text-muted-foreground">Details: {detailedMessage}</p>
+            </div>),
+            variant: "destructive",
+            duration: 20000,
+        });
+      }
+      // Handle Service Usage permission error
+      else if (detailedMessage.includes('serviceusage.services.use')) {
          toast({
             title: "Login Failed: Server Permission Missing",
             description: (
