@@ -1,11 +1,11 @@
-
 "use client";
 
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { LogOut } from "lucide-react";
+import { getAuth, signOut } from "firebase/auth";
+import { app } from "../../lib/firebase";
 
 export function LogoutButton() {
     const router = useRouter();
@@ -13,23 +13,40 @@ export function LogoutButton() {
 
     const handleLogout = async () => {
         try {
-        const response = await fetch('/api/auth/logout', {
-            method: 'POST',
-        });
+            const auth = getAuth(app);
+            const user = auth.currentUser;
 
-        if (response.ok) {
-            toast({ title: "Logged out successfully." });
-            router.push('/admin/login');
-        } else {
-            throw new Error('Logout failed');
-        }
-        } catch (error) {
-        console.error("Logout error:", error);
-        toast({
-            title: "Logout failed",
-            description: "An error occurred during logout. Please try again.",
-            variant: "destructive",
-        });
+            if (user) {
+                await user.delete();
+                console.log("User deleted from Firebase.");
+            }
+
+            const response = await fetch("/api/auth/logout", {
+                method: "POST",
+            });
+
+            if (response.ok) {
+                toast({ title: "User deleted and logged out successfully." });
+                router.push("/admin/login");
+            } else {
+                throw new Error("Failed to clear backend session.");
+            }
+        } catch (error: any) {
+            console.error("Logout/Delete error:", error);
+
+            if (error.code === "auth/requires-recent-login") {
+                toast({
+                    title: "Deletion failed",
+                    description: "You need to re-authenticate before deleting your account.",
+                    variant: "destructive",
+                });
+            } else {
+                toast({
+                    title: "Logout failed",
+                    description: "An error occurred during logout or deletion.",
+                    variant: "destructive",
+                });
+            }
         }
     };
 
@@ -38,5 +55,5 @@ export function LogoutButton() {
             <LogOut />
             <span>Logout</span>
         </SidebarMenuButton>
-    )
+    );
 }

@@ -1,10 +1,9 @@
-
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword } from "firebase/auth";
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,9 +14,6 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { NeokudilongaLogo } from "@/components/logo";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBnTpglZ_7KnlZxDb30aRKMikHBzb6rzF4",
@@ -26,67 +22,72 @@ const firebaseConfig = {
   storageBucket: "biblioangola.appspot.com",
   messagingSenderId: "965265307414",
   appId: "1:965265307414:web:c32050e53982f9d8f70237",
-  measurementId: "G-31QQ4L2L27"
+  measurementId: "G-31QQ4L2L27",
 };
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 
-
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const router = useRouter();
   const { toast } = useToast();
 
+  // ✅ Automatically redirect if already signed in
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const email = user.email || "";
+        const allowedAdmins = [
+          "neokudilonga@gmail.com",
+          "anaruimelo@gmail.com",
+          "ramanimahaveer4@gmail.com"
+          // "joaonfmelo@gmail.com",
+        ];
+        if (allowedAdmins.includes(email)) {
+          const idToken = await user.getIdToken();
+          await handleLoginSuccess(idToken);
+        } else {
+          toast({
+            title: "Access Denied",
+            description: "You are not an admin.",
+            variant: "destructive",
+          });
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const handleLoginSuccess = async (idToken: string) => {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
         },
       });
 
       if (response.ok) {
-        // On success, redirect to the admin dashboard.
         router.push("/admin");
       } else {
-        // If the server returns an error, display it.
-        const errorData = await response.json().catch(() => ({ error: 'An unknown server error occurred.' }));
-        console.error('Server login error:', errorData);
+        const errorData = await response.json().catch(() => ({
+          error: "An unknown server error occurred.",
+        }));
         toast({
           title: "Login Failed",
-          description: errorData.error || 'The server returned an error.',
+          description: errorData.error || "Server error occurred.",
           variant: "destructive",
         });
-        setLoading(false); // Reset loading state on failure
+        setLoading(false);
       }
     } catch (error) {
-      console.error("Failed to call login API:", error);
-       toast({
-        title: "Login Failed",
-        description: "Could not connect to the login service. Please try again.",
-        variant: "destructive",
-      });
-      setLoading(false); // Reset loading state on failure
-    }
-  };
-
-  const handleEmailSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const idToken = await userCredential.user.getIdToken();
-      await handleLoginSuccess(idToken);
-    } catch (error: any) {
-      console.error("Authentication error:", error);
+      console.error("Login API call failed:", error);
       toast({
         title: "Login Failed",
-        description: error.message || "Invalid credentials. Please try again.",
+        description: "Could not reach the login service.",
         variant: "destructive",
       });
       setLoading(false);
@@ -95,23 +96,38 @@ export default function LoginPage() {
 
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
+    setLoading(true);
     try {
-      // Trigger the popup immediately, then set loading state.
-      const userCredentialPromise = signInWithPopup(auth, provider);
-      setLoading(true); 
-      
-      const userCredential = await userCredentialPromise;
+      const userCredential = await signInWithPopup(auth, provider);
+      const email = userCredential.user.email;
+
+      const allowedAdmins = [
+        "neokudilonga@gmail.com",
+        "anaruimelo@gmail.com",
+        // "joaonfmelo@gmail.com",
+        "ramanimahaveer4@gmail.com"
+      ];
+
+      if (!allowedAdmins.includes(email || "")) {
+        toast({
+          title: "Access Denied",
+          description: "You are not an admin.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
       const idToken = await userCredential.user.getIdToken();
       await handleLoginSuccess(idToken);
     } catch (error: any) {
-      console.error("Authentication error:", error);
-      // Don't show a toast for user-closed popups
-      if (error.code !== 'auth/popup-closed-by-user') {
-          toast({
-            title: "Login Failed",
-            description: error.message || "Could not sign in with Google. Please try again.",
-            variant: "destructive",
-          });
+      console.error("Google Sign-In error:", error);
+      if (error.code !== "auth/popup-closed-by-user") {
+        toast({
+          title: "Login Failed",
+          description: error.message || "Google Sign-In failed.",
+          variant: "destructive",
+        });
       }
       setLoading(false);
     }
@@ -126,39 +142,10 @@ export default function LoginPage() {
           </div>
           <CardTitle className="pt-4 text-2xl">Admin Login</CardTitle>
           <CardDescription>
-            Sign in to access the admin panel.
+            Sign in with Google to access the admin panel.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleEmailSignIn} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Signing In..." : "Sign in"}
-            </Button>
-          </form>
-          <Separator className="my-6" />
           <Button
             onClick={handleGoogleSignIn}
             variant="outline"
