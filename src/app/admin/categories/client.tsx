@@ -59,7 +59,7 @@ export default function CategoriesPageClient({ initialCategories }: CategoriesPa
       newCategoryNamePT &&
       newCategoryNameEN &&
       !categories.find(
-        c =>
+        (c: Category) =>
           c.name.pt.toLowerCase() === newCategoryNamePT.toLowerCase() ||
           c.name.en.toLowerCase() === newCategoryNameEN.toLowerCase()
       )
@@ -121,44 +121,68 @@ export default function CategoriesPageClient({ initialCategories }: CategoriesPa
               </TableRow>
             </TableHeader>
             <TableBody>
-              {categories.map((category) => (
-                <TableRow key={category.name.pt + category.name.en}>
-                  <TableCell className="font-medium">{category.name.pt}</TableCell>
-                  <TableCell className="font-medium">{category.name.en}</TableCell>
-                   <TableCell>
-                     <Badge variant={category.type === 'book' ? 'secondary' : 'default'}>
-                        {category.type === 'book' ? t('common.book') : t('common.game')}
-                     </Badge>
-                   </TableCell>
-                  <TableCell className="text-right">
-                     <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button
-                                aria-haspopup="true"
-                                size="icon"
-                                variant="ghost"
-                                className="text-destructive hover:text-destructive"
-                            >
-                                <Trash2 className="h-4 w-4" />
-                                <span className="sr-only">{t('categories_page.delete_category')}</span>
-                            </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                            <AlertDialogTitle>{t('common.are_you_sure')}</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                {t('common.action_cannot_be_undone_category')}
-                            </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDeleteCategory(category.name)} className="bg-destructive hover:bg-destructive/90">{t('common.delete')}</AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
+              {categories.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center text-muted-foreground">
+                    Nenhuma categoria cadastrada ainda.
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                categories.map((category: Category, idx: number) => {
+                  let pt = '-';
+                  let en = '-';
+                  if (typeof category.name === 'string') {
+                    pt = String(category.name).trim() || '-';
+                    en = '';
+                  } else if (typeof category.name === 'object' && category.name !== null) {
+                    pt = String(category.name.pt).trim() || '-';
+                    en = String(category.name.en).trim() || '-';
+                  }
+                  const type = category.type || '';
+                  let key = `${pt}_${en}_${type}`;
+                  // If the composite key is empty or not unique, use the index as a fallback
+                  if (!pt && !en && !type) key = `category_${idx}`;
+                  else if (categories.findIndex((c: Category) => `${(c.name?.pt ?? '')}_${(c.name?.en ?? '')}_${c.type || ''}` === key) !== idx) key = `category_${idx}`;
+                  return (
+                    <TableRow key={key}>
+                      <TableCell className="font-medium">{pt}</TableCell>
+                      <TableCell className="font-medium">{en}</TableCell>
+                      <TableCell>
+                        <Badge variant={category.type === 'book' ? 'secondary' : 'default'}>
+                          {category.type === 'book' ? t('common.book') : t('common.game')}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              aria-haspopup="true"
+                              size="icon"
+                              variant="ghost"
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">{t('categories_page.delete_category')}</span>
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>{t('common.are_you_sure')}</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                {t('common.action_cannot_be_undone_category')}
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDeleteCategory(category.name)} className="bg-destructive hover:bg-destructive/90">{t('common.delete')}</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
             </TableBody>
           </Table>
         </CardContent>

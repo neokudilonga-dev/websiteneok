@@ -258,14 +258,18 @@ export function AddEditGameSheet({
                         onPaste={handlePaste}
                     >
                         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                        {fields.map((field, index) => (
-                            <div key={field.id} className="relative aspect-square">
-                            {field.value && <Image src={field.value} alt={`Pré-visualização da imagem ${index+1}`} layout="fill" className="rounded-md object-cover" />}
-                            <Button type="button" variant="destructive" size="icon" className="absolute -right-2 -top-2 h-6 w-6 rounded-full" onClick={() => remove(index)}>
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        ))}
+            {(form.getValues("images") || []).map((img, index) => (
+              <div key={img?.substring(0, 32) + '-' + index} className="relative aspect-square">
+                {img && <Image src={img} alt={`Pré-visualização da imagem ${index+1}`} layout="fill" className="rounded-md object-cover" />}
+                <Button type="button" variant="destructive" size="icon" className="absolute -right-2 -top-2 h-6 w-6 rounded-full" onClick={() => {
+                  const currentImages = form.getValues("images") || [];
+                  const newImages = [...currentImages.slice(0, index), ...currentImages.slice(index + 1)];
+                  form.setValue("images", newImages);
+                }}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
                         <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-input bg-background/50 text-center transition-colors hover:border-primary">
                             <Upload className="h-8 w-8 text-muted-foreground" />
                             <span className="text-sm text-muted-foreground">Carregar</span>
@@ -377,8 +381,8 @@ export function AddEditGameSheet({
                                         </FormControl>
                                         <SelectContent>
                                             {schools.map(school => (
-                                              <SelectItem key={school.id} value={school.id}>{typeof school.name === 'object' && school.name !== null && 'pt' in school.name && 'en' in school.name
-                                                ? (school.name[language as keyof typeof school.name] ?? school.name.pt ?? "")
+                                              <SelectItem key={school.id} value={school.id}>{typeof school.name === 'object' && school.name !== null
+                                                ? ((school.name as Record<string, string>)[language] ?? (school.name as Record<string, string>).pt ?? "")
                                                 : (typeof school.name === 'string' ? school.name : "")}
                                               </SelectItem>
                                             ))}

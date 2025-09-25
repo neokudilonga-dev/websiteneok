@@ -81,9 +81,11 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify(school),
       });
       if (!response.ok) throw new Error('Failed to add school');
-      const newSchool = await response.json();
-      setSchools(prev => [...prev, newSchool]);
-  toast({ title: "School Added", description: `${school.name} was added successfully.` });
+      // Refetch schools from backend
+      const updated = await fetch('/api/schools');
+      const updatedSchools = await updated.json();
+      setSchools(updatedSchools);
+      toast({ title: "School Added", description: `${school.name} was added successfully.` });
     } catch (error) {
       console.error(error);
       toast({ title: "Error", description: "Could not add school.", variant: "destructive" });
@@ -100,7 +102,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             body: JSON.stringify(updatedSchool),
         });
         if (!response.ok) throw new Error('Failed to update school');
-        setSchools(prev => prev.map(s => s.id === updatedSchool.id ? updatedSchool : s));
+  // Refetch schools from backend
+  const updated = await fetch('/api/schools');
+  const updatedSchools = await updated.json();
+  setSchools(updatedSchools);
   toast({ title: "School Updated", description: `${updatedSchool.name} was updated successfully.` });
     } catch (error) {
         console.error(error);
@@ -116,7 +121,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             method: 'DELETE',
         });
         if (!response.ok) throw new Error('Failed to delete school');
-        setSchools(prev => prev.filter(s => s.id !== schoolId));
+  // Refetch schools from backend
+  const updated = await fetch('/api/schools');
+  const updatedSchools = await updated.json();
+  setSchools(updatedSchools);
         toast({ title: "School Deleted", description: `School was deleted successfully.` });
     } catch (error) {
         console.error(error);
@@ -136,12 +144,11 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify({ product, readingPlan: readingPlanData }),
       });
       if (!response.ok) throw new Error('Failed to add product');
-      const newProduct = await response.json();
-      setProducts(prev => [...prev, newProduct]);
-      // Refetch reading plan as it's been modified
-      const rpResponse = await fetch('/api/reading-plan');
-      const updatedReadingPlan = await rpResponse.json();
-      setReadingPlan(updatedReadingPlan);
+  // Refetch products and reading plan from backend
+  const updatedProducts = await fetch('/api/products');
+  setProducts(await updatedProducts.json());
+  const rpResponse = await fetch('/api/reading-plan');
+  setReadingPlan(await rpResponse.json());
 
       toast({
         title: "Product Added",
@@ -166,11 +173,11 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify({ product, readingPlan: readingPlanData }),
       });
       if (!response.ok) throw new Error('Failed to update product');
-      setProducts(prev => prev.map(p => p.id === product.id ? product : p));
-      
-      const rpResponse = await fetch('/api/reading-plan');
-      const updatedReadingPlan = await rpResponse.json();
-      setReadingPlan(updatedReadingPlan);
+  // Refetch products and reading plan from backend
+  const updatedProducts = await fetch('/api/products');
+  setProducts(await updatedProducts.json());
+  const rpResponse = await fetch('/api/reading-plan');
+  setReadingPlan(await rpResponse.json());
       
       toast({
         title: "Product Updated",
@@ -193,8 +200,11 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete product');
-      setProducts(prev => prev.filter(p => p.id !== productId));
-      setReadingPlan(prev => prev.filter(rp => rp.productId !== productId));
+  // Refetch products and reading plan from backend
+  const updatedProducts = await fetch('/api/products');
+  setProducts(await updatedProducts.json());
+  const rpResponse = await fetch('/api/reading-plan');
+  setReadingPlan(await rpResponse.json());
       toast({ title: "Product Deleted", description: "Product was deleted successfully." });
     } catch (error) {
       console.error(error);
@@ -214,7 +224,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify(category),
       });
       if (!response.ok) throw new Error('Failed to add category');
-      setCategories(prev => [...prev, category].sort((a, b) => a.name[language].localeCompare(b.name[language])));
+      // Refetch categories from backend
+      const updated = await fetch('/api/categories');
+      const updatedCategories = await updated.json();
+      setCategories(updatedCategories);
       toast({ title: "Category Added", description: `${category.name[language]} was added successfully.` });
     } catch (error) {
       console.error(error);
@@ -237,7 +250,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete category');
-      setCategories(prev => prev.filter(c => c.name[language] !== nameToDelete));
+      // Refetch categories from backend
+      const updated = await fetch('/api/categories');
+      const updatedCategories = await updated.json();
+      setCategories(updatedCategories);
       toast({ title: "Category Deleted", description: `${nameToDelete} was deleted successfully.` });
     } catch (error) {
       console.error(error);
@@ -257,7 +273,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify({ name: publisher }),
       });
       if (!response.ok) throw new Error('Failed to add publisher');
-      setPublishers(prev => [...prev, publisher].sort());
+  // Refetch publishers from backend
+  const updated = await fetch('/api/publishers');
+  const updatedPublishers = await updated.json();
+  setPublishers(updatedPublishers);
       toast({ title: "Publisher Added", description: `${publisher} was added successfully.` });
     } catch (error) {
       console.error(error);
@@ -273,7 +292,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete publisher');
-      setPublishers(prev => prev.filter(p => p !== publisherName));
+  // Refetch publishers from backend
+  const updated = await fetch('/api/publishers');
+  const updatedPublishers = await updated.json();
+  setPublishers(updatedPublishers);
       toast({ title: "Publisher Deleted", description: `${publisherName} was deleted successfully.` });
     } catch (error) {
       console.error(error);
@@ -293,8 +315,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify(order),
       });
       if (!response.ok) throw new Error('Failed to add order');
-      const newOrder = await response.json();
-      setOrders(prev => [newOrder, ...prev]);
+  // Refetch orders from backend
+  const updated = await fetch('/api/orders');
+  const updatedOrders = await updated.json();
+  setOrders(updatedOrders);
       // No toast here, as it's handled on the checkout page
     } catch (error) {
       console.error(error);
@@ -313,7 +337,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify({ paymentStatus: status }),
       });
       if (!response.ok) throw new Error('Failed to update payment status');
-      setOrders(prev => prev.map(o => o.reference === orderReference ? { ...o, paymentStatus: status } : o));
+  // Refetch orders from backend
+  const updated = await fetch('/api/orders');
+  const updatedOrders = await updated.json();
+  setOrders(updatedOrders);
       toast({ title: "Payment Status Updated" });
     } catch (error) {
       console.error(error);
@@ -331,7 +358,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify({ deliveryStatus: status }),
       });
       if (!response.ok) throw new Error('Failed to update delivery status');
-      setOrders(prev => prev.map(o => o.reference === orderReference ? { ...o, deliveryStatus: status } : o));
+  // Refetch orders from backend
+  const updated = await fetch('/api/orders');
+  const updatedOrders = await updated.json();
+  setOrders(updatedOrders);
       toast({ title: "Delivery Status Updated" });
     } catch (error) {
       console.error(error);
@@ -350,7 +380,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         schools, setSchools, addSchool, updateSchool, deleteSchool,
         products, setProducts, addProduct, updateProduct, deleteProduct,
         readingPlan, setReadingPlan,
-  categories, setCategories, addCategory, deleteCategory,
+        categories, setCategories, addCategory, deleteCategory,
         publishers, setPublishers, addPublisher, deletePublisher,
         orders, setOrders, addOrder, updateOrderPaymentStatus, updateOrderDeliveryStatus,
       }}
@@ -358,20 +388,20 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </DataContext.Provider>
   );
-};
-
-
-export const useData = () => {
-  const context = useContext(DataContext);
-  if (context === undefined) {
-    throw new Error("useData must be used within a DataProvider");
-  }
-  return context;
-};
+}
 
 // Simple hook for just the loading state (for global overlay)
 export const useGlobalLoading = () => {
   const context = useContext(DataContext);
   if (!context) throw new Error("useGlobalLoading must be used within a DataProvider");
   return context.loading;
+};
+
+// Export useData hook for context consumers
+export const useData = () => {
+  const context = useContext(DataContext);
+  if (context === undefined) {
+    throw new Error("useData must be used within a DataProvider");
+  }
+  return context;
 };
