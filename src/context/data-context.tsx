@@ -33,7 +33,7 @@ interface DataContextType {
   categories: Category[];
   setCategories: (categories: Category[]) => void;
   addCategory: (category: Category) => Promise<void>;
-  deleteCategory: (categoryName: { pt: string; en: string }) => Promise<void>;
+  deleteCategory: (categoryName: { pt: string; en: string } | string) => Promise<void>;
 
   // Publishers
   publishers: string[];
@@ -55,7 +55,7 @@ interface DataContextType {
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [schools, setSchools] = useState<School[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [readingPlan, setReadingPlan] = useState<ReadingPlanItem[]>([]);
@@ -226,12 +226,14 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const deleteCategory = async (categoryName: { pt: string; en: string } | string) => {
     setLoading(true);
     try {
-      // Use the current language to identify the category for deletion
-      let nameToDelete = categoryName;
+      // Always resolve to a string for deletion and UI
+      let nameToDelete: string;
       if (typeof categoryName === 'object' && categoryName !== null) {
-        nameToDelete = categoryName[language];
+        nameToDelete = categoryName[language] || categoryName.pt || categoryName.en;
+      } else {
+        nameToDelete = categoryName;
       }
-      const response = await fetch(`/api/categories/${encodeURIComponent(nameToDelete as string)}`, {
+      const response = await fetch(`/api/categories/${encodeURIComponent(nameToDelete)}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete category');
@@ -358,10 +360,18 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+
 export const useData = () => {
   const context = useContext(DataContext);
   if (context === undefined) {
     throw new Error("useData must be used within a DataProvider");
   }
   return context;
+};
+
+// Simple hook for just the loading state (for global overlay)
+export const useGlobalLoading = () => {
+  const context = useContext(DataContext);
+  if (!context) throw new Error("useGlobalLoading must be used within a DataProvider");
+  return context.loading;
 };

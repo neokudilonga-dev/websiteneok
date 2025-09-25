@@ -27,7 +27,7 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import type { Product } from "@/lib/types";
-import { useEffect, ChangeEvent } from "react";
+import { useEffect, ChangeEvent, useState } from "react";
 import { PlusCircle, Trash2, Upload } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -73,10 +73,8 @@ export function AddEditGameSheet({
   const form = useForm<GameFormValues>({
     resolver: zodResolver(gameFormSchema),
     defaultValues: {
-      name_pt: "",
-      name_en: "",
-      description_pt: "",
-      description_en: "",
+      name: "",
+      description: "",
       price: 0,
       stock: 0,
       images: [],
@@ -85,10 +83,7 @@ export function AddEditGameSheet({
     },
   });
 
-   const { fields, append, remove, update } = useFieldArray({
-    control: form.control,
-    name: "images",
-  });
+  // Remove useFieldArray for images, as images is an array of strings, not a field array object
 
   const { fields: readingPlanFields, append: appendReadingPlan, remove: removeReadingPlan } = useFieldArray({
     control: form.control,
@@ -103,10 +98,8 @@ export function AddEditGameSheet({
           .map(rp => ({ schoolId: rp.schoolId, grade: rp.grade, status: rp.status }));
         
         form.reset({
-          name_pt: game.name.pt,
-          name_en: game.name.en,
-          description_pt: game.description.pt,
-          description_en: game.description.en,
+          name: typeof game.name === 'object' ? (game.name[language] || game.name.pt) : game.name,
+          description: typeof game.description === 'object' ? (game.description[language] || game.description.pt) : game.description,
           price: game.price,
           stock: game.stock,
           images: game.images || [],
@@ -115,10 +108,8 @@ export function AddEditGameSheet({
         });
       } else {
         form.reset({
-          name_pt: "",
-          name_en: "",
-          description_pt: "",
-          description_en: "",
+          name: "",
+          description: "",
           price: 0,
           stock: 0,
           images: [],
@@ -135,8 +126,8 @@ export function AddEditGameSheet({
     const productData: Product = {
       id: game?.id || "",
       type: "game",
-      name: { pt: data.name_pt, en: data.name_en },
-      description: { pt: data.description_pt, en: data.description_en },
+      name: data.name,
+      description: data.description,
       price: data.price,
       stock: data.stock,
       images: data.images,

@@ -427,7 +427,7 @@ export function AddEditBookSheet({
                                     </FormControl>
                                     <SelectContent>
                                         {schools.map(school => (
-                                        <SelectItem key={school.id} value={school.id}>{school.name[language] || school.name.pt}</SelectItem>
+                                        <SelectItem key={school.id} value={school.id}>{typeof school.name === 'object' ? ((school.name as Record<string, string>)[language] || (school.name as Record<string, string>).pt) : school.name}</SelectItem>
                                         ))}
                                     </SelectContent>
                                     </Select>

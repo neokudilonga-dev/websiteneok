@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   description: "A sua fonte de livros e jogos escolares.",
 };
 
+
+// Providers moved to a client component
+import Providers from "@/components/ui/providers";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,11 +31,9 @@ export default function RootLayout({
       <body className="font-body antialiased" suppressHydrationWarning>
         <LanguageProvider>
           <DataProvider>
-            <CartProvider>
-            {children}
-            <Toaster />
-            <WhatsAppButton />
-            </CartProvider>
+            <Providers>
+              {children}
+            </Providers>
           </DataProvider>
         </LanguageProvider>
       </body>

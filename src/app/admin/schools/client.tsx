@@ -80,8 +80,13 @@ export default function SchoolsPageClient({ initialSchools }: SchoolsPageClientP
   }
   
   const getSchoolName = (school: School) => {
-  if (!school || !school.name) return 'No Name';
-  return school.name || 'Unnamed School';
+    if (!school || !school.name) return 'No Name';
+    // If name is an object (i18n), use the current language
+    if (typeof school.name === 'object' && school.name !== null) {
+      const nameObj = school.name as { pt?: string; en?: string; [key: string]: string | undefined };
+      return nameObj[language] || nameObj.pt || nameObj.en || 'Unnamed School';
+    }
+    return school.name || 'Unnamed School';
   }
 
   return (
