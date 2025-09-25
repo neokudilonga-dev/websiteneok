@@ -67,6 +67,8 @@ export function AddEditGameSheet({
 }: AddEditGameSheetProps) {
   const { schools, readingPlan, addProduct, updateProduct } = useData();
   const { language } = useLanguage();
+  const [asyncError, setAsyncError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const form = useForm<GameFormValues>({
     resolver: zodResolver(gameFormSchema),
@@ -127,7 +129,9 @@ export function AddEditGameSheet({
     }
   }, [game, form, isOpen, readingPlan]);
 
-  const onSubmit = (data: GameFormValues) => {
+  const onSubmit = async (data: GameFormValues) => {
+    setAsyncError(null);
+    setIsSaving(true);
     const productData: Product = {
       id: game?.id || "",
       type: "game",
@@ -139,16 +143,19 @@ export function AddEditGameSheet({
       stockStatus: data.stockStatus,
       image: "",
     };
-    
     const readingPlanData = data.readingPlan || [];
-    
-    if (game) {
-        updateProduct(productData, readingPlanData);
-    } else {
-        addProduct(productData, readingPlanData);
+    try {
+      if (game) {
+        await updateProduct(productData, readingPlanData);
+      } else {
+        await addProduct(productData, readingPlanData);
+      }
+      setIsOpen(false);
+    } catch (err: any) {
+      setAsyncError(err?.message || "Erro ao guardar alterações. Tente novamente.");
+    } finally {
+      setIsSaving(false);
     }
-    
-    setIsOpen(false);
   };
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>, indexToUpdate?: number) => {
@@ -200,6 +207,11 @@ export function AddEditGameSheet({
                 Preencha os detalhes para o novo jogo.
               </SheetDescription>
             </SheetHeader>
+            {asyncError && (
+              <div className="mb-2 rounded border border-red-500 bg-red-100 px-3 py-2 text-sm text-red-700">
+                {asyncError}
+              </div>
+            )}
             <div className="flex-1 space-y-4 overflow-y-auto py-4 pr-6">
               <div className="space-y-2">
             <Label>Nome do Jogo</Label>
@@ -448,7 +460,9 @@ export function AddEditGameSheet({
                   Cancelar
                 </Button>
               </SheetClose>
-              <Button type="submit">Guardar Alterações</Button>
+              <Button type="submit" disabled={isSaving}>
+                {isSaving ? "A guardar..." : "Guardar Alterações"}
+              </Button>
             </SheetFooter>
           </form>
         </Form>

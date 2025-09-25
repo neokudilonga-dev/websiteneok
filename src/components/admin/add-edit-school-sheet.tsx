@@ -24,7 +24,7 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import type { School } from "@/lib/types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
 
@@ -52,11 +52,12 @@ export function AddEditSchoolSheet({
   school,
   onSaveChanges,
 }: AddEditSchoolSheetProps) {
+  const [asyncError, setAsyncError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const form = useForm<SchoolFormValues>({
     resolver: zodResolver(schoolFormSchema),
     defaultValues: {
-      name_pt: "",
-      name_en: "",
+      name: "",
       id: "",
       abbreviation: "",
       allowPickup: false,
@@ -66,34 +67,43 @@ export function AddEditSchoolSheet({
   });
 
   useEffect(() => {
-     if (isOpen) {
-        if (school) {
+    if (isOpen) {
+      if (school) {
         form.reset({
-            name_pt: school.name.pt,
-            name_en: school.name.en,
-            id: school.id,
-            abbreviation: school.abbreviation,
-            allowPickup: school.allowPickup || false,
-            allowPickupAtLocation: school.allowPickupAtLocation || false,
-            hasRecommendedPlan: school.hasRecommendedPlan || false,
+          name: school.name,
+          id: school.id,
+          abbreviation: school.abbreviation,
+          allowPickup: school.allowPickup || false,
+          allowPickupAtLocation: school.allowPickupAtLocation || false,
+          hasRecommendedPlan: school.hasRecommendedPlan || false,
         });
-        } else {
-        form.reset({ name_pt: "", name_en: "", id: "", abbreviation: "", allowPickup: false, allowPickupAtLocation: false, hasRecommendedPlan: false });
-        }
+      } else {
+        form.reset({ name: "", id: "", abbreviation: "", allowPickup: false, allowPickupAtLocation: false, hasRecommendedPlan: false });
+      }
     }
   }, [school, form, isOpen]);
 
 
-  const onSubmit = (data: SchoolFormValues) => {
-    onSaveChanges({
-        id: school?.id || data.id,
-        name: { pt: data.name_pt, en: data.name_en },
-        abbreviation: data.abbreviation,
-        allowPickup: data.allowPickup,
-        allowPickupAtLocation: data.allowPickupAtLocation,
-        hasRecommendedPlan: data.hasRecommendedPlan,
-    });
-    setIsOpen(false);
+  const onSubmit = async (data: SchoolFormValues) => {
+    setAsyncError(null);
+    setIsSaving(true);
+    try {
+      await Promise.resolve(
+        onSaveChanges({
+          id: school?.id || data.id,
+          name: data.name,
+          abbreviation: data.abbreviation,
+          allowPickup: data.allowPickup,
+          allowPickupAtLocation: data.allowPickupAtLocation,
+          hasRecommendedPlan: data.hasRecommendedPlan,
+        })
+      );
+      setIsOpen(false);
+    } catch (err: any) {
+      setAsyncError(err?.message || "Erro ao guardar alterações. Tente novamente.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -109,28 +119,21 @@ export function AddEditSchoolSheet({
                   : "Preencha os detalhes para a nova escola."}
               </SheetDescription>
             </SheetHeader>
+            {asyncError && (
+              <div className="mb-2 rounded border border-red-500 bg-red-100 px-3 py-2 text-sm text-red-700">
+                {asyncError}
+              </div>
+            )}
             <div className="flex-1 space-y-4 overflow-y-auto py-4">
               <div className="space-y-2">
                 <Label>Nome da Escola</Label>
                 <FormField
                   control={form.control}
-                  name="name_pt"
+                  name="name"
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="Português" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                 <FormField
-                  control={form.control}
-                  name="name_en"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input placeholder="Inglês" {...field} />
+                        <Input placeholder="Nome da Escola" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -233,7 +236,9 @@ export function AddEditSchoolSheet({
                   Cancelar
                 </Button>
               </SheetClose>
-              <Button type="submit">Guardar Alterações</Button>
+              <Button type="submit" disabled={isSaving}>
+                {isSaving ? "A guardar..." : "Guardar Alterações"}
+              </Button>
             </SheetFooter>
           </form>
         </Form>

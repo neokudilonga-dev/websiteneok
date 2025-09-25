@@ -44,8 +44,9 @@ interface CategoriesPageClientProps {
 
 export default function CategoriesPageClient({ initialCategories }: CategoriesPageClientProps) {
   const { categories, addCategory, deleteCategory, setCategories } = useData();
-  const { t } = useLanguage();
-  const [newCategoryName, setNewCategoryName] = useState('');
+  const { t, language } = useLanguage();
+  const [newCategoryNamePT, setNewCategoryNamePT] = useState('');
+  const [newCategoryNameEN, setNewCategoryNameEN] = useState('');
   const [newCategoryType, setNewCategoryType] = useState<'book' | 'game'>('book');
 
   useEffect(() => {
@@ -54,77 +55,65 @@ export default function CategoriesPageClient({ initialCategories }: CategoriesPa
   }, [initialCategories]);
 
   const handleAddCategory = () => {
-    if (newCategoryName && !categories.find(c => c.name.toLowerCase() === newCategoryName.toLowerCase())) {
-        addCategory({ name: newCategoryName, type: newCategoryType });
-        setNewCategoryName('');
-        setNewCategoryType('book');
+    if (
+      newCategoryNamePT &&
+      newCategoryNameEN &&
+      !categories.find(
+        c =>
+          c.name.pt.toLowerCase() === newCategoryNamePT.toLowerCase() ||
+          c.name.en.toLowerCase() === newCategoryNameEN.toLowerCase()
+      )
+    ) {
+      addCategory({ name: { pt: newCategoryNamePT, en: newCategoryNameEN }, type: newCategoryType });
+      setNewCategoryNamePT('');
+      setNewCategoryNameEN('');
+      setNewCategoryType('book');
     }
   };
 
-  const handleDeleteCategory = (categoryToDelete: string) => {
+  const handleDeleteCategory = (categoryToDelete: { pt: string; en: string }) => {
     deleteCategory(categoryToDelete);
   };
 
 
   return (
     <>
+      <div className="flex gap-4 mb-4">
+        <div className="flex-1">
+          <Label>Nome da Categoria (PT)</Label>
+          <Input value={newCategoryNamePT} onChange={e => setNewCategoryNamePT(e.target.value)} placeholder="Ex: Biologia" />
+        </div>
+        <div className="flex-1">
+          <Label>Category Name (EN)</Label>
+          <Input value={newCategoryNameEN} onChange={e => setNewCategoryNameEN(e.target.value)} placeholder="Ex: Biology" />
+        </div>
+        <div className="flex-1">
+          <Label>{t('categories_page.category_type') || 'Tipo'}</Label>
+          <RadioGroup value={newCategoryType} onValueChange={v => setNewCategoryType(v as 'book' | 'game')} className="flex flex-row gap-2 mt-2">
+            <RadioGroupItem value="book" id="book" />
+            <Label htmlFor="book">{t('common.book') || 'Livro'}</Label>
+            <RadioGroupItem value="game" id="game" />
+            <Label htmlFor="game">{t('common.game') || 'Jogo'}</Label>
+          </RadioGroup>
+        </div>
+        <Button onClick={handleAddCategory} className="self-end" disabled={!newCategoryNamePT || !newCategoryNameEN}>
+          <PlusCircle className="mr-2" />
+          {t('categories_page.add_category') || 'Adicionar Categoria'}
+        </Button>
+      </div>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-4">
           <div className="space-y-1">
             <CardTitle>{t('categories_page.title')}</CardTitle>
             <CardDescription>{t('categories_page.description')}</CardDescription>
           </div>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-                <Button>
-                    <PlusCircle className="mr-2" />
-                    {t('categories_page.add_category')}
-                </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                <AlertDialogTitle>{t('categories_page.dialog_title')}</AlertDialogTitle>
-                <AlertDialogDescription>
-                    {t('categories_page.dialog_description')}
-                </AlertDialogDescription>
-                </AlertDialogHeader>
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="category-name">{t('categories_page.category_name')}</Label>
-                        <Input 
-                            id="category-name"
-                            value={newCategoryName} 
-                            onChange={(e) => setNewCategoryName(e.target.value)} 
-                            placeholder={t('categories_page.category_name_placeholder')}
-                        />
-                    </div>
-                     <div className="space-y-2">
-                        <Label>{t('categories_page.category_type')}</Label>
-                        <RadioGroup defaultValue="book" onValueChange={(value) => setNewCategoryType(value as 'book' | 'game')} value={newCategoryType}>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="book" id="r-book" />
-                                <Label htmlFor="r-book">{t('common.book')}</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="game" id="r-game" />
-                                <Label htmlFor="r-game">{t('common.game_and_other')}</Label>
-                            </div>
-                        </RadioGroup>
-                     </div>
-                </div>
-                <AlertDialogFooter>
-                <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-                <AlertDialogAction onClick={handleAddCategory}>{t('common.add')}</AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
-
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t('categories_page.category_name')}</TableHead>
+                <TableHead>{t('categories_page.category_name')} (PT)</TableHead>
+                <TableHead>{t('categories_page.category_name')} (EN)</TableHead>
                 <TableHead>{t('common.type')}</TableHead>
                 <TableHead className="w-[100px] text-right">
                   <span className="sr-only">{t('common.actions')}</span>
@@ -133,8 +122,9 @@ export default function CategoriesPageClient({ initialCategories }: CategoriesPa
             </TableHeader>
             <TableBody>
               {categories.map((category) => (
-                <TableRow key={category.name}>
-                  <TableCell className="font-medium">{category.name}</TableCell>
+                <TableRow key={category.name.pt + category.name.en}>
+                  <TableCell className="font-medium">{category.name.pt}</TableCell>
+                  <TableCell className="font-medium">{category.name.en}</TableCell>
                    <TableCell>
                      <Badge variant={category.type === 'book' ? 'secondary' : 'default'}>
                         {category.type === 'book' ? t('common.book') : t('common.game')}

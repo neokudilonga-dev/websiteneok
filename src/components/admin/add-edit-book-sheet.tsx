@@ -56,7 +56,7 @@ const bookFormSchema = z.object({
   price: z.coerce.number().min(0, "O preço deve ser um número positivo."),
   stock: z.coerce.number().min(0, "O stock deve ser um número positivo."),
   image: z.string().min(1, "A imagem é obrigatória."),
-  category: z.string().min(1, "A categoria é obrigatória."),
+  category: z.string().min(1, "A categoria é obrigatória."), // Will store the i18n name
   publisher: z.string().optional(),
   stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out']),
   readingPlan: z.array(readingPlanItemSchema).optional(),
@@ -69,17 +69,18 @@ export function AddEditBookSheet({
   setIsOpen,
   book,
 }: AddEditBookSheetProps) {
-    const { schools, categories, publishers, readingPlan, addProduct, updateProduct } = useData();
-    const { t, language } = useLanguage();
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
-    const bookCategories = useMemo(() => categories.filter(c => c.type === 'book'), [categories]);
-
+  const { schools, categories, publishers, readingPlan, addProduct, updateProduct } = useData();
+  const { t, language } = useLanguage();
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [asyncError, setAsyncError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const bookCategories = useMemo(() => categories.filter(c => c.type === 'book'), [categories]);
 
   const form = useForm<BookFormValues>({
     resolver: zodResolver(bookFormSchema),
     defaultValues: {
-  name: "",
-  description: "",
+      name: "",
+      description: "",
       price: 0,
       stock: 0,
       image: "",
@@ -132,30 +133,35 @@ export function AddEditBookSheet({
   }, [book, form, isOpen, readingPlan]);
 
 
-  const onSubmit = (data: BookFormValues) => {
-  const productData: Product = {
-    id: book?.id || '',
-    type: 'book',
-    name: data.name,
-    description: data.description,
-    price: data.price,
-    stock: data.stock,
-    image: data.image,
-    images: [],
-    category: data.category,
-    publisher: data.publisher,
-    stockStatus: data.stockStatus
-  };
-    
+  const onSubmit = async (data: BookFormValues) => {
+    setAsyncError(null);
+    setIsSaving(true);
+    const productData: Product = {
+      id: book?.id || '',
+      type: 'book',
+      name: data.name,
+      description: data.description,
+      price: data.price,
+      stock: data.stock,
+      image: data.image,
+      images: [],
+      category: data.category,
+      publisher: data.publisher,
+      stockStatus: data.stockStatus
+    };
     const readingPlanData = data.readingPlan || [];
-
-    if (book) {
-      updateProduct(productData, readingPlanData);
-    } else {
-      addProduct(productData, readingPlanData);
+    try {
+      if (book) {
+        await updateProduct(productData, readingPlanData);
+      } else {
+        await addProduct(productData, readingPlanData);
+      }
+      setIsOpen(false);
+    } catch (err: any) {
+      setAsyncError(err?.message || "Erro ao guardar alterações. Tente novamente.");
+    } finally {
+      setIsSaving(false);
     }
-
-    setIsOpen(false);
   };
   
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -208,6 +214,11 @@ export function AddEditBookSheet({
                   : "Preencha os detalhes para o novo livro."}
               </SheetDescription>
             </SheetHeader>
+            {asyncError && (
+              <div className="mb-2 rounded border border-red-500 bg-red-100 px-3 py-2 text-sm text-red-700">
+                {asyncError}
+              </div>
+            )}
             <div className="flex-1 space-y-4 overflow-y-auto py-4 pr-6">
               <div className="space-y-2">
          <Label>Nome do Livro</Label>
@@ -315,16 +326,18 @@ export function AddEditBookSheet({
                         render={({ field }) => (
                         <FormItem>
                             <FormLabel>Categoria</FormLabel>
-                                <Select onValueChange={field.onChange} value={field.value}>
+                            <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Selecione uma categoria" />
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                    {bookCategories.map(cat => (
-                                    <SelectItem key={cat.name} value={cat.name}>{cat.name}</SelectItem>
-                                    ))}
+                                {bookCategories.map((category) => (
+                                  <SelectItem key={category.name.pt + category.name.en} value={category.name[language]}>
+                                    {category.name[language]}
+                                  </SelectItem>
+                                ))}
                                 </SelectContent>
                             </Select>
                             <FormMessage />
@@ -491,7 +504,9 @@ export function AddEditBookSheet({
                   Cancelar
                 </Button>
               </SheetClose>
-              <Button type="submit">Guardar Alterações</Button>
+              <Button type="submit" disabled={isSaving}>
+                {isSaving ? "A guardar..." : "Guardar Alterações"}
+              </Button>
             </SheetFooter>
           </form>
         </Form>

@@ -4,6 +4,7 @@
 import { createContext, useContext, useState, ReactNode, useCallback } from "react";
 import type { School, Product, ReadingPlanItem, Order, Category, PaymentStatus, DeliveryStatus } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "./language-context";
 
 interface DataContextType {
   // Loading state
@@ -32,7 +33,7 @@ interface DataContextType {
   categories: Category[];
   setCategories: (categories: Category[]) => void;
   addCategory: (category: Category) => Promise<void>;
-  deleteCategory: (categoryName: string) => Promise<void>;
+  deleteCategory: (categoryName: { pt: string; en: string }) => Promise<void>;
 
   // Publishers
   publishers: string[];
@@ -59,6 +60,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [readingPlan, setReadingPlan] = useState<ReadingPlanItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const { language } = useLanguage();
   const [publishers, setPublishers] = useState<string[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const { toast } = useToast();
@@ -141,7 +143,13 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       const updatedReadingPlan = await rpResponse.json();
       setReadingPlan(updatedReadingPlan);
 
-      toast({ title: "Product Added", description: `${product.name.pt} was added successfully.` });
+      toast({
+        title: "Product Added",
+        description:
+          typeof product.name === 'string'
+            ? `${product.name} was added successfully.`
+            : `${product.name[language]} was added successfully.`
+      });
     } catch (error) {
       console.error(error);
       toast({ title: "Error", description: "Could not add product.", variant: "destructive" });
@@ -164,7 +172,13 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       const updatedReadingPlan = await rpResponse.json();
       setReadingPlan(updatedReadingPlan);
       
-      toast({ title: "Product Updated", description: `${product.name.pt} was updated successfully.` });
+      toast({
+        title: "Product Updated",
+        description:
+          typeof product.name === 'string'
+            ? `${product.name} was updated successfully.`
+            : `${product.name[language]} was updated successfully.`
+      });
     } catch (error) {
       console.error(error);
       toast({ title: "Error", description: "Could not update product.", variant: "destructive" });
@@ -193,38 +207,43 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   // Category mutations
   const addCategory = async (category: Category) => {
     setLoading(true);
-     try {
+    try {
       const response = await fetch('/api/categories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(category),
       });
       if (!response.ok) throw new Error('Failed to add category');
-      setCategories(prev => [...prev, category].sort((a,b) => a.name.localeCompare(b.name)));
-      toast({ title: "Category Added", description: `${category.name} was added successfully.` });
+      setCategories(prev => [...prev, category].sort((a, b) => a.name[language].localeCompare(b.name[language])));
+      toast({ title: "Category Added", description: `${category.name[language]} was added successfully.` });
     } catch (error) {
       console.error(error);
       toast({ title: "Error", description: "Could not add category.", variant: "destructive" });
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-  }
-  const deleteCategory = async (categoryName: string) => {
+  };
+  const deleteCategory = async (categoryName: { pt: string; en: string } | string) => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/categories/${encodeURIComponent(categoryName)}`, {
+      // Use the current language to identify the category for deletion
+      let nameToDelete = categoryName;
+      if (typeof categoryName === 'object' && categoryName !== null) {
+        nameToDelete = categoryName[language];
+      }
+      const response = await fetch(`/api/categories/${encodeURIComponent(nameToDelete as string)}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete category');
-      setCategories(prev => prev.filter(c => c.name !== categoryName));
-      toast({ title: "Category Deleted", description: `${categoryName} was deleted successfully.` });
+      setCategories(prev => prev.filter(c => c.name[language] !== nameToDelete));
+      toast({ title: "Category Deleted", description: `${nameToDelete} was deleted successfully.` });
     } catch (error) {
       console.error(error);
       toast({ title: "Error", description: "Could not delete category.", variant: "destructive" });
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-  }
+  };
 
   // Publisher mutations
   const addPublisher = async (publisher: string) => {
@@ -329,7 +348,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         schools, setSchools, addSchool, updateSchool, deleteSchool,
         products, setProducts, addProduct, updateProduct, deleteProduct,
         readingPlan, setReadingPlan,
-        categories, setCategories, addCategory, deleteCategory,
+  categories, setCategories, addCategory, deleteCategory,
         publishers, setPublishers, addPublisher, deletePublisher,
         orders, setOrders, addOrder, updateOrderPaymentStatus, updateOrderDeliveryStatus,
       }}

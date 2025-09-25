@@ -9,16 +9,13 @@ export async function DELETE(request: Request, { params }: { params: { name: str
             return NextResponse.json({ error: 'Category name is required' }, { status: 400 });
         }
 
-        const categoriesCollection = firestore.collection('categories');
-        const querySnapshot = await categoriesCollection.where('name', '==', name).limit(1).get();
-
-        if (querySnapshot.empty) {
+        // Use pt name as doc ID
+        const docRef = firestore.collection('categories').doc(name);
+        const doc = await docRef.get();
+        if (!doc.exists) {
             return NextResponse.json({ error: 'Category not found' }, { status: 404 });
         }
-
-        const doc = querySnapshot.docs[0];
-        await doc.ref.delete();
-
+        await docRef.delete();
         return NextResponse.json({ message: 'Category deleted successfully' }, { status: 200 });
     } catch (error) {
         console.error('Error deleting category:', error);

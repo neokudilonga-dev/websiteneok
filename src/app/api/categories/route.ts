@@ -25,9 +25,9 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Category name and type are required' }, { status: 400 });
     }
 
-    // Use name as the document ID for simplicity, assuming names are unique
-    const categoryRef = firestore.collection('categories').doc(body.name);
-    await categoryRef.set(body);
+  // Use pt name as the document ID for simplicity, assuming pt names are unique
+  const categoryRef = firestore.collection('categories').doc(body.name.pt);
+  await categoryRef.set(body);
 
     return NextResponse.json(body, { status: 201 });
   } catch (error) {

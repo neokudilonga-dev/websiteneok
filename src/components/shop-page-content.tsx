@@ -324,9 +324,9 @@ export default function ShopPageContent() {
                       </SelectTrigger>
                       <SelectContent>
                           <SelectItem value="all">{t('shop.all_categories')}</SelectItem>
-                          {bookCategories.map(category => (
-                              <SelectItem key={category.name} value={category.name}>{category.name}</SelectItem>
-                          ))}
+              {bookCategories.map(category => (
+                <SelectItem key={category.name.pt + category.name.en} value={category.name[language]}>{category.name[language]}</SelectItem>
+              ))}
                       </SelectContent>
                   </Select>
               </div>
@@ -351,9 +351,9 @@ export default function ShopPageContent() {
                       </SelectTrigger>
                       <SelectContent>
                           <SelectItem value="all">{t('shop.all_categories')}</SelectItem>
-                          {gameCategories.map(category => (
-                              <SelectItem key={category.name} value={category.name}>{category.name}</SelectItem>
-                          ))}
+              {gameCategories.map(category => (
+                <SelectItem key={category.name.pt + category.name.en} value={category.name[language]}>{category.name[language]}</SelectItem>
+              ))}
                       </SelectContent>
                   </Select>
               </div>

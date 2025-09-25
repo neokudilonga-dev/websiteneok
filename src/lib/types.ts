@@ -1,20 +1,31 @@
 
 
-export interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  stock?: number;
-  image: string; // For books
-  images: string[]; // For games
-  type: "book" | "game";
-  dataAiHint?: string;
-  category?: string;
-  publisher?: string;
-  stockStatus?: 'in_stock' | 'out_of_stock' | 'sold_out';
-  status?: "mandatory" | "recommended";
-}
+// Zod validation schemas (for API validation)
+import { z } from 'zod';
+
+export const ProductSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1, 'Name is required'),
+  description: z.string().min(1, 'Description is required'),
+  price: z.number().nonnegative('Price must be non-negative'),
+  stock: z.number().optional(),
+  image: z.string(),
+  images: z.array(z.string()),
+  type: z.enum(["book", "game"]),
+  dataAiHint: z.string().optional(),
+  category: z.string().optional(),
+  publisher: z.string().optional(),
+  stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out']).optional(),
+  status: z.enum(["mandatory", "recommended"]).optional(),
+});
+
+export const ReadingPlanItemSchema = z.object({
+  id: z.string().optional(),
+  productId: z.string().optional(),
+  schoolId: z.string(),
+  grade: z.union([z.number(), z.string()]),
+  status: z.enum(["mandatory", "recommended"]),
+});
 
 export interface ReadingPlanItem {
   id: string;
@@ -31,6 +42,23 @@ export interface School {
   allowPickup?: boolean;
   allowPickupAtLocation?: boolean;
   hasRecommendedPlan?: boolean;
+}
+
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  stock?: number;
+  image: string;
+  images: string[];
+  type: "book" | "game";
+  dataAiHint?: string;
+  category?: string;
+  publisher?: string;
+  stockStatus?: 'in_stock' | 'out_of_stock' | 'sold_out';
+  status?: "mandatory" | "recommended";
 }
 
 export interface CartItem extends Product {
@@ -62,6 +90,9 @@ export interface Order {
 }
 
 export interface Category {
-    name: string;
-    type: 'book' | 'game';
+  name: {
+    pt: string;
+    en: string;
+  };
+  type: 'book' | 'game';
 }

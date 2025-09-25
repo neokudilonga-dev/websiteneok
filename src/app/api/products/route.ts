@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
 import type { Product, ReadingPlanItem } from '@/lib/types';
+import { ProductSchema, ReadingPlanItemSchema } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
 
 export async function GET() {
@@ -17,18 +18,44 @@ export async function GET() {
         console.error('Error fetching products:', error);
         return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
     }
-}
-
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     console.log("Incoming product data:", JSON.stringify(body));
-    const { product, readingPlan }: { product: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[] } = body;
+    const { product, readingPlan } = body;
+
+    // Validate product
+    const productResult = ProductSchema.safeParse(product);
+    if (!productResult.success) {
+      return NextResponse.json({
+        error: 'Invalid product data',
+        details: productResult.error?.flatten?.() ?? 'Unknown validation error'
+      }, { status: 400 });
+    }
+
+    // Validate readingPlan
+    if (!Array.isArray(readingPlan)) {
+      return NextResponse.json({
+        error: 'Invalid readingPlan data',
+        details: 'readingPlan must be an array'
+      }, { status: 400 });
+    }
+    for (const item of readingPlan) {
+      const planResult = ReadingPlanItemSchema.safeParse(item);
+      if (!planResult.success) {
+        return NextResponse.json({
+          error: 'Invalid readingPlan item',
+          details: planResult.error?.flatten?.() ?? 'Unknown validation error'
+        }, { status: 400 });
+      }
+    }
 
     // If product.image is too large, throw a specific error
     if (product.image && typeof product.image === 'string' && product.image.length > 1048487) {
-      throw new Error('Product image is too large. Please upload images to Firebase Storage and use a URL instead.');
+      return NextResponse.json({
+        error: 'Product image is too large. Please upload images to Firebase Storage and use a URL instead.'
+      }, { status: 400 });
     }
 
     const newId = uuidv4();
@@ -45,7 +72,7 @@ export async function POST(request: Request) {
 
     // Add reading plan items
     const readingPlanCollection = firestore.collection('readingPlan');
-    readingPlan.forEach(item => {
+    readingPlan.forEach((item: any) => {
         const newPlanItemRef = readingPlanCollection.doc(uuidv4());
         const newPlanItem: ReadingPlanItem = {
             id: newPlanItemRef.id,
@@ -63,3 +90,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to add product', details: error?.message }, { status: 500 });
   }
 }
+
