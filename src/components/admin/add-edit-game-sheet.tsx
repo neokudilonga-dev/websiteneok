@@ -98,8 +98,12 @@ export function AddEditGameSheet({
           .map(rp => ({ schoolId: rp.schoolId, grade: rp.grade, status: rp.status }));
         
         form.reset({
-          name: typeof game.name === 'object' ? (game.name[language] || game.name.pt) : game.name,
-          description: typeof game.description === 'object' ? (game.description[language] || game.description.pt) : game.description,
+          name: typeof game.name === 'object' && game.name !== null
+            ? ((game.name as Record<string, string>)[language] ?? (game.name as Record<string, string>).pt ?? "")
+            : (typeof game.name === 'string' ? game.name : ""),
+          description: typeof game.description === 'object' && game.description !== null
+            ? ((game.description as Record<string, string>)[language] ?? (game.description as Record<string, string>).pt ?? "")
+            : (typeof game.description === 'string' ? game.description : ""),
           price: game.price,
           stock: game.stock,
           images: game.images || [],
@@ -149,38 +153,36 @@ export function AddEditGameSheet({
     }
   };
 
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>, indexToUpdate?: number) => {
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
       Array.from(files).forEach(file => {
         const reader = new FileReader();
         reader.onloadend = () => {
           const base64String = reader.result as string;
-          if(indexToUpdate !== undefined) {
-             update(indexToUpdate, base64String);
-          } else {
-             append(base64String);
-          }
+          const currentImages = form.getValues("images") || [];
+          form.setValue("images", [...currentImages, base64String]);
         };
         reader.readAsDataURL(file);
-      })
+      });
     }
   };
 
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     const items = e.clipboardData.items;
     for (let i = 0; i < items.length; i++) {
-        if (items[i].type.indexOf("image") !== -1) {
-            const file = items[i].getAsFile();
-            if (file) {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    const base64String = reader.result as string;
-                    append(base64String);
-                };
-                reader.readAsDataURL(file);
-            }
+      if (items[i].type.indexOf("image") !== -1) {
+        const file = items[i].getAsFile();
+        if (file) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64String = reader.result as string;
+            const currentImages = form.getValues("images") || [];
+            form.setValue("images", [...currentImages, base64String]);
+          };
+          reader.readAsDataURL(file);
         }
+      }
     }
   };
 
@@ -375,7 +377,10 @@ export function AddEditGameSheet({
                                         </FormControl>
                                         <SelectContent>
                                             {schools.map(school => (
-                                            <SelectItem key={school.id} value={school.id}>{school.name[language] || school.name.pt}</SelectItem>
+                                              <SelectItem key={school.id} value={school.id}>{typeof school.name === 'object' && school.name !== null && 'pt' in school.name && 'en' in school.name
+                                                ? (school.name[language as keyof typeof school.name] ?? school.name.pt ?? "")
+                                                : (typeof school.name === 'string' ? school.name : "")}
+                                              </SelectItem>
                                             ))}
                                         </SelectContent>
                                         </Select>
