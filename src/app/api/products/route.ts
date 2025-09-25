@@ -22,16 +22,23 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { product, readingPlan }: { product: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[] } = await request.json();
-    
+    const body = await request.json();
+    console.log("Incoming product data:", JSON.stringify(body));
+    const { product, readingPlan }: { product: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[] } = body;
+
+    // If product.image is too large, throw a specific error
+    if (product.image && typeof product.image === 'string' && product.image.length > 1048487) {
+      throw new Error('Product image is too large. Please upload images to Firebase Storage and use a URL instead.');
+    }
+
     const newId = uuidv4();
     const newProduct: Product = {
       ...product,
       id: newId,
     };
-    
+
     const batch = firestore.batch();
-    
+
     // Add the new product
     const productRef = firestore.collection('products').doc(newId);
     batch.set(productRef, newProduct);
@@ -51,8 +58,8 @@ export async function POST(request: Request) {
     await batch.commit();
 
     return NextResponse.json(newProduct, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error adding product:', error);
-    return NextResponse.json({ error: 'Failed to add product' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to add product', details: error?.message }, { status: 500 });
   }
 }

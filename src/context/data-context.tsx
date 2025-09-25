@@ -81,7 +81,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       if (!response.ok) throw new Error('Failed to add school');
       const newSchool = await response.json();
       setSchools(prev => [...prev, newSchool]);
-      toast({ title: "School Added", description: `${school.name.pt} was added successfully.` });
+  toast({ title: "School Added", description: `${school.name} was added successfully.` });
     } catch (error) {
       console.error(error);
       toast({ title: "Error", description: "Could not add school.", variant: "destructive" });
@@ -99,7 +99,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         });
         if (!response.ok) throw new Error('Failed to update school');
         setSchools(prev => prev.map(s => s.id === updatedSchool.id ? updatedSchool : s));
-        toast({ title: "School Updated", description: `${updatedSchool.name.pt} was updated successfully.` });
+  toast({ title: "School Updated", description: `${updatedSchool.name} was updated successfully.` });
     } catch (error) {
         console.error(error);
         toast({ title: "Error", description: "Could not update school.", variant: "destructive" });

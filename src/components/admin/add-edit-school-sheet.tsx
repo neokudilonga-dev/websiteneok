@@ -36,8 +36,7 @@ interface AddEditSchoolSheetProps {
 }
 
 const schoolFormSchema = z.object({
-  name_pt: z.string().min(3, "O nome da escola deve ter pelo menos 3 caracteres."),
-  name_en: z.string().min(3, "The school name must have at least 3 characters."),
+  name: z.string().min(3, "O nome da escola deve ter pelo menos 3 caracteres."),
   id: z.string().min(3, "O ID deve ter pelo menos 3 caracteres.").regex(/^[a-z0-9-]+$/, "O ID só pode conter letras minúsculas, números e hífenes."),
   abbreviation: z.string().min(2, "A abreviação deve ter pelo menos 2 caracteres.").max(5, "A abreviação não pode ter mais de 5 caracteres.").regex(/^[A-Z0-9]+$/, "A abreviação só pode conter letras maiúsculas e números."),
   allowPickup: z.boolean().default(false),

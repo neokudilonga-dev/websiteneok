@@ -80,8 +80,8 @@ export default function SchoolsPageClient({ initialSchools }: SchoolsPageClientP
   }
   
   const getSchoolName = (school: School) => {
-    if (!school || !school.name) return 'No Name';
-    return school.name[language] || school.name.pt || 'Unnamed School';
+  if (!school || !school.name) return 'No Name';
+  return school.name || 'Unnamed School';
   }
 
   return (

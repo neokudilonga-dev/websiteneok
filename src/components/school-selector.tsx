@@ -33,7 +33,7 @@ export default function SchoolSelector({
       <SelectContent>
         {schools.map((school) => (
           <SelectItem key={school.id} value={school.id}>
-            {school.name[language] || school.name.pt}
+            {school.name}
           </SelectItem>
         ))}
       </SelectContent>

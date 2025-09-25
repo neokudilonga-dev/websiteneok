@@ -49,10 +49,8 @@ const readingPlanItemSchema = z.object({
 
 
 const gameFormSchema = z.object({
-  name_pt: z.string().min(3, "O nome deve ter pelo menos 3 caracteres."),
-  name_en: z.string().min(3, "The name must be at least 3 characters long."),
-  description_pt: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
-  description_en: z.string().min(10, "The description must be at least 10 characters long."),
+  name: z.string().min(3, "O nome deve ter pelo menos 3 caracteres."),
+  description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
   price: z.coerce.number().min(0, "O preço deve ser um número positivo."),
   stock: z.coerce.number().min(0, "O stock deve ser um número positivo."),
   images: z.array(z.string()).min(1, "Pelo menos uma imagem é obrigatória."),
@@ -204,60 +202,36 @@ export function AddEditGameSheet({
             </SheetHeader>
             <div className="flex-1 space-y-4 overflow-y-auto py-4 pr-6">
               <div className="space-y-2">
-                 <Label>Nome do Jogo</Label>
-                 <FormField
-                    control={form.control}
-                    name="name_pt"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormControl>
-                        <Input placeholder="Português" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-                 <FormField
-                    control={form.control}
-                    name="name_en"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormControl>
-                        <Input placeholder="Inglês" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
+            <Label>Nome do Jogo</Label>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input placeholder="Nome do Jogo" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
               </div>
               
-              <div className="space-y-2">
-                <Label>Descrição</Label>
-                <FormField
-                    control={form.control}
-                    name="description_pt"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormControl>
-                        <Textarea placeholder="Português" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="description_en"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormControl>
-                        <Textarea placeholder="Inglês" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-              </div>
+        <div className="space-y-2">
+        <Label>Descrição</Label>
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+          <FormItem>
+            <FormControl>
+            <Textarea placeholder="Descrição do Jogo" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+          )}
+        />
+        </div>
 
               <FormField
                 control={form.control}

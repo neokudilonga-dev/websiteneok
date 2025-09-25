@@ -1,13 +1,9 @@
 
-export type TranslatedString = {
-  pt: string;
-  en: string;
-};
 
 export interface Product {
   id: string;
-  name: TranslatedString;
-  description: TranslatedString;
+  name: string;
+  description: string;
   price: number;
   stock?: number;
   image: string; // For books
@@ -30,7 +26,7 @@ export interface ReadingPlanItem {
 
 export interface School {
   id: string;
-  name: TranslatedString;
+  name: string;
   abbreviation: string;
   allowPickup?: boolean;
   allowPickupAtLocation?: boolean;

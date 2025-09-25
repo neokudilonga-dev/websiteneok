@@ -8,18 +8,11 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     const { id } = params;
     const body: School = await request.json();
     
-    // The name object is complex, so we need to handle it properly.
-    // The rest of the properties can be spread.
-    const { name, ...restOfBody } = body;
-
     const schoolRef = firestore.collection('schools').doc(id);
-    await schoolRef.update({
-        'name.pt': name.pt,
-        'name.en': name.en,
-        ...restOfBody
-    });
-
-    return NextResponse.json({ id, ...body }, { status: 200 });
+    // Remove id from body to avoid duplicate keys
+    const { id: _id, ...updateData } = body;
+    await schoolRef.update(updateData);
+    return NextResponse.json({ ...updateData, id }, { status: 200 });
   } catch (error) {
     console.error('Error updating school:', error);
     return NextResponse.json({ error: 'Failed to update school' }, { status: 500 });
