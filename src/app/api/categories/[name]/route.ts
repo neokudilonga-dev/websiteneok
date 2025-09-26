@@ -3,7 +3,13 @@
 import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
 
-export async function DELETE(request: Request, { params }: { params: { name: string } }) {
+type RouteParams = { params: { name: string } };
+
+export async function DELETE(
+  request: Request, 
+  context: RouteParams
+) {
+  const { params } = context;
     try {
         const name = decodeURIComponent(params.name);
         if (!name) {

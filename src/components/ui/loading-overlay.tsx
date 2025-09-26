@@ -1,11 +1,12 @@
 import React from "react";
-import BookLoader from "@/components/ui/book-loader";
+import Spinner from "@/components/ui/spinner";
 
 export default function LoadingOverlay({ show = false }: { show: boolean }) {
   if (!show) return null;
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white/70 dark:bg-black/70 backdrop-blur-sm transition-opacity">
-  <BookLoader size={64} className="text-primary" />
+  <Spinner size={64} color="#8b4513" className="text-primary" />
     </div>
   );
 }
+

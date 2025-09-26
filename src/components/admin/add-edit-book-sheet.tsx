@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -70,7 +69,7 @@ export function AddEditBookSheet({
   book,
 }: AddEditBookSheetProps) {
   const { schools, categories, publishers, readingPlan, addProduct, updateProduct, setCategories } = useData();
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [asyncError, setAsyncError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -160,9 +159,14 @@ export function AddEditBookSheet({
       images: [],
       category: data.category,
       publisher: data.publisher,
-      stockStatus: data.stockStatus
+      stockStatus: data.stockStatus,
     };
-    const readingPlanData = data.readingPlan || [];
+    const readingPlanData = data.readingPlan?.map(rp => ({
+      productId: book?.id || '',
+      schoolId: rp.schoolId,
+      grade: typeof rp.grade === 'string' ? rp.grade : String(rp.grade),
+      status: rp.status
+    })) || [];
     try {
       if (book) {
         await updateProduct(productData, readingPlanData);
@@ -179,35 +183,108 @@ export function AddEditBookSheet({
   
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      // Upload to Firebase Storage
-      const storage = getStorage(app);
-      const fileRef = storageRef(storage, `products/${Date.now()}_${file.name}`);
-      uploadBytes(fileRef, file)
-        .then(async (snapshot) => {
-          const url = await getDownloadURL(fileRef);
-          form.setValue("image", url);
-          setImagePreview(url);
-        })
-        .catch((error) => {
-          alert("Failed to upload image: " + error.message);
-        });
+    if (!file) return;
+    
+    try {
+      // Create a new image element
+      const img = new Image();
+      
+      // Set up error handling
+      img.onerror = (error) => {
+        console.error("Error loading image:", error);
+        alert("Error loading image. Please try another file.");
+      };
+      
+      // Set up image processing after it loads
+      img.onload = () => {
+        try {
+          // Create canvas for resizing
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 400;
+          const MAX_HEIGHT = 400;
+          
+          // Calculate new dimensions
+          let width = img.width;
+          let height = img.height;
+          
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+          
+          // Set canvas dimensions
+          canvas.width = width;
+          canvas.height = height;
+          
+          // Draw resized image on canvas
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            throw new Error("Could not get canvas context");
+          }
+          
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Convert to blob
+          canvas.toBlob((blob) => {
+            if (!blob) {
+              throw new Error("Failed to create image blob");
+            }
+            
+            // Upload to Firebase
+            const storage = getStorage(app);
+            const fileRef = storageRef(storage, `products/${Date.now()}_compressed.jpg`);
+            
+            uploadBytes(fileRef, blob)
+              .then((snapshot) => getDownloadURL(snapshot.ref))
+              .then((url) => {
+                form.setValue("image", url);
+                setImagePreview(url);
+              })
+              .catch((error) => {
+                console.error("Upload failed:", error);
+                alert("Failed to upload image: " + error.message);
+              });
+          }, 'image/jpeg', 0.7);
+        } catch (error: any) {
+          console.error("Error processing image:", error);
+          alert("Error processing image: " + error.message);
+        }
+      };
+      
+      // Start loading the image
+      img.src = URL.createObjectURL(file);
+    } catch (error: any) {
+      console.error("Error in image handling:", error);
+      alert("Error handling image: " + error.message);
     }
-    };
+  };
 
     const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
         const items = e.clipboardData.items;
         for (let i = 0; i < items.length; i++) {
-            if (items[i].type.indexOf("image") !== -1) {
+            if (items[i].type && items[i].type.indexOf("image") !== -1) {
                 const file = items[i].getAsFile();
                 if (file) {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        const base64String = reader.result as string;
-                        form.setValue("image", base64String);
-                        setImagePreview(base64String);
-                    };
-                    reader.readAsDataURL(file);
+                  // Upload to Firebase Storage (same logic as handleImageChange)
+                  const storage = getStorage(app);
+                  const fileRef = storageRef(storage, `products/${Date.now()}_${file.name || 'pasted_image'}`);
+                  uploadBytes(fileRef, file)
+                    .then(async () => {
+                      const url = await getDownloadURL(fileRef);
+                      form.setValue("image", url);
+                      setImagePreview(url);
+                    })
+                    .catch((error) => {
+                      alert("Failed to upload image: " + error.message);
+                    });
+
                 }
             }
         }
@@ -268,7 +345,7 @@ export function AddEditBookSheet({
                <FormField
                 control={form.control}
                 name="image"
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
                     <FormLabel>Imagem da Capa do Livro</FormLabel>
                     <FormControl>
@@ -527,3 +604,5 @@ export function AddEditBookSheet({
     </Sheet>
   );
 }
+
+

@@ -11,9 +11,9 @@ export default function BookLoader({ size = 64, className = "" }: { size?: numbe
       xmlns="http://www.w3.org/2000/svg"
     >
       {/* Book base */}
-      <rect x="8" y="16" width="48" height="32" rx="4" fill="#f3f4f6" stroke="#0ea5e9" strokeWidth="2" />
+      <rect x="8" y="16" width="48" height="32" rx="4" fill="#d2b48c" stroke="#8b4513" strokeWidth="2" />
       {/* Book spine */}
-      <rect x="8" y="16" width="8" height="32" rx="2" fill="#e0e7ef" stroke="#0ea5e9" strokeWidth="1.5" />
+      <rect x="8" y="16" width="8" height="32" rx="2" fill="#a67c52" stroke="#8b4513" strokeWidth="1.5" />
       {/* Flipping page animation */}
       <g>
         <animateTransform
@@ -26,10 +26,11 @@ export default function BookLoader({ size = 64, className = "" }: { size?: numbe
           keyTimes="0;0.5;1"
           values="0 32 32;-30 32 32;0 32 32"
         />
-        <rect x="16" y="18" width="32" height="28" rx="2" fill="#fff" stroke="#0ea5e9" strokeWidth="1.2" />
+        <rect x="16" y="18" width="32" height="28" rx="2" fill="#d2b48c" stroke="#8b4513" strokeWidth="1.2" />
       </g>
       {/* Book shadow */}
-      <ellipse cx="32" cy="50" rx="18" ry="4" fill="#e0e7ef" opacity="0.5" />
+      <ellipse cx="32" cy="50" rx="18" ry="4" fill="#a67c52" opacity="0.5" />
     </svg>
   );
 }
+

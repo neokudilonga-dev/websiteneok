@@ -1,10 +1,9 @@
-
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { auth } from '@/lib/firebase-admin';
 
 export async function GET() {
-  const session = cookies().get('session')?.value || '';
+  const session = (await cookies()).get('session')?.value || '';
 
   if (!session) {
     return NextResponse.json({ isLogged: false }, { status: 401 });
@@ -23,3 +22,4 @@ export async function GET() {
     return NextResponse.json({ isLogged: false }, { status: 401 });
   }
 }
+
