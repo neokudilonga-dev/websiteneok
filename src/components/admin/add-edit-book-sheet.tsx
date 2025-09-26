@@ -71,8 +71,8 @@ export function AddEditBookSheet({
   book,
   onBookSaved,
 }: AddEditBookSheetProps) {
-  const { schools, categories, publishers, readingPlan, addProduct, updateProduct, setCategories } = useData();
-  const { language } = useLanguage();
+  const { schools, addProduct, updateProduct, categories, publishers, readingPlan, setCategories } = useData();
+  const { t, language } = useLanguage();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [asyncError, setAsyncError] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -524,11 +524,14 @@ export function AddEditBookSheet({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {schools.map((school) => (
-                              <SelectItem key={school.id} value={school.id}>
-                              {school.name}
-                              </SelectItem>
-                            ))}
+                            {schools.map((school) => {
+                              const translatedSchoolName = school.name[language as keyof typeof school.name];
+                              return (
+                                <SelectItem key={school.id} value={school.id}>
+                                  {translatedSchoolName}
+                                </SelectItem>
+                              );
+                            })}
                           </SelectContent>
                         </Select>
                         <FormMessage />

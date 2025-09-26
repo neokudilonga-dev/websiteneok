@@ -37,7 +37,10 @@ export interface ReadingPlanItem {
 
 export interface School {
   id: string;
-  name: string;
+  name: {
+    pt: string;
+    en: string;
+  };
   abbreviation: string;
   allowPickup?: boolean;
   allowPickupAtLocation?: boolean;
