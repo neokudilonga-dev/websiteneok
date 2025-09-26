@@ -5,12 +5,10 @@ import { z } from 'zod';
 
 export const ProductSchema = z.object({
   id: z.string().optional(),
-  name: z.string().min(1, 'Name is required'),
+  name: z.string().min(1, 'Name is required').optional(),
   description: z.string().min(1, 'Description is required'),
   price: z.number().nonnegative('Price must be non-negative'),
   stock: z.number().optional(),
-  image: z.string(),
-  images: z.array(z.string()),
   type: z.enum(["book", "game"]),
   dataAiHint: z.string().optional(),
   category: z.string().optional(),
@@ -50,15 +48,13 @@ export interface School {
 
 export interface Product {
   id: string;
-  name: {
+  name?: {
     pt: string;
     en: string;
   };
   description: string;
   price: number;
   stock?: number;
-  image: string;
-  images?: string[];
   type: "book" | "game";
   dataAiHint?: string;
   category?: string;

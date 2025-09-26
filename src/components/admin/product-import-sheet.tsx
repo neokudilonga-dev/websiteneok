@@ -31,12 +31,12 @@ export function ProductImportSheet({ isOpen, onClose }: ProductImportSheetProps)
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files ? event.target.files[0] : null;
     if (selectedFile) {
-      if (selectedFile.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || selectedFile.type === "application/vnd.ms-excel") {
+      if (selectedFile.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
         setFile(selectedFile);
       } else {
         toast({
           title: "Invalid file type",
-          description: "Please upload an Excel file (.xlsx or .xls).",
+          description: "Please upload an Excel file (.xlsx).",
           variant: "destructive",
         });
         setFile(null);
@@ -50,7 +50,7 @@ export function ProductImportSheet({ isOpen, onClose }: ProductImportSheetProps)
     if (!file) {
       toast({
         title: "No file selected",
-        description: "Please select a CSV file to upload.",
+        description: "Please select an Excel file to upload.",
         variant: "destructive",
       });
       return;
@@ -135,24 +135,24 @@ export function ProductImportSheet({ isOpen, onClose }: ProductImportSheetProps)
         <SheetHeader>
           <SheetTitle>Import Products</SheetTitle>
           <SheetDescription>
-            Upload a CSV file to bulk add or update products.
+            Upload an Excel file to bulk add or update products.
           </SheetDescription>
         </SheetHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="file" className="text-right">
-              CSV File
+              Excel File
             </Label>
             <Input
               id="file"
               type="file"
-              accept=".xlsx, .xls"
+              accept=".xlsx"
               onChange={handleFileChange}
             />
           </div>
           <Button onClick={handleUpload} disabled={!file || loading}>
             {loading ? <Spinner className="mr-2" /> : null}
-            Upload and Import
+            Upload Excel File
           </Button>
           <Button
             variant="outline"
@@ -165,7 +165,7 @@ export function ProductImportSheet({ isOpen, onClose }: ProductImportSheetProps)
 
           <SheetClose asChild>
             <Button type="submit" className="w-full">
-              Import
+              Done
             </Button>
           </SheetClose>
         </div>

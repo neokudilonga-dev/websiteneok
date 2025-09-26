@@ -208,7 +208,7 @@ export function AddEditBookSheet({
     }
 
     const productData: Product = {
-      id: book?.id || data.name[language] || data.name.pt, // Use book ID if editing, otherwise use name as ID
+      id: book?.id || data.name, // Use book ID if editing, otherwise use name as ID (string)
       type: 'book',
       name: {
         pt: language === 'pt' ? data.name : (book?.name.pt || ''),

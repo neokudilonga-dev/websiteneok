@@ -169,7 +169,7 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
                 </Button>
                 <Button onClick={() => setImportSheetOpen(true)} className="shrink-0">
                     <Upload className="mr-2" />
-                    Import Products
+                    Importar/Exportar Livros
                 </Button>
             </div>
         </CardHeader>

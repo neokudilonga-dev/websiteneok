@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
 import { ProductSchema } from "@/lib/types";
-import { collection, doc, writeBatch, query, where, getDocs } from "firebase/firestore";
-import * as XLSX from 'xlsx'; // Import the xlsx library
+import { collection, doc, writeBatch } from "firebase/firestore";
+import * as XLSX from 'xlsx';
 
 export async function POST(request: Request) {
   try {
@@ -26,14 +26,13 @@ export async function POST(request: Request) {
 
     for (const row of jsonData) {
       const productData = {
-        name: row.name,
         description: row.description,
         price: parseFloat(row.price),
         stock: parseInt(row.stock),
         category: row.category,
         publisher: row.publisher,
-        images: row.images ? row.images.split(',') : [],
-        // Add other fields as necessary
+        type: row.type || "book",
+        stockStatus: row.stockStatus || "in_stock",
       };
 
       const validation = ProductSchema.partial().safeParse(productData);
@@ -47,17 +46,13 @@ export async function POST(request: Request) {
         continue;
       }
 
-      const existingProductQuery = query(productsCollection, where("name", "==", productData.name));
-      const existingProductSnapshot = await getDocs(existingProductQuery);
-
-      if (!existingProductSnapshot.empty) {
-        // Update existing product
-        const productId = existingProductSnapshot.docs[0].id;
-        const productRef = doc(db, "products", productId);
+      if (row.id) {
+        // Update existing product if ID is provided
+        const productRef = doc(db, "products", row.id);
         batch.update(productRef, validation.data);
         importResults.push({ status: "updated", message: "Product updated successfully", data: productData });
       } else {
-        // Add new product
+        // Add new product if no ID is provided
         const productRef = doc(productsCollection);
         batch.set(productRef, validation.data);
         importResults.push({ status: "added", message: "Product added successfully", data: productData });

@@ -100,7 +100,7 @@ export function AddEditGameSheet({
           stock: game.stock,
           images: game.images || [],
           stockStatus: game.stockStatus || 'in_stock',
-          readingPlan: gameReadingPlan,
+          readingPlan: readingPlan,
         });
       } else {
         form.reset({
@@ -120,7 +120,7 @@ export function AddEditGameSheet({
     setAsyncError(null);
     setIsSaving(true);
     const productData: Product = {
-      id: game?.id || data.name[language] || data.name.pt, // Use game ID if editing, otherwise use name as ID
+      id: game?.id || data.name, // Use game ID if editing, otherwise use name as ID (string)
       type: "game",
       name: {
         pt: language === 'pt' ? data.name : (game?.name.pt || ''),

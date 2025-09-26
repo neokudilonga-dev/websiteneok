@@ -9,9 +9,9 @@ export async function GET() {
     const productSnapshot = await getDocs(productsCol);
     const productList = productSnapshot.docs.map((doc) => {
       const data = doc.data();
-      // Exclude image links
-      const { images, ...rest } = data;
-      return rest;
+      const id = doc.id; // Get the document ID
+      const { name, images, ...rest } = data; // Exclude name and images from data
+      return { id, ...rest }; // Combine id with the rest of the data
     });
 
     const worksheet = XLSX.utils.json_to_sheet(productList);
