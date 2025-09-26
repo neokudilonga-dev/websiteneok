@@ -23,3 +23,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to add order' }, { status: 500 });
   }
 }
+
+export async function GET() {
+  try {
+    const ordersCollection = firestore.collection('orders');
+    const ordersSnapshot = await ordersCollection.orderBy('date', 'desc').get();
+    const orders = ordersSnapshot.docs.map(doc => doc.data());
+    return NextResponse.json(orders, { status: 200 });
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 });
+  }
+}

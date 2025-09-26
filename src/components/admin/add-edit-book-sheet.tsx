@@ -36,6 +36,7 @@ import Image from "next/image";
 import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
 import imageCompression from 'browser-image-compression';
+import { getDisplayName } from "@/lib/utils";
 
 const readingPlanItemSchema = z.object({
   id: z.string().optional(),
@@ -301,8 +302,8 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
                     </FormControl>
                     <SelectContent>
                       {bookCategories.map((category) => (
-                        <SelectItem key={category.name.pt} value={category.name.pt}>
-                          {category.name[language]}
+                        <SelectItem key={getDisplayName(category.name, language)} value={typeof category.name === 'string' ? category.name : category.name.pt}>
+                          {getDisplayName(category.name, language)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -395,7 +396,7 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
                           <SelectContent>
                             {schools.map((school) => (
                               <SelectItem key={school.id} value={school.id}>
-                                {school.name[language]}
+                                {getDisplayName(school.name, language)}
                               </SelectItem>
                             ))}
                           </SelectContent>

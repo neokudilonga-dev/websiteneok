@@ -36,6 +36,7 @@ import { Input } from "@/components/ui/input";
 import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
 import { deleteImageFromFirebase } from "@/lib/firebase";
+import { getDisplayName } from "@/lib/utils";
 import { ProductImportSheet } from "@/components/admin/product-import-sheet";
 
 interface BooksPageClientProps {
@@ -158,7 +159,7 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
                     <DropdownMenuRadioGroup value={schoolFilter} onValueChange={setSchoolFilter}>
                         <DropdownMenuRadioItem value="all">{t('common.all_schools')}</DropdownMenuRadioItem>
                         {schools.map(school => (
-                            <DropdownMenuRadioItem key={school.id} value={school.id}>{school.name[language]}</DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem key={school.id} value={school.id}>{getDisplayName(school.name, language)}</DropdownMenuRadioItem>
                         ))}
                     </DropdownMenuRadioGroup>
                   </DropdownMenuContent>
@@ -196,14 +197,14 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
                 <TableRow key={product.id}>
                   <TableCell className="hidden sm:table-cell">
                     <Image
-                      alt={getProductName(product)}
+                      alt={getDisplayName(product.name, language)}
                       className="aspect-square rounded-md object-cover"
                       height="64"
                       src={Array.isArray(product.image) ? product.image[0] : product.image || 'https://placehold.co/64x64.png'}
                       width="64"
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{product.id}</TableCell>
+                  <TableCell className="font-medium">{getDisplayName(product.name, language)}</TableCell>
                    <TableCell className="text-muted-foreground">{product.publisher || 'N/A'}</TableCell>
                    <TableCell>
                       <Badge 

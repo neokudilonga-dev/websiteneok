@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
+import { getDisplayName } from "@/lib/utils";
 
 interface GradeProducts {
   mandatory: Product[];
@@ -126,7 +127,7 @@ export default function ShopPageContent() {
     switch (activeTab) {
       case "planos":
         return selectedSchool
-          ? `${t('shop.reading_plan')}: ${typeof selectedSchool.name === 'string' ? selectedSchool.name : (selectedSchool.name?.[language] || selectedSchool.name?.pt || '')}`
+          ? `${t('shop.reading_plan')}: ${getDisplayName(selectedSchool.name, language)}`
           : t('shop.select_your_school');
       case "catalogo":
         return t('shop.all_books');
@@ -141,9 +142,7 @@ export default function ShopPageContent() {
     switch (activeTab) {
       case 'planos':
         return selectedSchool
-          ? typeof selectedSchool.description === 'string'
-            ? selectedSchool.description
-            : (selectedSchool.description?.[language] || selectedSchool.description?.pt || '')
+          ? getDisplayName(selectedSchool.description, language)
           : t('shop.select_school_description');
       case 'catalogo':
         return t('shop.all_books_description');
@@ -249,7 +248,7 @@ export default function ShopPageContent() {
                                                   <div className="rounded-lg border bg-card p-6">
                                                       <h3 className="font-headline text-2xl font-semibold">{t('shop.mandatory_kit', { count: gradeProducts.mandatory.length })}</h3>
                                                       <p className="mt-2 text-muted-foreground">{t('shop.buy_all_mandatory')}</p>
-                                                      <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.mandatory, t('shop.mandatory_kit_name', { grade: getGradeDisplayName(grade), school: selectedSchool.name[language] || selectedSchool.name.pt }))}>
+                                                      <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.mandatory, t('shop.mandatory_kit_name', { grade: getGradeDisplayName(grade), school: getDisplayName(selectedSchool.name, language) }))}>
                                                           <ShoppingCart className="mr-2 h-5 w-5" /> 
                                                           {t('common.add_for')} {calculateKitPrice(gradeProducts.mandatory).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                                                       </Button>
@@ -259,7 +258,7 @@ export default function ShopPageContent() {
                                                   <div className="rounded-lg border bg-card p-6">
                                                       <h3 className="font-headline text-2xl font-semibold">{t('shop.recommended_kit', { count: gradeProducts.recommended.length })}</h3>
                                                       <p className="mt-2 text-muted-foreground">{t('shop.buy_all_recommended')}</p>
-                                                      <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.recommended, t('shop.recommended_kit_name', { grade: getGradeDisplayName(grade), school: selectedSchool.name[language] || selectedSchool.name.pt }))}>
+                                                      <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.recommended, t('shop.recommended_kit_name', { grade: getGradeDisplayName(grade), school: getDisplayName(selectedSchool.name, language) }))}>
                                                           <ShoppingCart className="mr-2 h-5 w-5" /> 
                                                           {t('common.add_for')} {calculateKitPrice(gradeProducts.recommended).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                                                       </Button>
@@ -271,7 +270,7 @@ export default function ShopPageContent() {
                                           <div className="rounded-lg border bg-card p-6 lg:col-span-2">
                                               <h3 className="font-headline text-2xl font-semibold">{t('shop.complete_kit', { grade: getGradeDisplayName(grade), count: gradeProducts.all.length })}</h3>
                                               <p className="mt-2 text-muted-foreground">{t('shop.buy_all_for_school_year')}</p>
-                                              <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.all, t('shop.complete_kit_name', { grade: getGradeDisplayName(grade), school: selectedSchool.name[language] || selectedSchool.name.pt }))}>
+                                              <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.all, t('shop.complete_kit_name', { grade: getGradeDisplayName(grade), school: getDisplayName(selectedSchool.name, language) }))}>
                                                   <ShoppingCart className="mr-2 h-5 w-5" /> 
                                                   {t('common.add_for')} {calculateKitPrice(gradeProducts.all).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                                               </Button>
@@ -309,7 +308,7 @@ export default function ShopPageContent() {
                               className="h-auto w-full transform-gpu rounded-lg border bg-accent/80 p-6 text-left shadow-sm transition-all hover:scale-[1.02] hover:bg-accent hover:shadow-md focus:scale-[1.02] focus:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                           >
                               <div className="flex flex-col">
-                                  <span className="font-headline text-lg font-semibold text-primary">{school.name[language] || school.name.pt}</span>
+                                  <span className="font-headline text-lg font-semibold text-primary">{getDisplayName(school.name, language)}</span>
                                   <span className="mt-1 text-sm text-primary/80">{t('shop.view_reading_plan')}</span>
                               </div>
                           </button>
@@ -337,7 +336,7 @@ export default function ShopPageContent() {
                       <SelectContent>
                           <SelectItem value="all">{t('shop.all_categories')}</SelectItem>
               {bookCategories.map(category => (
-                <SelectItem key={category.name.pt + category.name.en} value={category.name[language]}>{category.name[language]}</SelectItem>
+                <SelectItem key={category.name.pt + category.name.en} value={getDisplayName(category.name, language)}>{getDisplayName(category.name, language)}</SelectItem>
               ))}
                       </SelectContent>
                   </Select>
@@ -364,7 +363,7 @@ export default function ShopPageContent() {
                       <SelectContent>
                           <SelectItem value="all">{t('shop.all_categories')}</SelectItem>
               {gameCategories.map(category => (
-                <SelectItem key={category.name.pt + category.name.en} value={category.name[language]}>{category.name[language]}</SelectItem>
+                <SelectItem key={category.name.pt + category.name.en} value={getDisplayName(category.name, language)}>{getDisplayName(category.name, language)}</SelectItem>
               ))}
                       </SelectContent>
                   </Select>

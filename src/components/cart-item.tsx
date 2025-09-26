@@ -8,6 +8,7 @@ import { useCart } from "@/context/cart-context";
 import type { CartItem as CartItemType } from "@/lib/types";
 import { Minus, Plus, X } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
+import { getDisplayName } from "@/lib/utils";
 
 interface CartItemProps {
   item: CartItemType;
@@ -24,15 +25,14 @@ export default function CartItem({ item, isKitItem = false }: CartItemProps) {
     updateQuantity(item.id, item.quantity + change);
   };
   
-  const displayImage = item.type === 'book' ? item.image : (item.images?.[0] || 'https://placehold.co/600x400.png');
-  const displayName = item.name[language] || item.name.pt;
+  const displayImage = item.type === 'book' ? (typeof item.image === 'string' ? item.image : (Array.isArray(item.image) && item.image.length > 0 ? item.image[0] : 'https://placehold.co/600x400.png')) : (typeof item.image === 'string' ? item.image : (Array.isArray(item.image) && item.image.length > 0 ? item.image[0] : 'https://placehold.co/600x400.png'));
 
   return (
     <div className="flex items-start gap-4">
       <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border">
         <Image
           src={displayImage}
-          alt={displayName}
+          alt={getDisplayName(item.name, language)}
           fill
           className="object-cover"
           data-ai-hint={item.dataAiHint}
@@ -40,7 +40,7 @@ export default function CartItem({ item, isKitItem = false }: CartItemProps) {
       </div>
       <div className="flex flex-1 flex-col gap-1">
         <div className="flex justify-between">
-          <h3 className="font-semibold">{displayName}</h3>
+          <h3 className="font-semibold">{getDisplayName(item.name, language)}</h3>
           <p className="font-semibold">{(item.price * item.quantity).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
         </div>
         <p className="text-sm text-muted-foreground">{item.price.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })} {t('cart.each')}</p>

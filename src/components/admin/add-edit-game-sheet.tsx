@@ -34,6 +34,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Image from "next/image";
 import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
+import { getDisplayName } from "@/lib/utils";
 
 interface AddEditGameSheetProps {
   isOpen: boolean;
@@ -299,7 +300,7 @@ export function AddEditGameSheet({
                               {schools.map((school) => {
                                 return (
                                   <SelectItem key={school.id} value={school.id}>
-                                    {`${school.name[language]}`}
+                                    {getDisplayName(school.name, language)}
                                   </SelectItem>
                                 );
                               })}

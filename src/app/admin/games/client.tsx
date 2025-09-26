@@ -36,6 +36,7 @@ import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
 import { DropdownMenuRadioGroup, DropdownMenuRadioItem } from "@/components/ui/dropdown-menu";
 import type { School } from "@/lib/types";
+import { getDisplayName } from "@/lib/utils";
 
 interface GamesPageClientProps {
     initialProducts: Product[];
@@ -63,20 +64,20 @@ export default function GamesPageClient({ initialProducts, initialSchools }: Gam
   const [schoolFilter, setSchoolFilter] = useState("all");
 
   const gameProducts = useMemo(() => products.filter(p => p.type === 'game'), [products]);
-  
-  const getProductName = (product: Product) => {
-    if (!product || !product.name) return '';
-    if (typeof product.name === 'string') {
-      return product.name;
-    } else if (typeof product.name === 'object' && product.name !== null) {
-      return product.name[language] || product.name.pt || '';
-    }
-    return '';
-  }
+
+  // const getProductName = (product: Product) => {
+  //   if (!product || !product.name) return '';
+  //   if (typeof product.name === 'string') {
+  //     return product.name;
+  //   } else if (typeof product.name === 'object' && product.name !== null) {
+  //     return product.name[language] || product.name.pt || '';
+  //   }
+  //   return '';
+  // }
 
   const filteredProducts = useMemo(() => {
     return gameProducts.filter((product) => {
-      const name = getProductName(product) || '';
+      const name = getDisplayName(product.name, language) || '';
       const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStock = showSoldOut || product.stockStatus !== 'sold_out';
 
@@ -185,14 +186,14 @@ export default function GamesPageClient({ initialProducts, initialSchools }: Gam
                 <TableRow key={product.id}>
                   <TableCell className="hidden sm:table-cell">
                     <Image
-                      alt={getProductName(product)}
+                      alt={getDisplayName(product.name, language)}
                       className="aspect-square rounded-md object-cover"
                       height="64"
                       src={"https://placehold.co/64x64.png"}
                       width="64"
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{getProductName(product)}</TableCell>
+                  <TableCell className="font-medium">{getDisplayName(product.name, language)}</TableCell>
                   <TableCell>
                       <Badge 
                         variant={product.stockStatus === 'sold_out' ? 'destructive' : product.stockStatus === 'out_of_stock' ? 'secondary' : 'default'}
