@@ -187,7 +187,7 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
                       width="64"
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{product.id}</TableCell> // Display document ID as title
+                  <TableCell className="font-medium">{product.id}</TableCell>
                    <TableCell className="text-muted-foreground">{product.publisher || 'N/A'}</TableCell>
                    <TableCell>
                       <Badge 

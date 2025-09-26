@@ -199,6 +199,7 @@ export function AddEditBookSheet({
           oldImageUrl = book.image;
         }
         imageUrl = await uploadImage(imageFile);
+        form.setValue("image", imageUrl); // Add this line to update the form's image field
       } catch (error: any) {
         setAsyncError(error.message);
         setIsSaving(false);
@@ -265,6 +266,7 @@ export function AddEditBookSheet({
                     if (file) {
                         setImageFile(file);
                         setImagePreview(URL.createObjectURL(file));
+                        form.setValue("image", URL.createObjectURL(file)); // Add this line
                         console.log("Pasted image selected.");
                         return; // Exit after handling the first image
                     }
@@ -379,12 +381,15 @@ export function AddEditBookSheet({
                 <FormItem>
                   <FormLabel>Imagem do Livro</FormLabel>
                   <FormControl>
-                    <div>
+                    <div
+                      onPaste={handlePaste}
+                      className="flex flex-col items-center justify-center rounded-md border border-dashed p-4 text-center"
+                    >
                       <Input
                         type="file"
                         accept="image/*"
                         onChange={handleImageChange}
-                        className="mb-2"
+                        className="mb-2 hidden" // Add 'hidden' class here
                       />
                       {imagePreview && (
                         <div className="relative w-32 h-32 mb-2">
@@ -525,10 +530,9 @@ export function AddEditBookSheet({
                           </FormControl>
                           <SelectContent>
                             {schools.map((school) => {
-                              const translatedSchoolName = school.name[language as keyof typeof school.name];
                               return (
                                 <SelectItem key={school.id} value={school.id}>
-                                  {translatedSchoolName}
+                                  {`${school.name[language]}`}
                                 </SelectItem>
                               );
                             })}
@@ -595,6 +599,9 @@ export function AddEditBookSheet({
               </Button>
             </div>
             <SheetFooter className="flex flex-col sm:flex-row sm:justify-end gap-2 mt-4">
+              {asyncError && (
+                <p className="text-destructive text-sm text-center sm:text-right w-full">{asyncError}</p>
+              )}
               <SheetClose asChild>
                 <Button type="button" variant="outline">
                   Cancelar
