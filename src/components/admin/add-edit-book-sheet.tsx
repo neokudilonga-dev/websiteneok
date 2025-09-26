@@ -69,7 +69,7 @@ export function AddEditBookSheet({
   setIsOpen,
   book,
 }: AddEditBookSheetProps) {
-  const { schools, categories, publishers, readingPlan, addProduct, updateProduct } = useData();
+  const { schools, categories, publishers, readingPlan, addProduct, updateProduct, setCategories } = useData();
   const { t, language } = useLanguage();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [asyncError, setAsyncError] = useState<string | null>(null);
@@ -97,12 +97,25 @@ export function AddEditBookSheet({
   });
 
   useEffect(() => {
+    const fetchCategoriesIfNeeded = async () => {
+      if (isOpen && categories.length === 0) {
+        try {
+          const res = await fetch('/api/categories');
+          if (res.ok) {
+            const data = await res.json();
+            setCategories(data);
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+    };
+    fetchCategoriesIfNeeded();
     if (isOpen) {
       if (book) {
         const bookReadingPlan = readingPlan
-          .filter(rp => rp.productId === book.id)
-          .map(rp => ({ schoolId: rp.schoolId, grade: rp.grade, status: rp.status }));
-        
+          .filter((rp: any) => rp.productId === book.id)
+          .map((rp: any) => ({ schoolId: rp.schoolId, grade: rp.grade, status: rp.status }));
         form.reset({
           name: book.name,
           description: book.description,
@@ -130,7 +143,7 @@ export function AddEditBookSheet({
         setImagePreview(null);
       }
     }
-  }, [book, form, isOpen, readingPlan]);
+  }, [book, form, isOpen, readingPlan, categories.length, setCategories]);
 
 
   const onSubmit = async (data: BookFormValues) => {
