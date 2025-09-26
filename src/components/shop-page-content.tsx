@@ -73,6 +73,9 @@ export default function ShopPageContent() {
   const productsByGrade = useMemo(() => {
     const grades: { [key: string]: GradeProducts } = {};
     for (const item of schoolReadingPlan) {
+      if (!item.productId) {
+        continue; // Skip if productId is undefined
+      }
       const product = productsById[item.productId];
       if (product && product.stockStatus !== 'sold_out') {
         const gradeKey: string = item.grade as string; // Explicitly cast to string
