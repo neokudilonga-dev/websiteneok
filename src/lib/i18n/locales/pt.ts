@@ -213,7 +213,8 @@ export const pt = {
     filter_by_stock: 'Filtrar por Stock',
     filter_by_publisher: 'Filtrar por Editora',
     add_new_book: 'Adicionar Novo Livro',
-    not_in_plan: 'Fora do plano',
+    not_in_plan: 'Não no plano',
+    filter_by_school: 'Filtrar por Escola',
   },
   games_page: {
     title: 'Jogos e Outros',
@@ -260,11 +261,7 @@ export const pt = {
     all_clients: 'Todos os Clientes',
     bookstore_client: 'Livraria (LIV)',
     filter_by_status: 'Filtrar por Estado',
-    payment_status: 'Estado do Pagamento',
-    delivery_status: 'Estado da Entrega',
-    order_ref: 'Ref. Encomenda',
-    student_school: 'Aluno / Escola',
-    view_receipt: 'Ver Recibo',
+    all_schools: 'Todas as Escolas',
   },
   payment_status: {
     paid: 'Pago',

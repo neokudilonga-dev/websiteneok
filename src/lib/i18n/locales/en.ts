@@ -214,6 +214,7 @@ export const en = {
     filter_by_publisher: 'Filter by Publisher',
     add_new_book: 'Add New Book',
     not_in_plan: 'Not in plan',
+    filter_by_school: 'Filter by School',
   },
   games_page: {
     title: 'Games and Others',
@@ -260,11 +261,7 @@ export const en = {
     all_clients: 'All Clients',
     bookstore_client: 'Bookstore (LIV)',
     filter_by_status: 'Filter by Status',
-    payment_status: 'Payment Status',
-    delivery_status: 'Delivery Status',
-    order_ref: 'Order Ref.',
-    student_school: 'Student / School',
-    view_receipt: 'View Receipt',
+    all_schools: 'All Schools',
   },
   payment_status: {
     paid: 'Paid',

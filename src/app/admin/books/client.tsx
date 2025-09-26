@@ -9,7 +9,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, MoreHorizontal, Search, Filter } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Search, Filter, Upload } from "lucide-react";
 import {
   Table,
   TableHeader,
@@ -36,6 +36,7 @@ import { Input } from "@/components/ui/input";
 import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
 import { deleteImageFromFirebase } from "@/lib/firebase";
+import { ProductImportSheet } from "@/components/admin/product-import-sheet";
 
 interface BooksPageClientProps {
     initialProducts: Product[];
@@ -57,12 +58,14 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
   }, [initialProducts, initialReadingPlan, initialSchools, initialPublishers]);
 
   const [isSheetOpen, setSheetOpen] = useState(false);
+  const [isImportSheetOpen, setImportSheetOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Product | undefined>(
     undefined
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [stockFilter, setStockFilter] = useState("all");
   const [publisherFilter, setPublisherFilter] = useState("all");
+  const [schoolFilter, setSchoolFilter] = useState("all");
 
   const bookProducts = useMemo(() => products.filter(p => p.type === 'book'), [products]);
 
@@ -77,9 +80,10 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
       const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStock = stockFilter === 'all' || product.stockStatus === stockFilter;
       const matchesPublisher = publisherFilter === 'all' || product.publisher === publisherFilter;
-      return matchesSearch && matchesStock && matchesPublisher;
+      const matchesSchool = schoolFilter === 'all' || getBookReadingPlan(product.id).some(item => item.schoolId === schoolFilter);
+      return matchesSearch && matchesStock && matchesPublisher && matchesSchool;
     });
-  }, [bookProducts, searchQuery, stockFilter, publisherFilter]); // Removed language from dependency array
+  }, [bookProducts, searchQuery, stockFilter, publisherFilter, schoolFilter]); // Removed language from dependency array
 
   const handleAddBook = () => {
     setSelectedBook(undefined);
@@ -149,11 +153,23 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
                             <DropdownMenuRadioItem key={publisher} value={publisher}>{publisher}</DropdownMenuRadioItem>
                         ))}
                     </DropdownMenuRadioGroup>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel>{t('books_page.filter_by_school')}</DropdownMenuLabel>
+                    <DropdownMenuRadioGroup value={schoolFilter} onValueChange={setSchoolFilter}>
+                        <DropdownMenuRadioItem value="all">{t('common.all_schools')}</DropdownMenuRadioItem>
+                        {schools.map(school => (
+                            <DropdownMenuRadioItem key={school.id} value={school.id}>{school.name}</DropdownMenuRadioItem>
+                        ))}
+                    </DropdownMenuRadioGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <Button onClick={handleAddBook} className="shrink-0">
                     <PlusCircle className="mr-2" />
                     {t('books_page.add_new_book')}
+                </Button>
+                <Button onClick={() => setImportSheetOpen(true)} className="shrink-0">
+                    <Upload className="mr-2" />
+                    Import Products
                 </Button>
             </div>
         </CardHeader>
@@ -267,6 +283,10 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
           }
           setSheetOpen(false);
         }}
+      />
+      <ProductImportSheet
+        isOpen={isImportSheetOpen}
+        onClose={() => setImportSheetOpen(false)}
       />
     </>
   );

@@ -9,7 +9,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, MoreHorizontal, Search, Filter } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Search, Filter, Upload } from "lucide-react";
 import {
   Table,
   TableHeader,
@@ -30,30 +30,37 @@ import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import type { Product } from "@/lib/types";
 import { AddEditGameSheet } from "@/components/admin/add-edit-game-sheet";
+import { GameImportSheet } from "@/components/admin/game-import-sheet";
 import { Input } from "@/components/ui/input";
 import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
+import { DropdownMenuRadioGroup, DropdownMenuRadioItem } from "@/components/ui/dropdown-menu";
+import type { School } from "@/lib/types";
 
 interface GamesPageClientProps {
     initialProducts: Product[];
+    initialSchools: School[];
 }
 
-export default function GamesPageClient({ initialProducts }: GamesPageClientProps) {
-  const { products, setProducts, deleteProduct } = useData();
+export default function GamesPageClient({ initialProducts, initialSchools }: GamesPageClientProps) {
+  const { products, setProducts, deleteProduct, schools, setSchools } = useData();
   const { t, language } = useLanguage();
 
   useEffect(() => {
     setProducts(initialProducts);
+    setSchools(initialSchools);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialProducts]);
+  }, [initialProducts, initialSchools]);
 
 
   const [isSheetOpen, setSheetOpen] = useState(false);
+  const [isImportSheetOpen, setImportSheetOpen] = useState(false);
   const [selectedGame, setSelectedGame] = useState<Product | undefined>(
     undefined
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [showSoldOut, setShowSoldOut] = useState(false);
+  const [schoolFilter, setSchoolFilter] = useState("all");
 
   const gameProducts = useMemo(() => products.filter(p => p.type === 'game'), [products]);
   
@@ -67,9 +74,12 @@ export default function GamesPageClient({ initialProducts }: GamesPageClientProp
       const name = getProductName(product) || '';
       const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStock = showSoldOut || product.stockStatus !== 'sold_out';
-      return matchesSearch && matchesStock;
+
+      const matchesSchool = schoolFilter === "all" || product.readingPlan?.some(rp => rp.schoolId === schoolFilter);
+
+      return matchesSearch && matchesStock && matchesSchool;
     });
-  }, [gameProducts, searchQuery, showSoldOut, language]);
+  }, [gameProducts, searchQuery, showSoldOut, language, schoolFilter]);
 
   const handleAddGame = () => {
     setSelectedGame(undefined);
@@ -123,11 +133,28 @@ export default function GamesPageClient({ initialProducts }: GamesPageClientProp
                 >
                   {t('games_page.show_sold_out')}
                 </DropdownMenuCheckboxItem>
+                <DropdownMenuRadioGroup value={schoolFilter} onValueChange={setSchoolFilter}>
+                  <DropdownMenuLabel>{t('filter_by_school')}</DropdownMenuLabel>
+                  <DropdownMenuRadioItem value="all">
+                    {t('all_schools')}
+                  </DropdownMenuRadioItem>
+                  {schools.map((school) => (
+                    <DropdownMenuRadioItem key={school.id} value={school.id}>
+                      {typeof school.name === 'object' && school.name !== null
+                        ? ((school.name as Record<string, string>)[language] ?? (school.name as Record<string, string>).pt ?? "")
+                        : (typeof school.name === 'string' ? school.name : "")}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
               </DropdownMenuContent>
             </DropdownMenu>
             <Button onClick={handleAddGame} className="shrink-0">
               <PlusCircle className="mr-2" />
               {t('games_page.add_new_game')}
+            </Button>
+            <Button onClick={() => setImportSheetOpen(true)} className="shrink-0">
+              <Upload className="mr-2" />
+              Importar/Exportar Jogos
             </Button>
           </div>
         </CardHeader>
@@ -220,6 +247,10 @@ export default function GamesPageClient({ initialProducts }: GamesPageClientProp
         isOpen={isSheetOpen}
         setIsOpen={setSheetOpen}
         game={selectedGame}
+      />
+      <GameImportSheet
+        isOpen={isImportSheetOpen}
+        setIsOpen={setImportSheetOpen}
       />
     </>
   );

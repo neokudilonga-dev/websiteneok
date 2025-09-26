@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getStorage, ref, deleteObject } from "firebase/storage";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBnTpglZ_7KnlZxDb30aRKMikHBzb6rzF4",
@@ -15,6 +16,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const storage = getStorage(app);
+const db = getFirestore(app);
 
 // Set custom metadata for CORS
 const storageCustomMetadata = {
@@ -44,4 +46,4 @@ async function deleteImageFromFirebase(imageUrl: string) {
     }
 }
 
-export { app, auth, storage, storageCustomMetadata, deleteImageFromFirebase };
+export { app, auth, storage, db, storageCustomMetadata, deleteImageFromFirebase };
