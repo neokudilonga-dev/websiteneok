@@ -26,18 +26,26 @@ export default function ProductCard({ product, renderBadge }: ProductCardProps) 
   const { addToCart } = useCart();
   const { t, language } = useLanguage();
   
-  const displayName = product.name[language] || product.name.pt;
-  const displayDescription = product.description[language] || product.description.pt;
-  const displayImage = product.type === 'book' ? product.image : (product.images?.[0] || 'https://placehold.co/600x400.png');
+  const displayName = typeof product.name === 'string'
+    ? product.name
+    : (typeof product.name === 'object' ? (product.name?.[language] || product.name?.pt || '') : '');
+
+  const displayDescription = typeof product.description === 'string'
+    ? product.description
+    : (typeof product.description === 'object' ? (product.description?.[language] || product.description?.pt || '') : '');
+
+  const displayImage = Array.isArray(product.image)
+    ? product.image[0] || 'https://placehold.co/600x400.png'
+    : product.image || 'https://placehold.co/600x400.png';
   const isOutOfStock = product.stockStatus === 'out_of_stock';
 
   return (
     <Card className="flex h-full flex-col overflow-hidden transition-all hover:shadow-lg">
       <CardHeader className="relative p-0">
-        {product.type === 'game' && product.images && product.images.length > 1 ? (
+        {product.type === 'game' && Array.isArray(product.image) && product.image.length > 1 ? (
           <Carousel className="w-full">
             <CarouselContent>
-              {product.images.map((img, index) => (
+              {product.image.map((img: string, index: number) => (
                  <CarouselItem key={index}>
                     <div className="aspect-video overflow-hidden">
                       <Image
@@ -52,7 +60,7 @@ export default function ProductCard({ product, renderBadge }: ProductCardProps) 
                 </CarouselItem>
               ))}
             </CarouselContent>
-            {product.images.length > 1 && (
+            {product.image.length > 1 && (
                 <>
                     <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2" />
                     <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2" />
@@ -62,11 +70,10 @@ export default function ProductCard({ product, renderBadge }: ProductCardProps) 
         ) : (
            <div className="aspect-video overflow-hidden">
             <Image
-              alt={displayName}
-              className="h-full w-full object-cover"
-              height="400"
+              alt={`${displayName || ''} image ${0 + 1}`}
+              className="object-cover"
+              fill
               src={displayImage}
-              width="600"
               data-ai-hint={product.dataAiHint}
             />
           </div>

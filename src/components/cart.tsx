@@ -75,7 +75,7 @@ export default function Cart() {
             <SheetFooter className="mt-auto flex flex-col gap-4 bg-background p-6">
               <Separator />
               <div className="flex items-center justify-between text-lg font-semibold">
-                <span>{t('common.total')}</span>
+                <span>{t('common.total')} ..</span>
                 <span>{cartTotal.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
               </div>
               <SheetClose asChild>

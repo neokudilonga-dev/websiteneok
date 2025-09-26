@@ -67,35 +67,39 @@ export default function ShopPageContent() {
   }, [products]);
 
   const schoolReadingPlan = useMemo(() => selectedSchool
-    ? readingPlan.filter((item) => item.schoolId === selectedSchool.id)
+    ? readingPlan.filter((item) => item.schoolId === selectedSchool.id && item.grade !== undefined && item.grade !== null)
     : [], [selectedSchool, readingPlan]);
 
   const productsByGrade = useMemo(() => {
     const grades: { [key: string]: GradeProducts } = {};
-    schoolReadingPlan.forEach(item => {
+    for (const item of schoolReadingPlan) {
       const product = productsById[item.productId];
       if (product && product.stockStatus !== 'sold_out') {
-         if (!grades[item.grade]) {
-          grades[item.grade] = { mandatory: [], recommended: [], all: [] };
+        const gradeKey: string = String(item.grade); // item.grade is now guaranteed to be string | number
+        if (!grades[gradeKey]) {
+          grades[gradeKey] = { mandatory: [], recommended: [], all: [] };
         }
         if (item.status === 'mandatory') {
-            grades[item.grade].mandatory.push(product);
+            grades[gradeKey].mandatory.push(product);
         } else {
-            grades[item.grade].recommended.push(product);
+            grades[gradeKey].recommended.push(product);
         }
-        grades[item.grade].all.push(product);
+        grades[gradeKey].all.push(product);
       }
-    });
+    }
     return grades;
   }, [schoolReadingPlan, productsById]);
   
   const filteredGames = useMemo(() => {
-    return products.filter(p => 
-        p.type === 'game' && 
-        p.stockStatus !== 'sold_out' &&
-        (p.name[language] || p.name.pt).toLowerCase().includes(gameSearchQuery.toLowerCase()) &&
-        (selectedGameCategory === 'all' || p.category === selectedGameCategory)
-    )
+    return products.filter(p => {
+        const productName = typeof p.name === 'string'
+            ? p.name
+            : (typeof p.name === 'object' ? (p.name[language] || p.name.pt || '') : '');
+        return p.type === 'game' && 
+               p.stockStatus !== 'sold_out' &&
+               productName.toLowerCase().includes(gameSearchQuery.toLowerCase()) &&
+               (selectedGameCategory === 'all' || p.category === selectedGameCategory)
+    })
   }, [products, gameSearchQuery, selectedGameCategory, language]);
 
   const bookCategories = useMemo(() => categories.filter(c => c.type === 'book'), [categories]);
@@ -103,12 +107,15 @@ export default function ShopPageContent() {
 
 
   const filteredBooks = useMemo(() => {
-    return products.filter(p => 
-        p.type === 'book' && 
-        p.stockStatus !== 'sold_out' && 
-        (p.name && ((p.name[language] || p.name.pt) || '')).toLowerCase().includes(bookSearchQuery.toLowerCase()) && 
-        (selectedBookCategory === 'all' || p.category === selectedBookCategory)
-    )
+    return products.filter(p => {
+        const productName = typeof p.name === 'string'
+            ? p.name
+            : (typeof p.name === 'object' ? (p.name[language] || p.name.pt || '') : '');
+        return p.type === 'book' &&
+               p.stockStatus !== 'sold_out' &&
+               productName.toLowerCase().includes(bookSearchQuery.toLowerCase()) &&
+               (selectedBookCategory === 'all' || p.category === selectedBookCategory)
+    })
   }, [products, bookSearchQuery, selectedBookCategory, language]);
 
 
@@ -116,7 +123,7 @@ export default function ShopPageContent() {
     switch (activeTab) {
       case "planos":
         return selectedSchool
-          ? `${t('shop.reading_plan')}: ${selectedSchool.name[language] || selectedSchool.name.pt}`
+          ? `${t('shop.reading_plan')}: ${typeof selectedSchool.name === 'string' ? selectedSchool.name : (selectedSchool.name?.[language] || selectedSchool.name?.pt || '')}`
           : t('shop.select_your_school');
       case "catalogo":
         return t('shop.all_books');
@@ -127,12 +134,14 @@ export default function ShopPageContent() {
     }
   };
 
-   const renderDescription = () => {
+  const renderDescription = () => {
     switch (activeTab) {
       case 'planos':
-        return selectedSchool 
-            ? t('shop.select_grade_description') 
-            : t('shop.select_school_description');
+        return selectedSchool
+          ? typeof selectedSchool.description === 'string'
+            ? selectedSchool.description
+            : (selectedSchool.description?.[language] || selectedSchool.description?.pt || '')
+          : t('shop.select_school_description');
       case 'catalogo':
         return t('shop.all_books_description');
       case 'jogos':

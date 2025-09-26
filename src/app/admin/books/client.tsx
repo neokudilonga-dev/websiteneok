@@ -199,7 +199,7 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
                       alt={getProductName(product)}
                       className="aspect-square rounded-md object-cover"
                       height="64"
-                      src={product.image || 'https://placehold.co/64x64.png'}
+                      src={Array.isArray(product.image) ? product.image[0] : product.image || 'https://placehold.co/64x64.png'}
                       width="64"
                     />
                   </TableCell>

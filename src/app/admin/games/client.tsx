@@ -66,7 +66,12 @@ export default function GamesPageClient({ initialProducts, initialSchools }: Gam
   
   const getProductName = (product: Product) => {
     if (!product || !product.name) return '';
-    return product.name[language] || product.name.pt || '';
+    if (typeof product.name === 'string') {
+      return product.name;
+    } else if (typeof product.name === 'object' && product.name !== null) {
+      return product.name[language] || product.name.pt || '';
+    }
+    return '';
   }
 
   const filteredProducts = useMemo(() => {

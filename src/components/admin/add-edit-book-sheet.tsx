@@ -46,11 +46,20 @@ const readingPlanItemSchema = z.object({
 });
 
 const bookFormSchema = z.object({
-  name: z.object({
-    pt: z.string().min(3, "O nome em Português deve ter pelo menos 3 caracteres."),
-    en: z.string().min(3, "O nome em Inglês deve ter pelo menos 3 caracteres."),
-  }).optional(),
-  description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
+  name: z.union([
+    z.string().min(3, "O nome deve ter pelo menos 3 caracteres."),
+    z.object({
+      pt: z.string().min(3, "O nome em Português deve ter pelo menos 3 caracteres."),
+      en: z.string().min(3, "O nome em Inglês deve ter pelo menos 3 caracteres."),
+    }),
+  ]).optional(),
+  description: z.union([
+    z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
+    z.object({
+      pt: z.string().min(10, "A descrição em Português deve ter pelo menos 10 caracteres."),
+      en: z.string().min(10, "A descrição em Inglês deve ter pelo menos 10 caracteres."),
+    }),
+  ]),
   price: z.coerce.number().min(0, "O preço deve ser um número positivo."),
   stock: z.coerce.number().min(0, "O stock deve ser um número positivo."),
   category: z.string().min(1, "A categoria é obrigatória."),
@@ -122,8 +131,8 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
             status: rp.status,
           }));
         form.reset({
-          name: book.name || { pt: "", en: "" },
-          description: book.description,
+          name: typeof book.name === 'string' ? book.name : (book.name || { pt: "", en: "" }),
+          description: typeof book.description === 'string' ? book.description : (book.description || { pt: "", en: "" }),
           price: book.price,
           stock: book.stock,
           category: book.category,
@@ -154,8 +163,8 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
     try {
       const productData: Product = {
         id: book?.id || "",
-        name: data.name || { pt: '', en: '' },
-        description: data.description,
+        name: typeof data.name === 'string' ? data.name : (data.name || { pt: '', en: '' }),
+        description: typeof data.description === 'string' ? data.description : (data.description || { pt: '', en: '' }),
         price: data.price,
         stock: data.stock,
         type: "book",
@@ -209,12 +218,16 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
                   <FormControl>
                     <Input
                       placeholder={t('books_page.name_placeholder')}
-                      value={language === "pt" ? field.value?.pt : field.value?.en}
+                      value={typeof field.value === 'string' ? field.value : (field.value?.[language] || '')}
                       onChange={(e) =>
-                        field.onChange({
-                          ...field.value,
-                          [language]: e.target.value,
-                        })
+                        field.onChange(
+                          typeof field.value === 'string'
+                            ? e.target.value
+                            : {
+                                ...field.value,
+                                [language]: e.target.value,
+                              }
+                        )
                       }
                     />
                   </FormControl>
@@ -229,7 +242,20 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
                 <FormItem>
                   <FormLabel>{t('common.description')}</FormLabel>
                   <FormControl>
-                    <Textarea {...field} />
+                    <Textarea
+                      placeholder={t('books_page.description_placeholder')}
+                      value={typeof field.value === 'string' ? field.value : (field.value?.[language] || '')}
+                      onChange={(e) =>
+                        field.onChange(
+                          typeof field.value === 'string'
+                            ? e.target.value
+                            : {
+                                ...field.value,
+                                [language]: e.target.value,
+                              }
+                        )
+                      }
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

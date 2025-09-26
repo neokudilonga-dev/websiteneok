@@ -39,6 +39,10 @@ export interface School {
     pt: string;
     en: string;
   };
+  description?: {
+    pt: string;
+    en: string;
+  };
   abbreviation: string;
   allowPickup?: boolean;
   allowPickupAtLocation?: boolean;
@@ -48,12 +52,15 @@ export interface School {
 
 export interface Product {
   id: string;
-  name?: {
+  name?: string | {
     pt: string;
     en: string;
   };
-  description: string;
-  image?: string; // Add this line
+  description?: string | {
+    pt: string;
+    en: string;
+  };
+  image?: string | string[]; // Update this line
   price: number;
   stock?: number;
   type: "book" | "game";

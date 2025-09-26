@@ -49,8 +49,20 @@ const readingPlanItemSchema = z.object({
 
 
 const gameFormSchema = z.object({
-  name: z.string().optional(),
-  description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
+  name: z.union([
+    z.string().min(1, "O nome é obrigatório."),
+    z.object({
+      pt: z.string().min(1, "O nome em Português é obrigatório."),
+      en: z.string().min(1, "O nome em Inglês é obrigatório."),
+    }),
+  ]).optional(),
+  description: z.union([
+    z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
+    z.object({
+      pt: z.string().min(10, "A descrição em Português deve ter pelo menos 10 caracteres."),
+      en: z.string().min(10, "A descrição em Inglês deve ter pelo menos 10 caracteres."),
+    }),
+  ]),
   price: z.coerce.number().min(0, "O preço deve ser um número positivo."),
   stock: z.coerce.number().min(0, "O stock deve ser um número positivo."),
   stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out']),
@@ -92,8 +104,8 @@ export function AddEditGameSheet({
     if (isOpen) {
       if (game) {
         form.reset({
-          name: game.name?.[language] || game.name?.pt || "",
-          description: game.description,
+          name: typeof game.name === 'string' ? game.name : game.name?.[language] || game.name?.pt || "",
+          description: typeof game.description === 'string' ? game.description : game.description?.[language] || game.description?.pt || "",
           price: game.price,
           stock: game.stock,
           stockStatus: game.stockStatus || 'in_stock',
@@ -116,12 +128,9 @@ export function AddEditGameSheet({
     setAsyncError(null);
     setIsSaving(true);
     const productData: Product = {
-      id: game?.id || data.name || "", // Use game ID if editing, otherwise use name as ID (string)
+      id: game?.id || (typeof data.name === 'string' ? data.name : data.name?.pt || "") || "", // Ensure ID is string
       type: "game",
-      name: {
-        pt: language === 'pt' ? data.name || "" : (game?.name?.pt || ''),
-        en: language === 'en' ? data.name || "" : (game?.name?.en || ''),
-      },
+      name: data.name,
       description: data.description,
       price: data.price,
       stock: data.stock,
@@ -169,7 +178,17 @@ export function AddEditGameSheet({
                   <FormItem>
                     <FormLabel>Nome do Jogo</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nome do Jogo" {...field} />
+                      <Input
+                        placeholder="Nome do Jogo"
+                        value={typeof field.value === 'string' ? field.value : field.value?.[language] || ''}
+                        onChange={(e) => {
+                          if (typeof field.value === 'string') {
+                            field.onChange(e.target.value);
+                          } else {
+                            field.onChange({ ...field.value, [language]: e.target.value });
+                          }
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -182,7 +201,17 @@ export function AddEditGameSheet({
                   <FormItem>
                     <FormLabel>Descrição</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Descrição do Jogo" {...field} />
+                      <Textarea
+                        placeholder="Descrição do Jogo"
+                        value={typeof field.value === 'string' ? field.value : field.value?.[language] || ''}
+                        onChange={(e) => {
+                          if (typeof field.value === 'string') {
+                            field.onChange(e.target.value);
+                          } else {
+                            field.onChange({ ...field.value, [language]: e.target.value });
+                          }
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
