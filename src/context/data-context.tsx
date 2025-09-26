@@ -20,10 +20,10 @@ interface DataContextType {
 
   // Products
   products: Product[];
-  setProducts: (products: Product[]) => void;
+  setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
   addProduct: (product: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => Promise<void>;
   updateProduct: (product: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => Promise<void>;
-  deleteProduct: (productId: string) => Promise<void>;
+  deleteProduct: (productId: string, imageUrl?: string) => Promise<void>;
 
   // Reading Plan
   readingPlan: ReadingPlanItem[];
@@ -193,11 +193,15 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
     }
   };
-  const deleteProduct = async (productId: string) => {
+  const deleteProduct = async (productId: string, imageUrl?: string) => {
     setLoading(true);
     try {
       const response = await fetch(`/api/products/${productId}`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ imageUrl }),
       });
       if (!response.ok) throw new Error('Failed to delete product');
   // Refetch products and reading plan from backend

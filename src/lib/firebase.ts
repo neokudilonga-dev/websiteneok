@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getStorage } from "firebase/storage";
+import { getStorage, ref, deleteObject } from "firebase/storage";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBnTpglZ_7KnlZxDb30aRKMikHBzb6rzF4",
@@ -23,4 +23,25 @@ const storageCustomMetadata = {
     'Access-Control-Allow-Headers': 'Content-Type'
 };
 
-export { app, auth, storage, storageCustomMetadata };
+async function deleteImageFromFirebase(imageUrl: string) {
+    if (!imageUrl || !imageUrl.includes("firebasestorage.googleapis.com")) {
+        console.warn("Invalid Firebase Storage URL, skipping deletion:", imageUrl);
+        return;
+    }
+
+    try {
+        const imageRef = ref(storage, imageUrl);
+        await deleteObject(imageRef);
+        console.log("Image deleted successfully from Firebase Storage:", imageUrl);
+    } catch (error: any) {
+        console.error("Error deleting image from Firebase Storage:", imageUrl, error);
+        // Handle cases where the file might not exist, or other errors
+        if (error.code === 'storage/object-not-found') {
+            console.warn("Image not found in Firebase Storage, might have been deleted already:", imageUrl);
+        } else {
+            throw error; // Re-throw other unexpected errors
+        }
+    }
+}
+
+export { app, auth, storage, storageCustomMetadata, deleteImageFromFirebase };

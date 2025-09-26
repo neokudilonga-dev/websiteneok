@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
 import type { Product, ReadingPlanItem } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
+import { deleteImageFromFirebase } from '@/lib/firebase';
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -51,27 +52,27 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
-    try {
-        const { id } = await params;
-        
-        const batch = firestore.batch();
-        
-        // Delete product
-        const productRef = firestore.collection('products').doc(id);
-        batch.delete(productRef);
-        
-        // Delete associated reading plan items
-        const readingPlanQuery = firestore.collection('readingPlan').where('productId', '==', id);
-        const readingPlanSnapshot = await readingPlanQuery.get();
-        readingPlanSnapshot.docs.forEach(doc => {
-            batch.delete(doc.ref);
-        });
-        
-        await batch.commit();
+  try {
+    const { id } = await params;
+    const { imageUrl } = await request.json();
 
-        return NextResponse.json({ message: 'Product and associated items deleted successfully' }, { status: 200 });
-    } catch (error) {
-        console.error('Error deleting product:', error);
-        return NextResponse.json({ error: 'Failed to delete product' }, { status: 500 });
+    if (imageUrl) {
+      await deleteImageFromFirebase(imageUrl);
     }
+
+    const productRef = firestore.collection('products').doc(id);
+    await productRef.delete();
+
+    // Delete associated reading plan items
+    const readingPlanCollection = firestore.collection('readingPlan');
+    const existingPlanSnapshot = await readingPlanCollection.where('productId', '==', id).get();
+    const batch = firestore.batch();
+    existingPlanSnapshot.docs.forEach(doc => batch.delete(doc.ref));
+    await batch.commit();
+
+    return NextResponse.json({ message: 'Product and associated reading plan items deleted successfully' }, { status: 200 });
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    return NextResponse.json({ error: 'Failed to delete product' }, { status: 500 });
+  }
 }

@@ -35,6 +35,7 @@ import { AddEditBookSheet } from "@/components/admin/add-edit-book-sheet";
 import { Input } from "@/components/ui/input";
 import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
+import { deleteImageFromFirebase } from "@/lib/firebase";
 
 interface BooksPageClientProps {
     initialProducts: Product[];
@@ -90,8 +91,8 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
     setSheetOpen(true);
   };
 
-  const handleDeleteBook = (bookId: string) => {
-    deleteProduct(bookId);
+  const handleDeleteBook = (book: Product) => {
+    deleteProduct(book.id, book.image);
   };
 
   const getSchoolAbbreviation = (schoolId: string) => {
@@ -231,7 +232,7 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive"
-                          onClick={() => handleDeleteBook(product.id)}
+                          onClick={() => handleDeleteBook(product)}
                         >
                           {t('common.delete')}
                         </DropdownMenuItem>
@@ -248,6 +249,24 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
         isOpen={isSheetOpen}
         setIsOpen={setSheetOpen}
         book={selectedBook}
+        onBookSaved={(updatedBook, oldImageUrl) => {
+          if (updatedBook) {
+            setProducts((prevProducts: Product[]) => {
+              const existingIndex = prevProducts.findIndex(p => p.id === updatedBook.id);
+              if (existingIndex > -1) {
+                // Update existing book
+                return prevProducts.map(p => p.id === updatedBook.id ? updatedBook : p);
+              } else {
+                // Add new book
+                return [...prevProducts, updatedBook];
+              }
+            });
+            if (oldImageUrl && oldImageUrl !== updatedBook.image) {
+              deleteImageFromFirebase(oldImageUrl);
+            }
+          }
+          setSheetOpen(false);
+        }}
       />
     </>
   );

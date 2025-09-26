@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/form";
 import type { Product } from "@/lib/types";
 import { useEffect, useState, ChangeEvent, useMemo } from "react";
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { app } from "@/lib/firebase";
 import { PlusCircle, Trash2, Upload } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -35,12 +35,14 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Image from "next/image";
 import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
+import imageCompression from 'browser-image-compression';
 
 
 interface AddEditBookSheetProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   book?: Product;
+  onBookSaved: (updatedBook?: Product, oldImageUrl?: string) => void;
 }
 
 const readingPlanItemSchema = z.object({
@@ -67,11 +69,13 @@ export function AddEditBookSheet({
   isOpen,
   setIsOpen,
   book,
+  onBookSaved,
 }: AddEditBookSheetProps) {
   const { schools, categories, publishers, readingPlan, addProduct, updateProduct, setCategories } = useData();
   const { language } = useLanguage();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [asyncError, setAsyncError] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const bookCategories = useMemo(() => categories.filter(c => c.type === 'book'), [categories]);
 
@@ -127,6 +131,7 @@ export function AddEditBookSheet({
           readingPlan: bookReadingPlan
         });
         setImagePreview(book.image);
+        setImageFile(null); // Clear image file on edit
       } else {
         form.reset({
           name: "", // Reverted: name is user-provided
@@ -140,29 +145,81 @@ export function AddEditBookSheet({
           readingPlan: [],
         });
         setImagePreview(null);
+        setImageFile(null);
       }
     }
   }, [book, form, isOpen, readingPlan, categories.length, setCategories]);
 
+  const uploadImage = async (file: File): Promise<string> => {
+    setIsSaving(true);
+    setAsyncError(null);
+
+    try {
+      const compressedFile = await imageCompression(file, {
+        maxSizeMB: 1, // (max file size in MB)
+        maxWidthOrHeight: 1920, // (max width or height in pixels)
+        useWebWorker: true,
+      });
+
+      const fileName = `products/${Date.now()}_${compressedFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+      const storage = getStorage(app);
+      const fileRef = storageRef(storage, fileName);
+
+      const metadata = {
+        contentType: compressedFile.type,
+        customMetadata: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type'
+        }
+      };
+
+      const snapshot = await uploadBytes(fileRef, compressedFile, metadata);
+      const url = await getDownloadURL(snapshot.ref);
+      return `${url}?alt=media&t=${Date.now()}`;
+    } catch (error: any) {
+      console.error("Image upload failed:", error);
+      throw new Error(`Failed to upload image: ${error.message}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const onSubmit = async (data: BookFormValues) => {
     setAsyncError(null);
     setIsSaving(true);
+
+    let imageUrl = book?.image || "";
+    let oldImageUrl: string | undefined = undefined;
+
+    if (imageFile) {
+      try {
+        if (book?.image) {
+          oldImageUrl = book.image;
+        }
+        imageUrl = await uploadImage(imageFile);
+      } catch (error: any) {
+        setAsyncError(error.message);
+        setIsSaving(false);
+        return;
+      }
+    }
+
     const productData: Product = {
-      id: book?.id || '',
+      id: book?.id || data.name, // Use book ID if editing, otherwise use name as ID
       type: 'book',
       name: data.name, // Reverted: name is user-provided
       description: data.description,
       price: data.price,
       stock: data.stock,
-      image: data.image,
+      image: imageUrl,
       images: [],
       category: data.category,
       publisher: data.publisher,
       stockStatus: data.stockStatus,
     };
     const readingPlanData = data.readingPlan?.map(rp => ({
-      productId: book?.id || '',
+      productId: book?.id || data.name,
       schoolId: rp.schoolId,
       grade: typeof rp.grade === 'string' ? rp.grade : String(rp.grade),
       status: rp.status
@@ -174,6 +231,7 @@ export function AddEditBookSheet({
         await addProduct(productData, readingPlanData);
       }
       setIsOpen(false);
+      onBookSaved(productData, oldImageUrl);
     } catch (err: any) {
       setAsyncError(err?.message || "Erro ao guardar alterações. Tente novamente.");
     } finally {
@@ -186,45 +244,14 @@ export function AddEditBookSheet({
       const file = e.target.files?.[0];
       if (!file) return;
       
-      // Show loading state
-      setIsSaving(true);
-      setAsyncError(null);
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
       
-      // Create a unique filename
-      const fileName = `products/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-      
-      // Get Firebase storage reference
-      const storage = getStorage(app);
-      const fileRef = storageRef(storage, fileName);
-      
-      // Set CORS metadata
-      const metadata = {
-        contentType: file.type,
-        customMetadata: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type'
-        }
-      };
-      
-      // Upload file with metadata
-      const snapshot = await uploadBytes(fileRef, file, metadata);
-      
-      // Get download URL with cache-busting query parameter
-      const url = await getDownloadURL(snapshot.ref);
-      const cacheBustedUrl = `${url}?alt=media&t=${Date.now()}`;
-      
-      // Update form and UI
-      form.setValue("image", cacheBustedUrl, { shouldValidate: true });
-      setImagePreview(cacheBustedUrl);
-      
-      console.log("Image uploaded successfully:", cacheBustedUrl);
+      console.log("Image selected:", file.name);
     } catch (error: any) {
-      console.error("Image upload failed:", error);
-      setAsyncError(`Failed to upload image: ${error.message}`);
-      alert(`Failed to upload image: ${error.message}`);
-    } finally {
-      setIsSaving(false);
+      console.error("Image selection failed:", error);
+      setAsyncError(`Failed to select image: ${error.message}`);
+      alert(`Failed to select image: ${error.message}`);
     }
   };
 
@@ -235,369 +262,353 @@ export function AddEditBookSheet({
                 if (items[i].type && items[i].type.indexOf("image") !== -1) {
                     const file = items[i].getAsFile();
                     if (file) {
-                        // Show loading state
-                        setIsSaving(true);
-                        setAsyncError(null);
-                        
-                        // Create a unique filename
-                        const fileName = `products/${Date.now()}_pasted_image.jpg`;
-                        
-                        // Get Firebase storage reference
-                        const storage = getStorage(app);
-                        const fileRef = storageRef(storage, fileName);
-                        
-                        // Set CORS metadata
-                        const metadata = {
-                            contentType: file.type,
-                            customMetadata: {
-                                'Access-Control-Allow-Origin': '*',
-                                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                                'Access-Control-Allow-Headers': 'Content-Type'
-                            }
-                        };
-                        
-                        // Upload file with metadata
-                        const snapshot = await uploadBytes(fileRef, file, metadata);
-                        
-                        // Get download URL with cache-busting query parameter
-                        const url = await getDownloadURL(snapshot.ref);
-                        const cacheBustedUrl = `${url}?alt=media&t=${Date.now()}`;
-                        
-                        // Update form and UI
-                        form.setValue("image", cacheBustedUrl, { shouldValidate: true });
-                        setImagePreview(cacheBustedUrl);
-                        
-                        console.log("Pasted image uploaded successfully:", cacheBustedUrl);
+                        setImageFile(file);
+                        setImagePreview(URL.createObjectURL(file));
+                        console.log("Pasted image selected.");
                         return; // Exit after handling the first image
                     }
                 }
             }
         } catch (error: any) {
-            console.error("Pasted image upload failed:", error);
-            setAsyncError(`Failed to upload pasted image: ${error.message}`);
-            alert(`Failed to upload pasted image: ${error.message}`);
-        } finally {
-            setIsSaving(false);
+            console.error("Pasted image selection failed:", error);
+            setAsyncError(`Failed to select pasted image: ${error.message}`);
+            alert(`Failed to select pasted image: ${error.message}`);
         }
     };
 
+  const deleteImage = async (imageUrl: string) => {
+    try {
+      const storage = getStorage(app);
+      const imageRef = storageRef(storage, imageUrl);
+      await deleteObject(imageRef);
+      console.log("Old image deleted successfully:", imageUrl);
+    } catch (error: any) {
+      console.error("Failed to delete old image:", error);
+      // Don't block the main process if old image deletion fails
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    form.setValue("image", "");
+  };
+
+  useEffect(() => {
+    if (!isOpen) {
+      // When the sheet closes, reset the form and image states
+      form.reset();
+      setImagePreview(null);
+      setImageFile(null);
+      setAsyncError(null);
+      setIsSaving(false);
+    }
+  }, [isOpen, form]);
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetContent className="sm:max-w-2xl">
+      <SheetContent className="sm:max-w-[600px] w-full flex flex-col">
+        <SheetHeader>
+          <SheetTitle>{book ? "Editar Livro" : "Adicionar Novo Livro"}</SheetTitle>
+          <SheetDescription>
+            {book ? "Edite os detalhes do livro existente." : "Adicione um novo livro ao catálogo."}
+          </SheetDescription>
+        </SheetHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex h-full flex-col">
-            <SheetHeader>
-              <SheetTitle>{book ? "Editar Livro" : "Adicionar Novo Livro"}</SheetTitle>
-              <SheetDescription>
-                {book
-                  ? "Atualize os detalhes deste livro."
-                  : "Preencha os detalhes para o novo livro."}
-              </SheetDescription>
-            </SheetHeader>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4 flex-grow overflow-y-auto">
             {asyncError && (
-              <div className="mb-2 rounded border border-red-500 bg-red-100 px-3 py-2 text-sm text-red-700">
-                {asyncError}
-              </div>
+              <div className="text-red-500 text-sm text-center">{asyncError}</div>
             )}
-            <div className="flex-1 space-y-4 overflow-y-auto py-4 pr-6">
-              <div className="space-y-2">
-         <Label>Nome do Livro</Label>
-         <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-          <FormItem>
-            <FormControl>
-            <Input placeholder="Nome do Livro" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-          )}
-        />
-              </div>
-
-         <div className="space-y-2">
-         <Label>Descrição</Label>
-         <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-          <FormItem>
-            <FormControl>
-            <Textarea placeholder="Descrição do Livro" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-          )}
-        />
-        </div>
-              
-               <FormField
-                control={form.control}
-                name="image"
-                render={() => (
-                  <FormItem>
-                    <FormLabel>Imagem da Capa do Livro</FormLabel>
-                    <FormControl>
-                        <div 
-                            className="relative flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input bg-background/50 p-4 text-center transition-colors hover:border-primary"
-                            onPaste={handlePaste}
-                        >
-                            {imagePreview ? (
-                                <Image src={imagePreview} alt="Pré-visualização da capa do livro" width={200} height={200} className="mb-2 max-h-48 w-auto rounded-md object-contain" />
-                            ) : (
-                                <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                                    <Upload className="h-8 w-8" />
-                                    <p className="font-semibold">Cole uma imagem</p>
-                                    <p className="text-xs">ou</p>
-                                </div>
-                            )}
-                            
-                             <Button 
-                                type="button" 
-                                variant="outline" 
-                                size="sm" 
-                                onClick={() => {
-                                    const input = document.getElementById('image-upload') as HTMLInputElement;
-                                    if (input) {
-                                        input.value = '';  // Clear previous selection
-                                        input.click();
-                                    }
-                                }}
-                            >
-                                <Upload className="mr-2" />
-                                Carregar uma Imagem
-                            </Button>
-
-                            <Input 
-                                id="image-upload" 
-                                type="file" 
-                                className="hidden" 
-                                accept="image/*"
-                                onChange={handleImageChange}
-                             />
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nome do Livro</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nome do Livro" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Descrição</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Descrição do Livro" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Preço</FormLabel>
+                  <FormControl>
+                    <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="stock"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Stock</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="0" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="image"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Imagem do Livro</FormLabel>
+                  <FormControl>
+                    <div>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="mb-2"
+                      />
+                      {imagePreview && (
+                        <div className="relative w-32 h-32 mb-2">
+                          <Image
+                            src={imagePreview}
+                            alt="Image Preview"
+                            layout="fill"
+                            objectFit="cover"
+                            className="rounded-md"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                            onClick={handleRemoveImage}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-                <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                        control={form.control}
-                        name="price"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Preço</FormLabel>
-                            <FormControl>
-                            <Input type="number" step="0.01" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="stock"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Stock</FormLabel>
-                            <FormControl>
-                            <Input type="number" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-                </div>
-                 <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                        control={form.control}
-                        name="category"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Categoria</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Selecione uma categoria" />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                {bookCategories.map((category) => (
-                                  <SelectItem key={category.name.pt + category.name.en} value={category.name[language]}>
-                                    {category.name[language]}
-                                  </SelectItem>
-                                ))}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-                     <FormField
-                        control={form.control}
-                        name="publisher"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Editora</FormLabel>
-                                <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Selecione uma editora" />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    {publishers.map(pub => (
-                                    <SelectItem key={pub} value={pub}>{pub}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-                </div>
-                 <FormField
-                    control={form.control}
-                    name="stockStatus"
-                    render={({ field }) => (
-                        <FormItem className="space-y-3">
-                        <FormLabel>Estado do Stock</FormLabel>
-                        <FormControl>
-                            <RadioGroup
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="flex items-center space-x-4"
-                            >
-                            <FormItem className="flex items-center space-x-2 space-y-0">
-                                <FormControl>
-                                <RadioGroupItem value="in_stock" />
-                                </FormControl>
-                                <FormLabel className="font-normal">Em Stock</FormLabel>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-2 space-y-0">
-                                <FormControl>
-                                <RadioGroupItem value="out_of_stock" />
-                                </FormControl>
-                                <FormLabel className="font-normal">Atraso na Entrega</FormLabel>
-                            </FormItem>
-                             <FormItem className="flex items-center space-x-2 space-y-0">
-                                <FormControl>
-                                <RadioGroupItem value="sold_out" />
-                                </FormControl>
-                                <FormLabel className="font-normal">Esgotado</FormLabel>
-                            </FormItem>
-                            </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-              <div>
-                <Label>Plano de Leitura</Label>
-                 <FormDescription className="mb-2">
-                    Adicione este livro aos planos de leitura das escolas.
-                </FormDescription>
-                <div className="space-y-4">
-                  {fields.map((field, index) => (
-                    <div key={field.id} className="flex flex-col gap-4 rounded-md border p-4">
-                        <div className="flex items-end gap-2">
-                            <FormField
-                                control={form.control}
-                                name={`readingPlan.${index}.schoolId`}
-                                render={({ field }) => (
-                                <FormItem className="flex-1">
-                                    <FormLabel>Escola</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl>
-                                        <SelectTrigger>
-                                        <SelectValue placeholder="Selecione uma escola" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {schools.map(school => (
-                                        <SelectItem key={school.id} value={school.id}>{typeof school.name === 'object' ? ((school.name as Record<string, string>)[language] || (school.name as Record<string, string>).pt) : school.name}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name={`readingPlan.${index}.grade`}
-                                render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Ano</FormLabel>
-                                    <FormControl>
-                                    <Input placeholder="Ex: 1 ou Iniciação" className="w-28" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                                )}
-                            />
-                            <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
-                                <Trash2 className="h-4 w-4" />
-                            </Button>
-                        </div>
-                        <FormField
-                            control={form.control}
-                            name={`readingPlan.${index}.status`}
-                            render={({ field }) => (
-                                <FormItem className="space-y-3">
-                                <FormLabel>Estado</FormLabel>
-                                <FormControl>
-                                    <RadioGroup
-                                    onValueChange={field.onChange}
-                                    defaultValue={field.value}
-                                    className="flex items-center space-x-4"
-                                    >
-                                    <FormItem className="flex items-center space-x-2 space-y-0">
-                                        <FormControl>
-                                        <RadioGroupItem value="mandatory" />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">Obrigatório</FormLabel>
-                                    </FormItem>
-                                    <FormItem className="flex items-center space-x-2 space-y-0">
-                                        <FormControl>
-                                        <RadioGroupItem value="recommended" />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">Recomendado</FormLabel>
-                                    </FormItem>
-                                    </RadioGroup>
-                                </FormControl>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                      )}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => document.querySelector<HTMLInputElement>('input[type="file"]')?.click()}
+                      >
+                        <Upload className="mr-2 h-4 w-4" /> Selecionar Imagem
+                      </Button>
                     </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => append({ schoolId: '', grade: '', status: 'mandatory' })}
-                  >
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Adicionar ao Plano de Leitura
-                  </Button>
+                  </FormControl>
+                  <FormDescription>
+                    Selecione ou cole uma imagem para o livro.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Categoria</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione uma categoria" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {bookCategories.map((cat) => (
+                        <SelectItem key={cat.name.en} value={cat.name[language as keyof typeof cat.name]}>
+                          {cat.name[language as keyof typeof cat.name]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="publisher"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Editora</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione uma editora (Opcional)" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {publishers.map((pub) => (
+                        <SelectItem key={pub} value={pub}>
+                          {pub}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="stockStatus"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>Estado do Stock</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex flex-col space-y-1"
+                    >
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="in_stock" />
+                        </FormControl>
+                        <FormLabel className="font-normal">Em Stock</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="out_of_stock" />
+                        </FormControl>
+                        <FormLabel className="font-normal">Sem Stock</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="sold_out" />
+                        </FormControl>
+                        <FormLabel className="font-normal">Esgotado</FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div>
+              <h3 className="mb-4 text-lg font-medium">Plano de Leitura</h3>
+              {fields.map((item, index) => (
+                <div key={item.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 p-4 border rounded-md">
+                  <FormField
+                    control={form.control}
+                    name={`readingPlan.${index}.schoolId`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Escola</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione a escola" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {schools.map((school) => (
+                              <SelectItem key={school.id} value={school.id}>
+                                {school.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`readingPlan.${index}.grade`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Ano</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={String(field.value)}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione o ano" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {Array.from({ length: 12 }, (_, i) => i + 1).map((grade) => (
+                              <SelectItem key={grade} value={String(grade)}>
+                                {grade}º Ano
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`readingPlan.${index}.status`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Estado</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione o estado" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="mandatory">Obrigatório</SelectItem>
+                            <SelectItem value="recommended">Recomendado</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex items-end">
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => remove(index)}
+                      className="self-end"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-
-
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => append({ schoolId: "", grade: "", status: "mandatory" })}
+                className="w-full"
+              >
+                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Item ao Plano de Leitura
+              </Button>
             </div>
-            <SheetFooter className="mt-auto pt-4">
+            <SheetFooter className="flex flex-col sm:flex-row sm:justify-end gap-2 mt-4">
               <SheetClose asChild>
                 <Button type="button" variant="outline">
                   Cancelar
                 </Button>
               </SheetClose>
               <Button type="submit" disabled={isSaving}>
-                {isSaving ? "A guardar..." : "Guardar Alterações"}
+                {isSaving ? "A Guardar..." : "Guardar Alterações"}
               </Button>
             </SheetFooter>
           </form>
