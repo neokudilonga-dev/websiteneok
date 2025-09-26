@@ -185,7 +185,8 @@ export function AddEditBookSheet({
     }
   };
 
-  const onSubmit = async (data: BookFormValues) => {
+  const onSubmit = async (data: z.infer<typeof bookFormSchema>) => {
+    console.log("onSubmit called with data:", data);
     setAsyncError(null);
     setIsSaving(true);
 
@@ -218,7 +219,7 @@ export function AddEditBookSheet({
       publisher: data.publisher,
       stockStatus: data.stockStatus,
     };
-    const readingPlanData = data.readingPlan?.map(rp => ({
+    const readingPlanData = data.readingPlan?.map((rp: { schoolId: string; grade: string | number; status: 'mandatory' | 'recommended' }) => ({
       productId: book?.id || data.name,
       schoolId: rp.schoolId,
       grade: typeof rp.grade === 'string' ? rp.grade : String(rp.grade),
@@ -525,7 +526,7 @@ export function AddEditBookSheet({
                           <SelectContent>
                             {schools.map((school) => (
                               <SelectItem key={school.id} value={school.id}>
-                                {school.name}
+                              {school.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -540,20 +541,9 @@ export function AddEditBookSheet({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Ano</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={String(field.value)}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione o ano" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {Array.from({ length: 12 }, (_, i) => i + 1).map((grade) => (
-                              <SelectItem key={grade} value={String(grade)}>
-                                {grade}º Ano
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <FormControl>
+                          <Input placeholder="Ano (ex: 1, 2, Iniciação)" {...field} />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
