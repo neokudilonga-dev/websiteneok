@@ -75,7 +75,7 @@ export default function ShopPageContent() {
     for (const item of schoolReadingPlan) {
       const product = productsById[item.productId];
       if (product && product.stockStatus !== 'sold_out') {
-        const gradeKey: string = String(item.grade); // item.grade is now guaranteed to be string | number
+        const gradeKey: string = item.grade as string; // Explicitly cast to string
         if (!grades[gradeKey]) {
           grades[gradeKey] = { mandatory: [], recommended: [], all: [] };
         }
