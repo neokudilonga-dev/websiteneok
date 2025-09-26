@@ -3,8 +3,9 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from 'next/navigation';
-import type { School, Product } from "@/lib/types";
+
 import ProductGrid from "@/components/product-grid";
+import ProductGridWithBadges from "@/components/product-grid-with-badges";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
 import { getDisplayName } from "@/lib/utils";
+import type { School, Product, ReadingPlanItem, Category } from "@/lib/types";
+import ProductCard from "./product-card";
+import { SidebarMenuSkeleton } from "@/components/ui/sidebar";
+
 
 interface GradeProducts {
   mandatory: Product[];
@@ -23,11 +28,32 @@ interface GradeProducts {
   all: Product[];
 }
 
-export default function ShopPageContent() {
-  const { schools, products, readingPlan, categories } = useData();
+
+
+interface ShopPageContentProps {
+  initialSchools: School[];
+  initialProducts: Product[];
+  initialReadingPlan: ReadingPlanItem[];
+  initialCategories: Category[];
+}
+
+export const ShopPageContent = ({
+  initialSchools,
+  initialProducts,
+  initialReadingPlan,
+  initialCategories,
+}: ShopPageContentProps) => {
+  const { schools, products, readingPlan, categories, loading, setSchools, setProducts, setReadingPlan, setCategories } = useData();
   const { t, language } = useLanguage();
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') || 'planos';
+
+  useEffect(() => {
+    setSchools(initialSchools);
+    setProducts(initialProducts);
+    setReadingPlan(initialReadingPlan);
+    setCategories(initialCategories);
+  }, [initialSchools, initialProducts, initialReadingPlan, initialCategories, setSchools, setProducts, setReadingPlan, setCategories]);
   
   const [selectedSchool, setSelectedSchool] = useState<School | undefined>(
     undefined
@@ -156,7 +182,10 @@ export default function ShopPageContent() {
   const renderProductGridWithBadges = (products: Product[], grade: string) => {
     const gradePlan = schoolReadingPlan.filter(p => String(p.grade) === grade);
 
-    return (
+    const bookCategories = useMemo(() => categories.filter(cat => cat.type === 'book'), [categories]);
+  const gameCategories = useMemo(() => categories.filter(cat => cat.type === 'game'), [categories]);
+
+  return (
       <ProductGrid products={products} renderBadge={(product) => {
         const planItem = gradePlan.find(gp => gp.productId === product.id);
         if (planItem) {
@@ -238,14 +267,14 @@ export default function ShopPageContent() {
                         </AccordionTrigger>
                         <AccordionContent>
                            {String(grade).toLowerCase() === 'outros' || showIndividual === grade ? (
-                              renderProductGridWithBadges(gradeProducts.all, grade)
+                              <ProductGridWithBadges products={gradeProducts.all} grade={grade} schoolReadingPlan={schoolReadingPlan} />
                            ) : (
                               <div className="space-y-6">
                                   <div className="grid gap-6 lg:grid-cols-2">
                                       {selectedSchool.hasRecommendedPlan ? (
                                           <>
                                               {gradeProducts.mandatory.length > 0 && (
-                                                  <div className="rounded-lg border bg-card p-6">
+                                                  <div className="rounded-lg bg-card p-6">
                                                       <h3 className="font-headline text-2xl font-semibold">{t('shop.mandatory_kit', { count: gradeProducts.mandatory.length })}</h3>
                                                       <p className="mt-2 text-muted-foreground">{t('shop.buy_all_mandatory')}</p>
                                                       <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.mandatory, t('shop.mandatory_kit_name', { grade: getGradeDisplayName(grade), school: getDisplayName(selectedSchool.name, language) }))}>
@@ -302,73 +331,99 @@ export default function ShopPageContent() {
               ) : (
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                       {schools.map(school => (
-                          <button
-                              key={school.id}
-                              onClick={() => handleSchoolSelect(school.id)}
-                              className="h-auto w-full transform-gpu rounded-lg border bg-accent/80 p-6 text-left shadow-sm transition-all hover:scale-[1.02] hover:bg-accent hover:shadow-md focus:scale-[1.02] focus:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                           <button
+                            key={school.id}
+                            onClick={() => setSelectedSchool(school)}
+                            className="flex flex-col items-center justify-center rounded-lg border p-6 text-center transition-all hover:shadow-lg"
                           >
-                              <div className="flex flex-col">
-                                  <span className="font-headline text-lg font-semibold text-primary">{getDisplayName(school.name, language)}</span>
-                                  <span className="mt-1 text-sm text-primary/80">{t('shop.view_reading_plan')}</span>
-                              </div>
+                            <h3 className="font-headline text-xl font-semibold tracking-tight">
+                              {getDisplayName(school.name, language)}
+                            </h3>
+                            <p className="mt-1 text-muted-foreground">
+                              {getDisplayName(school.description, language)}
+                            </p>
                           </button>
                       ))}
                   </div>
               )}
           </TabsContent>
 
-          <TabsContent value="catalogo" className="mt-6 space-y-6">
-             <div className="flex flex-col gap-4 sm:flex-row">
-                  <div className="relative flex-1">
-                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                          type="search"
-                          placeholder={t('shop.search_books_placeholder')}
-                          className="w-full rounded-lg bg-background pl-8"
-                          value={bookSearchQuery}
-                          onChange={(e) => setBookSearchQuery(e.target.value)}
-                      />
-                  </div>
-                  <Select value={selectedBookCategory} onValueChange={setSelectedBookCategory}>
-                      <SelectTrigger className="w-full sm:w-[280px]">
-                          <SelectValue placeholder={t('shop.filter_by_category')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                          <SelectItem value="all">{t('shop.all_categories')}</SelectItem>
-              {bookCategories.map(category => (
-                <SelectItem key={category.name.pt + category.name.en} value={getDisplayName(category.name, language)}>{getDisplayName(category.name, language)}</SelectItem>
-              ))}
-                      </SelectContent>
-                  </Select>
+          <TabsContent value="catalogo" className="mt-6">
+            <div className="flex gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder={t('shop.search_books_placeholder')}
+                  className="w-full rounded-lg bg-background pl-8"
+                  value={bookSearchQuery}
+                  onChange={(e) => setBookSearchQuery(e.target.value)}
+                />
               </div>
-            <ProductGrid products={filteredBooks} />
+              <Select value={selectedBookCategory} onValueChange={setSelectedBookCategory}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder={t('shop.filter_by_category')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('common.all_categories')}</SelectItem>
+                  {bookCategories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {getDisplayName(category.name, language)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="mt-6">
+              {loading ? (
+                <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                  {[...Array(8)].map((_, i) => (
+                    <SidebarMenuSkeleton key={i} />
+                  ))}
+                </div>
+              ) : (
+                <ProductGrid products={filteredBooks} />
+              )}
+            </div>
           </TabsContent>
 
-          <TabsContent value="jogos" className="mt-6 space-y-6">
-              <div className="flex flex-col gap-4 sm:flex-row">
-                  <div className="relative flex-1">
-                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                          type="search"
-                          placeholder={t('shop.search_games_placeholder')}
-                          className="w-full rounded-lg bg-background pl-8"
-                          value={gameSearchQuery}
-                          onChange={(e) => setGameSearchQuery(e.target.value)}
-                      />
-                  </div>
-                  <Select value={selectedGameCategory} onValueChange={setSelectedGameCategory}>
-                      <SelectTrigger className="w-full sm:w-[280px]">
-                          <SelectValue placeholder={t('shop.filter_by_category')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                          <SelectItem value="all">{t('shop.all_categories')}</SelectItem>
-              {gameCategories.map(category => (
-                <SelectItem key={category.name.pt + category.name.en} value={getDisplayName(category.name, language)}>{getDisplayName(category.name, language)}</SelectItem>
-              ))}
-                      </SelectContent>
-                  </Select>
+          <TabsContent value="jogos" className="mt-6">
+            <div className="flex gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder={t('shop.search_games_placeholder')}
+                  className="w-full rounded-lg bg-background pl-8"
+                  value={gameSearchQuery}
+                  onChange={(e) => setGameSearchQuery(e.target.value)}
+                />
               </div>
-            <ProductGrid products={filteredGames} />
+              <Select value={selectedGameCategory} onValueChange={setSelectedGameCategory}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder={t('shop.filter_by_category')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('common.all_categories')}</SelectItem>
+                  {gameCategories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {getDisplayName(category.name, language)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="mt-6">
+              {loading ? (
+                <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                  {[...Array(8)].map((_, i) => (
+                    <SidebarMenuSkeleton key={i} />
+                  ))}
+                </div>
+              ) : (
+                <ProductGrid products={filteredGames} />
+              )}
+            </div>
           </TabsContent>
         </Tabs>
       </div>

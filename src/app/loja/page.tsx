@@ -1,11 +1,37 @@
 
-"use client";
-
-import { Suspense, useEffect, useState } from 'react';
-import ShopPageContent from '@/components/shop-page-content';
-import { useData } from '@/context/data-context';
+import { Suspense } from 'react';
+import { ShopPageContent } from '@/components/shop-page-content';
 import Header from '@/components/header';
+import { DataProvider } from '@/context/data-context';
 
+export const revalidate = 60; // Revalidate every 60 seconds
+
+async function getShopData() {
+  try {
+    const [schoolsRes, productsRes, readingPlanRes, categoriesRes] = await Promise.all([
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/schools`, { next: { revalidate: 60 } }),
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`, { next: { revalidate: 60 } }),
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/reading-plan`, { next: { revalidate: 60 } }),
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories`, { next: { revalidate: 60 } })
+    ]);
+
+    if (!schoolsRes.ok) throw new Error('Failed to fetch schools');
+    if (!productsRes.ok) throw new Error('Failed to fetch products');
+    if (!readingPlanRes.ok) throw new Error('Failed to fetch reading plan');
+    if (!categoriesRes.ok) throw new Error('Failed to fetch categories');
+
+    const schoolsData = await schoolsRes.json();
+    const productsData = await productsRes.json();
+    const readingPlanData = await readingPlanRes.json();
+    const categoriesData = await categoriesRes.json();
+    
+    return { schoolsData, productsData, readingPlanData, categoriesData };
+
+  } catch (error) {
+      console.error("Error fetching shop data:", error);
+      return { schoolsData: [], productsData: [], readingPlanData: [], categoriesData: [] };
+  }
+}
 
 function ShopPageLoading() {
     return (
@@ -15,55 +41,21 @@ function ShopPageLoading() {
     )
 }
 
-export default function LojaPage() {
-  const [isLoading, setIsLoading] = useState(true);
-  const { setSchools, setProducts, setReadingPlan, setCategories } = useData();
-
-  useEffect(() => {
-    async function getShopData() {
-      try {
-        setIsLoading(true);
-        const [schoolsRes, productsRes, readingPlanRes, categoriesRes] = await Promise.all([
-            fetch('/api/schools'),
-            fetch('/api/products'),
-            fetch('/api/reading-plan'),
-            fetch('/api/categories')
-        ]);
-
-        if (!schoolsRes.ok) throw new Error('Failed to fetch schools');
-        if (!productsRes.ok) throw new Error('Failed to fetch products');
-        if (!readingPlanRes.ok) throw new Error('Failed to fetch reading plan');
-        if (!categoriesRes.ok) throw new Error('Failed to fetch categories');
-
-        const schoolsData = await schoolsRes.json();
-        const productsData = await productsRes.json();
-        const readingPlanData = await readingPlanRes.json();
-        const categoriesData = await categoriesRes.json();
-        
-        // Populate the context with the fetched data
-        setSchools(schoolsData);
-        setProducts(productsData);
-        setReadingPlan(readingPlanData);
-        setCategories(categoriesData);
-
-      } catch (error) {
-          console.error("Error fetching shop data:", error);
-      } finally {
-          setIsLoading(false);
-      }
-    }
-    getShopData();
-  }, [setSchools, setProducts, setReadingPlan, setCategories]);
+export default async function LojaPage() {
+  const { schoolsData, productsData, readingPlanData, categoriesData } = await getShopData();
 
   return (
     <div className="flex min-h-screen w-full flex-col">
         <Header />
         <Suspense fallback={<ShopPageLoading />}>
-        {isLoading ? (
-            <ShopPageLoading />
-        ) : (
-            <ShopPageContent />
-        )}
+            <DataProvider initialSchools={schoolsData} initialProducts={productsData} initialReadingPlan={readingPlanData} initialCategories={categoriesData}>
+                <ShopPageContent 
+                  initialSchools={schoolsData}
+                  initialProducts={productsData}
+                  initialReadingPlan={readingPlanData}
+                  initialCategories={categoriesData}
+                />
+            </DataProvider>
         </Suspense>
     </div>
   );

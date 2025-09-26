@@ -101,6 +101,7 @@ export interface Order {
 }
 
 export interface Category {
+  id: string;
   name: {
     pt: string;
     en: string;

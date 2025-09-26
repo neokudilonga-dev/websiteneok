@@ -48,18 +48,31 @@ interface DataContextType {
   updateOrderPaymentStatus: (orderReference: string, status: PaymentStatus) => Promise<void>;
   updateOrderDeliveryStatus: (orderReference: string, status: DeliveryStatus) => Promise<void>;
 
-  // Function to refetch all data
-  refetchData: () => Promise<void>;
+
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-export const DataProvider = ({ children }: { children: ReactNode }) => {
+interface DataProviderProps {
+  children: ReactNode;
+  initialSchools: School[];
+  initialProducts: Product[];
+  initialReadingPlan: ReadingPlanItem[];
+  initialCategories: Category[];
+}
+
+export const DataProvider = ({
+  children,
+  initialSchools,
+  initialProducts,
+  initialReadingPlan,
+  initialCategories,
+}: DataProviderProps) => {
   const [loading, setLoading] = useState(false);
-  const [schools, setSchools] = useState<School[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [readingPlan, setReadingPlan] = useState<ReadingPlanItem[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [schools, setSchools] = useState<School[]>(initialSchools);
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [readingPlan, setReadingPlan] = useState<ReadingPlanItem[]>(initialReadingPlan);
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
   const { language } = useLanguage();
   const [publishers, setPublishers] = useState<string[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -383,7 +396,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       value={{
         loading,
         setLoading,
-        refetchData,
+
         schools, setSchools, addSchool, updateSchool, deleteSchool,
         products, setProducts, addProduct, updateProduct, deleteProduct,
         readingPlan, setReadingPlan,
