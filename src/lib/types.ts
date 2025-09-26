@@ -62,6 +62,7 @@ export interface Product {
   publisher?: string;
   stockStatus?: 'in_stock' | 'out_of_stock' | 'sold_out';
   status?: "mandatory" | "recommended";
+  readingPlan?: ReadingPlanItem[];
 }
 
 export interface CartItem extends Product {

@@ -158,7 +158,7 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
                     <DropdownMenuRadioGroup value={schoolFilter} onValueChange={setSchoolFilter}>
                         <DropdownMenuRadioItem value="all">{t('common.all_schools')}</DropdownMenuRadioItem>
                         {schools.map(school => (
-                            <DropdownMenuRadioItem key={school.id} value={school.id}>{school.name}</DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem key={school.id} value={school.id}>{school.name[language]}</DropdownMenuRadioItem>
                         ))}
                     </DropdownMenuRadioGroup>
                   </DropdownMenuContent>
