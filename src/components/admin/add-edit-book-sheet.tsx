@@ -120,7 +120,7 @@ export function AddEditBookSheet({
           .filter((rp: any) => rp.productId === book.id)
           .map((rp: any) => ({ schoolId: rp.schoolId, grade: rp.grade, status: rp.status }));
         form.reset({
-          name: book.name, // Reverted: name is user-provided
+          name: book.name[language] || book.name.pt, // Display name based on current language
           description: book.description,
           price: book.price,
           stock: book.stock,
@@ -208,9 +208,12 @@ export function AddEditBookSheet({
     }
 
     const productData: Product = {
-      id: book?.id || data.name, // Use book ID if editing, otherwise use name as ID
+      id: book?.id || data.name[language] || data.name.pt, // Use book ID if editing, otherwise use name as ID
       type: 'book',
-      name: data.name, // Reverted: name is user-provided
+      name: {
+        pt: language === 'pt' ? data.name : (book?.name.pt || ''),
+        en: language === 'en' ? data.name : (book?.name.en || ''),
+      },
       description: data.description,
       price: data.price,
       stock: data.stock,

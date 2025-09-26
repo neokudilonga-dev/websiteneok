@@ -93,17 +93,9 @@ export function AddEditGameSheet({
   useEffect(() => {
     if (isOpen) {
       if (game) {
-        const gameReadingPlan = readingPlan
-          .filter(rp => rp.productId === game.id)
-          .map(rp => ({ schoolId: rp.schoolId, grade: rp.grade, status: rp.status }));
-        
         form.reset({
-          name: typeof game.name === 'object' && game.name !== null
-            ? ((game.name as Record<string, string>)[language] ?? (game.name as Record<string, string>).pt ?? "")
-            : (typeof game.name === 'string' ? game.name : ""),
-          description: typeof game.description === 'object' && game.description !== null
-            ? ((game.description as Record<string, string>)[language] ?? (game.description as Record<string, string>).pt ?? "")
-            : (typeof game.description === 'string' ? game.description : ""),
+          name: game.name[language] || game.name.pt, // Display name based on current language
+          description: game.description,
           price: game.price,
           stock: game.stock,
           images: game.images || [],
@@ -128,9 +120,12 @@ export function AddEditGameSheet({
     setAsyncError(null);
     setIsSaving(true);
     const productData: Product = {
-      id: game?.id || "",
+      id: game?.id || data.name[language] || data.name.pt, // Use game ID if editing, otherwise use name as ID
       type: "game",
-      name: data.name,
+      name: {
+        pt: language === 'pt' ? data.name : (game?.name.pt || ''),
+        en: language === 'en' ? data.name : (game?.name.en || ''),
+      },
       description: data.description,
       price: data.price,
       stock: data.stock,

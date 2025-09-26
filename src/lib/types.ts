@@ -50,7 +50,10 @@ export interface School {
 
 export interface Product {
   id: string;
-  name: string;
+  name: {
+    pt: string;
+    en: string;
+  };
   description: string;
   price: number;
   stock?: number;
