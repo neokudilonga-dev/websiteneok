@@ -20,7 +20,7 @@ interface DataContextType {
 
   // Products
   products: Product[];
-  setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
+  setProducts: (products: Product[]) => void;
   addProduct: (product: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => Promise<void>;
   updateProduct: (product: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => Promise<void>;
   deleteProduct: (productId: string, imageUrl?: string) => Promise<void>;

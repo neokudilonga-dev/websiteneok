@@ -251,7 +251,7 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
         book={selectedBook}
         onBookSaved={(updatedBook, oldImageUrl) => {
           if (updatedBook) {
-            setProducts((prevProducts: Product[]) => {
+            (setProducts as any)((prevProducts: Product[]) => {
               const existingIndex = prevProducts.findIndex(p => p.id === updatedBook.id);
               if (existingIndex > -1) {
                 // Update existing book
