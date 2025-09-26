@@ -181,112 +181,103 @@ export function AddEditBookSheet({
     }
   };
   
-    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
+    const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
     try {
-      // Create a new image element
-      const img = new Image();
+      const file = e.target.files?.[0];
+      if (!file) return;
       
-      // Set up error handling
-      img.onerror = (error) => {
-        console.error("Error loading image:", error);
-        alert("Error loading image. Please try another file.");
-      };
+      // Show loading state
+      setIsSaving(true);
+      setAsyncError(null);
       
-      // Set up image processing after it loads
-      img.onload = () => {
-        try {
-          // Create canvas for resizing
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 400;
-          const MAX_HEIGHT = 400;
-          
-          // Calculate new dimensions
-          let width = img.width;
-          let height = img.height;
-          
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
-          }
-          
-          // Set canvas dimensions
-          canvas.width = width;
-          canvas.height = height;
-          
-          // Draw resized image on canvas
-          const ctx = canvas.getContext('2d');
-          if (!ctx) {
-            throw new Error("Could not get canvas context");
-          }
-          
-          ctx.drawImage(img, 0, 0, width, height);
-          
-          // Convert to blob
-          canvas.toBlob((blob) => {
-            if (!blob) {
-              throw new Error("Failed to create image blob");
-            }
-            
-            // Upload to Firebase
-            const storage = getStorage(app);
-            const fileRef = storageRef(storage, `products/${Date.now()}_compressed.jpg`);
-            
-            uploadBytes(fileRef, blob)
-              .then((snapshot) => getDownloadURL(snapshot.ref))
-              .then((url) => {
-                form.setValue("image", url);
-                setImagePreview(url);
-              })
-              .catch((error) => {
-                console.error("Upload failed:", error);
-                alert("Failed to upload image: " + error.message);
-              });
-          }, 'image/jpeg', 0.7);
-        } catch (error: any) {
-          console.error("Error processing image:", error);
-          alert("Error processing image: " + error.message);
+      // Create a unique filename
+      const fileName = `products/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+      
+      // Get Firebase storage reference
+      const storage = getStorage(app);
+      const fileRef = storageRef(storage, fileName);
+      
+      // Set CORS metadata
+      const metadata = {
+        contentType: file.type,
+        customMetadata: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type'
         }
       };
       
-      // Start loading the image
-      img.src = URL.createObjectURL(file);
+      // Upload file with metadata
+      const snapshot = await uploadBytes(fileRef, file, metadata);
+      
+      // Get download URL with cache-busting query parameter
+      const url = await getDownloadURL(snapshot.ref);
+      const cacheBustedUrl = `${url}?alt=media&t=${Date.now()}`;
+      
+      // Update form and UI
+      form.setValue("image", cacheBustedUrl, { shouldValidate: true });
+      setImagePreview(cacheBustedUrl);
+      
+      console.log("Image uploaded successfully:", cacheBustedUrl);
     } catch (error: any) {
-      console.error("Error in image handling:", error);
-      alert("Error handling image: " + error.message);
+      console.error("Image upload failed:", error);
+      setAsyncError(`Failed to upload image: ${error.message}`);
+      alert(`Failed to upload image: ${error.message}`);
+    } finally {
+      setIsSaving(false);
     }
   };
 
-    const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
-        const items = e.clipboardData.items;
-        for (let i = 0; i < items.length; i++) {
-            if (items[i].type && items[i].type.indexOf("image") !== -1) {
-                const file = items[i].getAsFile();
-                if (file) {
-                  // Upload to Firebase Storage (same logic as handleImageChange)
-                  const storage = getStorage(app);
-                  const fileRef = storageRef(storage, `products/${Date.now()}_${file.name || 'pasted_image'}`);
-                  uploadBytes(fileRef, file)
-                    .then(async () => {
-                      const url = await getDownloadURL(fileRef);
-                      form.setValue("image", url);
-                      setImagePreview(url);
-                    })
-                    .catch((error) => {
-                      alert("Failed to upload image: " + error.message);
-                    });
-
+    const handlePaste = async (e: React.ClipboardEvent<HTMLDivElement>) => {
+        try {
+            const items = e.clipboardData.items;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type && items[i].type.indexOf("image") !== -1) {
+                    const file = items[i].getAsFile();
+                    if (file) {
+                        // Show loading state
+                        setIsSaving(true);
+                        setAsyncError(null);
+                        
+                        // Create a unique filename
+                        const fileName = `products/${Date.now()}_pasted_image.jpg`;
+                        
+                        // Get Firebase storage reference
+                        const storage = getStorage(app);
+                        const fileRef = storageRef(storage, fileName);
+                        
+                        // Set CORS metadata
+                        const metadata = {
+                            contentType: file.type,
+                            customMetadata: {
+                                'Access-Control-Allow-Origin': '*',
+                                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                                'Access-Control-Allow-Headers': 'Content-Type'
+                            }
+                        };
+                        
+                        // Upload file with metadata
+                        const snapshot = await uploadBytes(fileRef, file, metadata);
+                        
+                        // Get download URL with cache-busting query parameter
+                        const url = await getDownloadURL(snapshot.ref);
+                        const cacheBustedUrl = `${url}?alt=media&t=${Date.now()}`;
+                        
+                        // Update form and UI
+                        form.setValue("image", cacheBustedUrl, { shouldValidate: true });
+                        setImagePreview(cacheBustedUrl);
+                        
+                        console.log("Pasted image uploaded successfully:", cacheBustedUrl);
+                        return; // Exit after handling the first image
+                    }
                 }
             }
+        } catch (error: any) {
+            console.error("Pasted image upload failed:", error);
+            setAsyncError(`Failed to upload pasted image: ${error.message}`);
+            alert(`Failed to upload pasted image: ${error.message}`);
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -363,7 +354,18 @@ export function AddEditBookSheet({
                                 </div>
                             )}
                             
-                             <Button type="button" variant="outline" size="sm" onClick={() => document.getElementById('image-upload')?.click()}>
+                             <Button 
+                                type="button" 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => {
+                                    const input = document.getElementById('image-upload') as HTMLInputElement;
+                                    if (input) {
+                                        input.value = '';  // Clear previous selection
+                                        input.click();
+                                    }
+                                }}
+                            >
                                 <Upload className="mr-2" />
                                 Carregar uma Imagem
                             </Button>
@@ -371,7 +373,7 @@ export function AddEditBookSheet({
                             <Input 
                                 id="image-upload" 
                                 type="file" 
-                                className="sr-only" 
+                                className="hidden" 
                                 accept="image/*"
                                 onChange={handleImageChange}
                              />
