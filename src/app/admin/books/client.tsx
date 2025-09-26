@@ -66,8 +66,8 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
   const bookProducts = useMemo(() => products.filter(p => p.type === 'book'), [products]);
 
   const getProductName = (product: Product) => {
-    if (!product || !product.name) return 'No Name';
-    return product.name[language] || product.name.pt || 'Unnamed Product';
+    if (!product || !product.id) return 'No ID';
+    return product.id; // Now returns the document ID as the name
   }
 
   const filteredProducts = useMemo(() => {
@@ -78,7 +78,7 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
       const matchesPublisher = publisherFilter === 'all' || product.publisher === publisherFilter;
       return matchesSearch && matchesStock && matchesPublisher;
     });
-  }, [bookProducts, searchQuery, stockFilter, publisherFilter, language]);
+  }, [bookProducts, searchQuery, stockFilter, publisherFilter]); // Removed language from dependency array
 
   const handleAddBook = () => {
     setSelectedBook(undefined);
@@ -186,7 +186,7 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
                       width="64"
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{getProductName(product)}</TableCell>
+                  <TableCell className="font-medium">{product.id}</TableCell> // Display document ID as title
                    <TableCell className="text-muted-foreground">{product.publisher || 'N/A'}</TableCell>
                    <TableCell>
                       <Badge 

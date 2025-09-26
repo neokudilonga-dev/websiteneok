@@ -41,7 +41,8 @@ export default function LoginPage() {
         const allowedAdmins = [
           "neokudilonga@gmail.com",
           "anaruimelo@gmail.com",
-          "ramanimahaveer4@gmail.com"
+          "ramanimahaveer4@gmail.com",
+          "joaonfmelo@gmail.com"
           // "joaonfmelo@gmail.com",
         ];
         if (allowedAdmins.includes(email)) {

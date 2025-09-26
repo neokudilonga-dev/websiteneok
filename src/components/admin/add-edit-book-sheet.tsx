@@ -50,7 +50,7 @@ const readingPlanItemSchema = z.object({
 });
 
 const bookFormSchema = z.object({
-  name: z.string().min(3, "O nome deve ter pelo menos 3 caracteres."),
+  name: z.string().min(3, "O nome deve ter pelo menos 3 caracteres."), // Reverted: name is required and user-provided
   description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
   price: z.coerce.number().min(0, "O preço deve ser um número positivo."),
   stock: z.coerce.number().min(0, "O stock deve ser um número positivo."),
@@ -78,7 +78,7 @@ export function AddEditBookSheet({
   const form = useForm<BookFormValues>({
     resolver: zodResolver(bookFormSchema),
     defaultValues: {
-      name: "",
+      name: "", // Reverted: name is user-provided
       description: "",
       price: 0,
       stock: 0,
@@ -116,7 +116,7 @@ export function AddEditBookSheet({
           .filter((rp: any) => rp.productId === book.id)
           .map((rp: any) => ({ schoolId: rp.schoolId, grade: rp.grade, status: rp.status }));
         form.reset({
-          name: book.name,
+          name: book.name, // Reverted: name is user-provided
           description: book.description,
           price: book.price,
           stock: book.stock,
@@ -129,7 +129,7 @@ export function AddEditBookSheet({
         setImagePreview(book.image);
       } else {
         form.reset({
-          name: "",
+          name: "", // Reverted: name is user-provided
           description: "",
           price: 0,
           stock: 0,
@@ -151,7 +151,7 @@ export function AddEditBookSheet({
     const productData: Product = {
       id: book?.id || '',
       type: 'book',
-      name: data.name,
+      name: data.name, // Reverted: name is user-provided
       description: data.description,
       price: data.price,
       stock: data.stock,

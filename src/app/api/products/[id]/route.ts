@@ -4,18 +4,23 @@ import { firestore } from '@/lib/firebase-admin';
 import type { Product, ReadingPlanItem } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const { product, readingPlan }: { product: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[] } = await request.json();
     
     const productRef = firestore.collection('products').doc(id);
-    await productRef.update({
-        ...product,
-        // Firestore handles nested objects, so we can pass them directly
-        name: { pt: product.name.pt, en: product.name.en },
-        description: { pt: product.description.pt, en: product.description.en },
+    
+    // Remove undefined values to prevent Firestore errors
+    const updateData: any = { ...product };
+    Object.keys(updateData).forEach(key => {
+        if (updateData[key] === undefined) {
+            delete updateData[key];
+        }
     });
+    // updateData.name = id; // Reverted: name should be user-provided
+    
+    await productRef.update(updateData);
 
     // Handle reading plan updates
     const readingPlanCollection = firestore.collection('readingPlan');
@@ -38,16 +43,16 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
     await batch.commit();
 
-    return NextResponse.json({ id, ...product }, { status: 200 });
+    return NextResponse.json({ ...product }, { status: 200 });
   } catch (error) {
     console.error('Error updating product:', error);
     return NextResponse.json({ error: 'Failed to update product' }, { status: 500 });
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
-        const { id } = params;
+        const { id } = await params;
         
         const batch = firestore.batch();
         

@@ -63,16 +63,16 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    const newId = uuidv4();
     const newProduct: Product = {
       ...productResult.data, // Use validated data
-      id: newId,
+      id: productResult.data.name, // Use user-provided name as ID
+      name: productResult.data.name, // Ensure name field also stores the user-provided name
     };
 
     const batch = firestore.batch();
 
     // Add the new product
-    const productRef = firestore.collection('products').doc(newId);
+    const productRef = firestore.collection('products').doc(newProduct.id); // Use newProduct.id as document ID
     batch.set(productRef, newProduct);
 
     // Add reading plan items
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
         const newPlanItemRef = readingPlanCollection.doc(uuidv4());
         const newPlanItem: ReadingPlanItem = {
             id: newPlanItemRef.id,
-            productId: newId,
+            productId: newProduct.id, // Use newProduct.id as productId
             ...item,
         };
         batch.set(newPlanItemRef, newPlanItem);
