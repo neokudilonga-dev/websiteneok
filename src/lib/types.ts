@@ -26,10 +26,10 @@ export const ReadingPlanItemSchema = z.object({
 });
 
 export interface ReadingPlanItem {
-  id: string;
-  productId: string;
+  id?: string;
+  productId?: string;
   schoolId: string;
-  grade: number | string;
+  grade: string | number;
   status: "mandatory" | "recommended";
 }
 

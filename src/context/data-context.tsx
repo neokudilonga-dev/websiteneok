@@ -21,8 +21,8 @@ interface DataContextType {
   // Products
   products: Product[];
   setProducts: (products: Product[]) => void;
-  addProduct: (product: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => Promise<void>;
-  updateProduct: (product: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => Promise<void>;
+  addProduct: (product: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => Promise<Product>;
+  updateProduct: (id: string, product: Product) => Promise<void>;
   deleteProduct: (productId: string, imageUrl?: string) => Promise<void>;
 
   // Reading Plan
@@ -144,55 +144,58 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify({ product, readingPlan: readingPlanData }),
       });
       if (!response.ok) throw new Error('Failed to add product');
-  // Refetch products and reading plan from backend
-  const updatedProducts = await fetch('/api/products');
-  setProducts(await updatedProducts.json());
-  const rpResponse = await fetch('/api/reading-plan');
-  setReadingPlan(await rpResponse.json());
-
-      toast({
-        title: "Product Added",
-        description:
-          typeof product.name === 'string'
-            ? `${product.name} was added successfully.`
-            : `${product.name[language]} was added successfully.`
-      });
-    } catch (error) {
-      console.error(error);
-      toast({ title: "Error", description: "Could not add product.", variant: "destructive" });
-    } finally {
-        setLoading(false);
-    }
-  };
-  const updateProduct = async (product: Product, readingPlanData: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[]) => {
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/products/${product.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product, readingPlan: readingPlanData }),
-      });
-      if (!response.ok) throw new Error('Failed to update product');
-  // Refetch products and reading plan from backend
-  const updatedProducts = await fetch('/api/products');
-  setProducts(await updatedProducts.json());
-  const rpResponse = await fetch('/api/reading-plan');
-  setReadingPlan(await rpResponse.json());
-      
-      toast({
-        title: "Product Updated",
-        description:
-          typeof product.name === 'string'
-            ? `${product.name} was updated successfully.`
-            : `${product.name[language]} was updated successfully.`
-      });
-    } catch (error) {
-      console.error(error);
-      toast({ title: "Error", description: "Could not update product.", variant: "destructive" });
-    } finally {
-        setLoading(false);
-    }
-  };
+       const newProduct = await response.json();
+   // Refetch products and reading plan from backend
+   const updatedProducts = await fetch('/api/products');
+   setProducts(await updatedProducts.json());
+   const rpResponse = await fetch('/api/reading-plan');
+   setReadingPlan(await rpResponse.json());
+ 
+       toast({
+         title: "Product Added",
+         description:
+           typeof product.name === 'string'
+             ? `${product.name} was added successfully.`
+             : `${product.name?.pt || product.name?.en} was added successfully.`
+       });
+       return newProduct;
+     } catch (error) {
+       console.error(error);
+       toast({ title: "Error", description: "Could not add product.", variant: "destructive" });
+       throw error;
+     } finally {
+         setLoading(false);
+     }
+   };
+   const updateProduct = async (id: string, product: Product) => {
+     setLoading(true);
+     try {
+       const response = await fetch(`/api/products/${id}`, {
+         method: 'PUT',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ product }),
+       });
+       if (!response.ok) throw new Error('Failed to update product');
+   // Refetch products and reading plan from backend
+   const updatedProducts = await fetch('/api/products');
+   setProducts(await updatedProducts.json());
+   const rpResponse = await fetch('/api/reading-plan');
+   setReadingPlan(await rpResponse.json());
+       
+       toast({
+         title: "Product Updated",
+         description:
+           typeof product.name === 'string'
+             ? `${product.name} was updated successfully.`
+             : `${product.name?.pt || product.name?.en} was updated successfully.`
+       });
+     } catch (error) {
+       console.error(error);
+       toast({ title: "Error", description: "Could not update product.", variant: "destructive" });
+     } finally {
+         setLoading(false);
+     }
+   };
   const deleteProduct = async (productId: string, imageUrl?: string) => {
     setLoading(true);
     try {

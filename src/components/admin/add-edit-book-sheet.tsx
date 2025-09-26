@@ -37,27 +37,23 @@ import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
 import imageCompression from 'browser-image-compression';
 
-
-interface AddEditBookSheetProps {
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
-  book?: Product;
-  onBookSaved: (updatedBook?: Product, oldImageUrl?: string) => void;
-}
-
 const readingPlanItemSchema = z.object({
+  id: z.string().optional(),
+  productId: z.string().optional(),
   schoolId: z.string().min(1, "A escola é obrigatória."),
   grade: z.union([z.coerce.number(), z.string()]).refine(val => val !== '', "O ano é obrigatório."),
   status: z.enum(["mandatory", "recommended"]),
 });
 
 const bookFormSchema = z.object({
-  name: z.string().min(3, "O nome deve ter pelo menos 3 caracteres."), // Reverted: name is required and user-provided
+  name: z.object({
+    pt: z.string().min(3, "O nome em Português deve ter pelo menos 3 caracteres."),
+    en: z.string().min(3, "O nome em Inglês deve ter pelo menos 3 caracteres."),
+  }).optional(),
   description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
   price: z.coerce.number().min(0, "O preço deve ser um número positivo."),
   stock: z.coerce.number().min(0, "O stock deve ser um número positivo."),
-  image: z.string().optional(),
-  category: z.string().min(1, "A categoria é obrigatória."), // Will store the i18n name
+  category: z.string().min(1, "A categoria é obrigatória."),
   publisher: z.string().optional(),
   stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out']),
   readingPlan: z.array(readingPlanItemSchema).optional(),
@@ -65,28 +61,28 @@ const bookFormSchema = z.object({
 
 type BookFormValues = z.infer<typeof bookFormSchema>;
 
-export function AddEditBookSheet({
-  isOpen,
-  setIsOpen,
-  book,
-  onBookSaved,
-}: AddEditBookSheetProps) {
+interface AddEditBookSheetProps {
+  book?: Product;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  onBookSaved: (updatedBook?: Product) => void;
+}
+
+export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen, setIsOpen, onBookSaved }) => {
+  const { language } = useLanguage();
   const { schools, addProduct, updateProduct, categories, publishers, readingPlan, setCategories } = useData();
-  const { t, language } = useLanguage();
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const { t } = useLanguage();
   const [asyncError, setAsyncError] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const bookCategories = useMemo(() => categories.filter(c => c.type === 'book'), [categories]);
 
   const form = useForm<BookFormValues>({
     resolver: zodResolver(bookFormSchema),
     defaultValues: {
-      name: "", // Reverted: name is user-provided
+      name: { pt: "", en: "" },
       description: "",
       price: 0,
       stock: 0,
-      image: "",
       category: "",
       publisher: "",
       stockStatus: 'in_stock',
@@ -118,223 +114,111 @@ export function AddEditBookSheet({
       if (book) {
         const bookReadingPlan = readingPlan
           .filter((rp: any) => rp.productId === book.id)
-          .map((rp: any) => ({ schoolId: rp.schoolId, grade: rp.grade, status: rp.status }));
+          .map((rp: any) => ({
+            id: rp.id || "",
+            productId: rp.productId || "",
+            schoolId: rp.schoolId,
+            grade: rp.grade,
+            status: rp.status,
+          }));
         form.reset({
-          name: book.name[language] || book.name.pt, // Display name based on current language
+          name: book.name || { pt: "", en: "" },
           description: book.description,
           price: book.price,
           stock: book.stock,
-          image: book.image,
           category: book.category,
           publisher: book.publisher,
           stockStatus: book.stockStatus || 'in_stock',
           readingPlan: bookReadingPlan
         });
-        setImagePreview(book.image);
-        setImageFile(null); // Clear image file on edit
       } else {
         form.reset({
-          name: "", // Reverted: name is user-provided
+          name: { pt: "", en: "" },
           description: "",
           price: 0,
           stock: 0,
-          image: "",
           category: "",
           publisher: "",
           stockStatus: "in_stock",
           readingPlan: [],
         });
-        setImagePreview(null);
-        setImageFile(null);
       }
     }
   }, [book, form, isOpen, readingPlan, categories.length, setCategories]);
-
-  const uploadImage = async (file: File): Promise<string> => {
-    setIsSaving(true);
-    setAsyncError(null);
-
-    try {
-      const compressedFile = await imageCompression(file, {
-        maxSizeMB: 1, // (max file size in MB)
-        maxWidthOrHeight: 1920, // (max width or height in pixels)
-        useWebWorker: true,
-      });
-
-      const fileName = `products/${Date.now()}_${compressedFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-      const storage = getStorage(app);
-      const fileRef = storageRef(storage, fileName);
-
-      const metadata = {
-        contentType: compressedFile.type,
-        customMetadata: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type'
-        }
-      };
-
-      const snapshot = await uploadBytes(fileRef, compressedFile, metadata);
-      const url = await getDownloadURL(snapshot.ref);
-      return `${url}?alt=media&t=${Date.now()}`;
-    } catch (error: any) {
-      console.error("Image upload failed:", error);
-      throw new Error(`Failed to upload image: ${error.message}`);
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   const onSubmit = async (data: z.infer<typeof bookFormSchema>) => {
     console.log("onSubmit called with data:", data);
     setAsyncError(null);
     setIsSaving(true);
 
-    let imageUrl = book?.image || "";
-    let oldImageUrl: string | undefined = undefined;
-
-    if (imageFile) {
-      try {
-        if (book?.image) {
-          oldImageUrl = book.image;
-        }
-        imageUrl = await uploadImage(imageFile);
-        form.setValue("image", imageUrl); // Add this line to update the form's image field
-      } catch (error: any) {
-        setAsyncError(error.message);
-        setIsSaving(false);
-        return;
-      }
-    }
-
-    const productData: Product = {
-      id: book?.id || data.name, // Use book ID if editing, otherwise use name as ID (string)
-      type: 'book',
-      name: {
-        pt: language === 'pt' ? data.name : (book?.name.pt || ''),
-        en: language === 'en' ? data.name : (book?.name.en || ''),
-      },
-      description: data.description,
-      price: data.price,
-      stock: data.stock,
-      image: imageUrl,
-      images: [],
-      category: data.category,
-      publisher: data.publisher,
-      stockStatus: data.stockStatus,
-    };
-    const readingPlanData = data.readingPlan?.map((rp: { schoolId: string; grade: string | number; status: 'mandatory' | 'recommended' }) => ({
-      productId: book?.id || data.name,
-      schoolId: rp.schoolId,
-      grade: typeof rp.grade === 'string' ? rp.grade : String(rp.grade),
-      status: rp.status
-    })) || [];
     try {
+      const productData: Product = {
+        id: book?.id || "",
+        name: data.name || { pt: '', en: '' },
+        description: data.description,
+        price: data.price,
+        stock: data.stock,
+        type: "book",
+        category: data.category,
+        publisher: data.publisher,
+        stockStatus: data.stockStatus,
+        readingPlan: data.readingPlan?.map((rp) => ({
+          id: rp.id || "",
+          productId: rp.productId || "",
+          schoolId: rp.schoolId,
+          grade: rp.grade,
+          status: rp.status,
+        })) || [],
+      };
+
       if (book) {
-        await updateProduct(productData, readingPlanData);
+        // Update existing book
+        await updateProduct(book.id, productData);
+        onBookSaved({ ...book, ...productData });
       } else {
-        await addProduct(productData, readingPlanData);
+        // Add new book
+        const newBook = await addProduct(productData, productData.readingPlan || []);
+        onBookSaved(newBook);
       }
       setIsOpen(false);
-      onBookSaved(productData, oldImageUrl);
-    } catch (err: any) {
-      setAsyncError(err?.message || "Erro ao guardar alterações. Tente novamente.");
+    } catch (error: any) {
+      console.error("Failed to save book:", error);
+      setAsyncError(error.message || "Failed to save book.");
     } finally {
       setIsSaving(false);
     }
   };
-  
-    const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    try {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      
-      setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
-      
-      console.log("Image selected:", file.name);
-    } catch (error: any) {
-      console.error("Image selection failed:", error);
-      setAsyncError(`Failed to select image: ${error.message}`);
-      alert(`Failed to select image: ${error.message}`);
-    }
-  };
-
-    const handlePaste = async (e: React.ClipboardEvent<HTMLDivElement>) => {
-        try {
-            const items = e.clipboardData.items;
-            for (let i = 0; i < items.length; i++) {
-                if (items[i].type && items[i].type.indexOf("image") !== -1) {
-                    const file = items[i].getAsFile();
-                    if (file) {
-                        setImageFile(file);
-                        setImagePreview(URL.createObjectURL(file));
-                        form.setValue("image", URL.createObjectURL(file)); // Add this line
-                        console.log("Pasted image selected.");
-                        return; // Exit after handling the first image
-                    }
-                }
-            }
-        } catch (error: any) {
-            console.error("Pasted image selection failed:", error);
-            setAsyncError(`Failed to select pasted image: ${error.message}`);
-            alert(`Failed to select pasted image: ${error.message}`);
-        }
-    };
-
-  const deleteImage = async (imageUrl: string) => {
-    try {
-      const storage = getStorage(app);
-      const imageRef = storageRef(storage, imageUrl);
-      await deleteObject(imageRef);
-      console.log("Old image deleted successfully:", imageUrl);
-    } catch (error: any) {
-      console.error("Failed to delete old image:", error);
-      // Don't block the main process if old image deletion fails
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setImageFile(null);
-    setImagePreview(null);
-    form.setValue("image", "");
-  };
-
-  useEffect(() => {
-    if (!isOpen) {
-      // When the sheet closes, reset the form and image states
-      form.reset();
-      setImagePreview(null);
-      setImageFile(null);
-      setAsyncError(null);
-      setIsSaving(false);
-    }
-  }, [isOpen, form]);
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetContent className="sm:max-w-[600px] w-full flex flex-col">
+      <SheetContent className="sm:max-w-[600px] w-full">
         <SheetHeader>
-          <SheetTitle>{book ? "Editar Livro" : "Adicionar Novo Livro"}</SheetTitle>
+          <SheetTitle>{book ? t('books_page.edit_book') : t('books_page.add_new_book')}</SheetTitle>
           <SheetDescription>
-            {book ? "Edite os detalhes do livro existente." : "Adicione um novo livro ao catálogo."}
+            {book ? t('books_page.edit_book_description') : t('books_page.add_new_book_description')}
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4 flex-grow overflow-y-auto">
-            {asyncError && (
-              <div className="text-red-500 text-sm text-center">{asyncError}</div>
-            )}
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4">
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome do Livro</FormLabel>
+                  <FormLabel>{t('books_page.name')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Nome do Livro" {...field} />
+                    <Input
+                      placeholder={t('books_page.name_placeholder')}
+                      value={language === "pt" ? field.value?.pt : field.value?.en}
+                      onChange={(e) =>
+                        field.onChange({
+                          ...field.value,
+                          [language]: e.target.value,
+                        })
+                      }
+                    />
                   </FormControl>
-
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -343,9 +227,9 @@ export function AddEditBookSheet({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Descrição</FormLabel>
+                  <FormLabel>{t('common.description')}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Descrição do Livro" {...field} />
+                    <Textarea {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -356,9 +240,9 @@ export function AddEditBookSheet({
               name="price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Preço</FormLabel>
+                  <FormLabel>{t('common.price')}</FormLabel>
                   <FormControl>
-                    <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                    <Input type="number" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -369,63 +253,10 @@ export function AddEditBookSheet({
               name="stock"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Stock</FormLabel>
+                  <FormLabel>{t('common.stock')}</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="0" {...field} />
+                    <Input type="number" {...field} />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="image"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Imagem do Livro</FormLabel>
-                  <FormControl>
-                    <div
-                      onPaste={handlePaste}
-                      className="flex flex-col items-center justify-center rounded-md border border-dashed p-4 text-center"
-                    >
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="mb-2 hidden" // Add 'hidden' class here
-                      />
-                      {imagePreview && (
-                        <div className="relative w-32 h-32 mb-2">
-                          <Image
-                            src={imagePreview}
-                            alt="Image Preview"
-                            layout="fill"
-                            objectFit="cover"
-                            className="rounded-md"
-                          />
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="icon"
-                            className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                            onClick={handleRemoveImage}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      )}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => document.querySelector<HTMLInputElement>('input[type="file"]')?.click()}
-                      >
-                        <Upload className="mr-2 h-4 w-4" /> Selecionar Imagem
-                      </Button>
-                    </div>
-                  </FormControl>
-                  <FormDescription>
-                    Selecione ou cole uma imagem para o livro.
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -435,17 +266,17 @@ export function AddEditBookSheet({
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Categoria</FormLabel>
+                  <FormLabel>{t('common.category')}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione uma categoria" />
+                        <SelectValue placeholder={t('books_page.select_category')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {bookCategories.map((cat) => (
-                        <SelectItem key={cat.name.en} value={cat.name[language as keyof typeof cat.name]}>
-                          {cat.name[language as keyof typeof cat.name]}
+                      {bookCategories.map((category) => (
+                        <SelectItem key={category.name.pt} value={category.name.pt}>
+                          {category.name[language]}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -459,17 +290,17 @@ export function AddEditBookSheet({
               name="publisher"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Editora</FormLabel>
+                  <FormLabel>{t('common.publisher')}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione uma editora (Opcional)" />
+                        <SelectValue placeholder={t('books_page.select_publisher')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {publishers.map((pub) => (
-                        <SelectItem key={pub} value={pub}>
-                          {pub}
+                      {publishers.map((publisher) => (
+                        <SelectItem key={publisher} value={publisher}>
+                          {publisher}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -483,7 +314,7 @@ export function AddEditBookSheet({
               name="stockStatus"
               render={({ field }) => (
                 <FormItem className="space-y-3">
-                  <FormLabel>Estado do Stock</FormLabel>
+                  <FormLabel>{t('common.stock_status')}</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
@@ -494,19 +325,25 @@ export function AddEditBookSheet({
                         <FormControl>
                           <RadioGroupItem value="in_stock" />
                         </FormControl>
-                        <FormLabel className="font-normal">Em Stock</FormLabel>
+                        <FormLabel className="font-normal">
+                          {t('stock_status.in_stock')}
+                        </FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>
                           <RadioGroupItem value="out_of_stock" />
                         </FormControl>
-                        <FormLabel className="font-normal">Sem Stock</FormLabel>
+                        <FormLabel className="font-normal">
+                          {t('stock_status.out_of_stock')}
+                        </FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>
                           <RadioGroupItem value="sold_out" />
                         </FormControl>
-                        <FormLabel className="font-normal">Esgotado</FormLabel>
+                        <FormLabel className="font-normal">
+                          {t('stock_status.sold_out')}
+                        </FormLabel>
                       </FormItem>
                     </RadioGroup>
                   </FormControl>
@@ -514,31 +351,27 @@ export function AddEditBookSheet({
                 </FormItem>
               )}
             />
-
             <div>
-              <h3 className="mb-4 text-lg font-medium">Plano de Leitura</h3>
+              <Label>{t('books_page.reading_plan')}</Label>
               {fields.map((item, index) => (
-                <div key={item.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 p-4 border rounded-md">
+                <div key={item.id} className="flex space-x-2 mt-2">
                   <FormField
                     control={form.control}
                     name={`readingPlan.${index}.schoolId`}
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Escola</FormLabel>
+                      <FormItem className="flex-1">
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Selecione a escola" />
+                              <SelectValue placeholder={t('books_page.select_school')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {schools.map((school) => {
-                              return (
-                                <SelectItem key={school.id} value={school.id}>
-                                  {`${school.name[language]}`}
-                                </SelectItem>
-                              );
-                            })}
+                            {schools.map((school) => (
+                              <SelectItem key={school.id} value={school.id}>
+                                {school.name[language]}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -549,11 +382,8 @@ export function AddEditBookSheet({
                     control={form.control}
                     name={`readingPlan.${index}.grade`}
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Ano</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Ano (ex: 1, 2, Iniciação)" {...field} />
-                        </FormControl>
+                      <FormItem className="flex-1">
+                        <Input type="number" placeholder={t('books_page.grade')} {...field} />
                         <FormMessage />
                       </FormItem>
                     )}
@@ -562,56 +392,41 @@ export function AddEditBookSheet({
                     control={form.control}
                     name={`readingPlan.${index}.status`}
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Estado</FormLabel>
+                      <FormItem className="flex-1">
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Selecione o estado" />
+                              <SelectValue placeholder={t('books_page.select_status')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="mandatory">Obrigatório</SelectItem>
-                            <SelectItem value="recommended">Recomendado</SelectItem>
+                            <SelectItem value="mandatory">{t('books_page.mandatory')}</SelectItem>
+                            <SelectItem value="recommended">{t('books_page.recommended')}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <div className="flex items-end">
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => remove(index)}
-                      className="self-end"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <Button type="button" variant="destructive" onClick={() => remove(index)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               ))}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => append({ schoolId: "", grade: "", status: "mandatory" })}
-                className="w-full"
-              >
-                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Item ao Plano de Leitura
+              <Button type="button" variant="outline" className="mt-2" onClick={() => append({ schoolId: "", grade: "", status: "mandatory" } as any)}>
+                <PlusCircle className="mr-2" />
+                {t('books_page.add_to_reading_plan')}
               </Button>
             </div>
-            <SheetFooter className="flex flex-col sm:flex-row sm:justify-end gap-2 mt-4">
-              {asyncError && (
-                <p className="text-destructive text-sm text-center sm:text-right w-full">{asyncError}</p>
-              )}
+            {asyncError && <p className="text-red-500 text-sm">{asyncError}</p>}
+            <SheetFooter>
               <SheetClose asChild>
                 <Button type="button" variant="outline">
-                  Cancelar
+                  {t('common.cancel')}
                 </Button>
               </SheetClose>
               <Button type="submit" disabled={isSaving}>
-                {isSaving ? "A Guardar..." : "Guardar Alterações"}
+                {isSaving ? t('common.saving') : t('common.save_changes')}
               </Button>
             </SheetFooter>
           </form>

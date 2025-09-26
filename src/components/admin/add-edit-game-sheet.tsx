@@ -49,11 +49,10 @@ const readingPlanItemSchema = z.object({
 
 
 const gameFormSchema = z.object({
-  name: z.string().min(3, "O nome deve ter pelo menos 3 caracteres."),
+  name: z.string().optional(),
   description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
   price: z.coerce.number().min(0, "O preço deve ser um número positivo."),
   stock: z.coerce.number().min(0, "O stock deve ser um número positivo."),
-  images: z.array(z.string()).optional(),
   stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out']),
   readingPlan: z.array(readingPlanItemSchema).optional(),
 });
@@ -77,7 +76,6 @@ export function AddEditGameSheet({
       description: "",
       price: 0,
       stock: 0,
-      images: [],
       stockStatus: "in_stock",
       readingPlan: [],
     },
@@ -94,11 +92,10 @@ export function AddEditGameSheet({
     if (isOpen) {
       if (game) {
         form.reset({
-          name: game.name[language] || game.name.pt, // Display name based on current language
+          name: game.name?.[language] || game.name?.pt || "",
           description: game.description,
           price: game.price,
           stock: game.stock,
-          images: game.images || [],
           stockStatus: game.stockStatus || 'in_stock',
           readingPlan: readingPlan,
         });
@@ -108,7 +105,6 @@ export function AddEditGameSheet({
           description: "",
           price: 0,
           stock: 0,
-          images: [],
           stockStatus: "in_stock",
           readingPlan: [],
         });
@@ -120,23 +116,21 @@ export function AddEditGameSheet({
     setAsyncError(null);
     setIsSaving(true);
     const productData: Product = {
-      id: game?.id || data.name, // Use game ID if editing, otherwise use name as ID (string)
+      id: game?.id || data.name || "", // Use game ID if editing, otherwise use name as ID (string)
       type: "game",
       name: {
-        pt: language === 'pt' ? data.name : (game?.name.pt || ''),
-        en: language === 'en' ? data.name : (game?.name.en || ''),
+        pt: language === 'pt' ? data.name || "" : (game?.name?.pt || ''),
+        en: language === 'en' ? data.name || "" : (game?.name?.en || ''),
       },
       description: data.description,
       price: data.price,
       stock: data.stock,
-      images: data.images,
       stockStatus: data.stockStatus,
-      image: "",
     };
     const readingPlanData = data.readingPlan || [];
     try {
       if (game) {
-        await updateProduct(productData, readingPlanData);
+        await updateProduct(game.id, productData);
       } else {
         await addProduct(productData, readingPlanData);
       }
@@ -145,39 +139,6 @@ export function AddEditGameSheet({
       setAsyncError(err?.message || "Erro ao guardar alterações. Tente novamente.");
     } finally {
       setIsSaving(false);
-    }
-  };
-
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      Array.from(files).forEach(file => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64String = reader.result as string;
-          const currentImages = form.getValues("images") || [];
-          form.setValue("images", [...currentImages, base64String]);
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-  };
-
-  const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
-    const items = e.clipboardData.items;
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].type.indexOf("image") !== -1) {
-        const file = items[i].getAsFile();
-        if (file) {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            const base64String = reader.result as string;
-            const currentImages = form.getValues("images") || [];
-            form.setValue("images", [...currentImages, base64String]);
-          };
-          reader.readAsDataURL(file);
-        }
-      }
     }
   };
 
@@ -200,263 +161,190 @@ export function AddEditGameSheet({
                 {asyncError}
               </div>
             )}
-            <div className="flex-1 space-y-4 overflow-y-auto py-4 pr-6">
-              <div className="space-y-2">
-            <Label>Nome do Jogo</Label>
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input placeholder="Nome do Jogo" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-              </div>
-              
-        <div className="space-y-2">
-        <Label>Descrição</Label>
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-          <FormItem>
-            <FormControl>
-            <Textarea placeholder="Descrição do Jogo" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-          )}
-        />
-        </div>
-
+            <div className="flex-1 space-y-4 py-4 overflow-y-auto">
               <FormField
                 control={form.control}
-                name="images"
-                render={() => (
+                name="name"
+                render={({ field }) => (
                   <FormItem>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <FormLabel>Imagens do Jogo</FormLabel>
-                        <FormDescription>Adicione uma ou mais imagens para o jogo.</FormDescription>
-                      </div>
-                       <Button type="button" variant="outline" size="sm" onClick={() => document.getElementById('image-upload-multiple')?.click()}>
-                            <Upload className="mr-2" />
-                            Carregar Imagens
-                        </Button>
-                    </div>
-                     <div 
-                        className="relative rounded-lg border-2 border-dashed border-input bg-background/50 p-4 transition-colors hover:border-primary"
-                        onPaste={handlePaste}
-                    >
-                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-            {(form.getValues("images") || []).map((img, index) => (
-              <div key={img?.substring(0, 32) + '-' + index} className="relative aspect-square">
-                {img && <Image src={img} alt={`Pré-visualização da imagem ${index+1}`} layout="fill" className="rounded-md object-cover" />}
-                <Button type="button" variant="destructive" size="icon" className="absolute -right-2 -top-2 h-6 w-6 rounded-full" onClick={() => {
-                  const currentImages = form.getValues("images") || [];
-                  const newImages = [...currentImages.slice(0, index), ...currentImages.slice(index + 1)];
-                  form.setValue("images", newImages);
-                }}>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-                        <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-input bg-background/50 text-center transition-colors hover:border-primary">
-                            <Upload className="h-8 w-8 text-muted-foreground" />
-                            <span className="text-sm text-muted-foreground">Carregar</span>
-                            <Input 
-                                id="image-upload-multiple"
-                                type="file" 
-                                className="sr-only" 
-                                accept="image/*"
-                                multiple
-                                onChange={(e) => handleImageChange(e)}
-                                />
-                        </label>
-                        </div>
-                         <div className="mt-4 text-center text-sm text-muted-foreground">
-                            Pode colar imagens aqui
-                        </div>
-                    </div>
-
+                    <FormLabel>Nome do Jogo</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nome do Jogo" {...field} />
+                    </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
-
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                    control={form.control}
-                    name="price"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Preço</FormLabel>
-                        <FormControl>
-                        <Input type="number" step="0.01" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="stock"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Stock</FormLabel>
-                        <FormControl>
-                        <Input type="number" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-              </div>
-
-               <FormField
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Descrição do Jogo" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Preço</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="stock"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Stock</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="0" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
                 control={form.control}
                 name="stockStatus"
                 render={({ field }) => (
-                    <FormItem className="space-y-3">
+                  <FormItem className="space-y-3">
                     <FormLabel>Estado do Stock</FormLabel>
                     <FormControl>
-                        <RadioGroup
+                      <RadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        className="flex items-center space-x-4"
-                        >
-                        <FormItem className="flex items-center space-x-2 space-y-0">
-                            <FormControl>
+                        className="flex flex-col space-y-1"
+                      >
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
                             <RadioGroupItem value="in_stock" />
-                            </FormControl>
-                            <FormLabel className="font-normal">Em Stock</FormLabel>
+                          </FormControl>
+                          <FormLabel className="font-normal">Em Stock</FormLabel>
                         </FormItem>
-                        <FormItem className="flex items-center space-x-2 space-y-0">
-                            <FormControl>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
                             <RadioGroupItem value="out_of_stock" />
-                            </FormControl>
-                            <FormLabel className="font-normal">Atraso na Entrega</FormLabel>
+                          </FormControl>
+                          <FormLabel className="font-normal">Sem Stock</FormLabel>
                         </FormItem>
-                            <FormItem className="flex items-center space-x-2 space-y-0">
-                            <FormControl>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
                             <RadioGroupItem value="sold_out" />
-                            </FormControl>
-                            <FormLabel className="font-normal">Esgotado</FormLabel>
+                          </FormControl>
+                          <FormLabel className="font-normal">Esgotado</FormLabel>
                         </FormItem>
-                        </RadioGroup>
+                      </RadioGroup>
                     </FormControl>
                     <FormMessage />
-                    </FormItem>
+                  </FormItem>
                 )}
-                />
-
-                <div>
-                    <Label>Plano de Leitura</Label>
-                    <FormDescription className="mb-2">
-                        Adicione este item aos planos de leitura das escolas.
-                    </FormDescription>
-                    <div className="space-y-4">
-                    {readingPlanFields.map((field, index) => (
-                        <div key={field.id} className="flex flex-col gap-4 rounded-md border p-4">
-                            <div className="flex items-end gap-2">
-                                <FormField
-                                    control={form.control}
-                                    name={`readingPlan.${index}.schoolId`}
-                                    render={({ field }) => (
-                                    <FormItem className="flex-1">
-                                        <FormLabel>Escola</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                            <SelectValue placeholder="Selecione uma escola" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {schools.map(school => (
-                                              <SelectItem key={school.id} value={school.id}>{typeof school.name === 'object' && school.name !== null
-                                                ? ((school.name as Record<string, string>)[language] ?? (school.name as Record<string, string>).pt ?? "")
-                                                : (typeof school.name === 'string' ? school.name : "")}
-                                              </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name={`readingPlan.${index}.grade`}
-                                    render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Ano/Categoria</FormLabel>
-                                        <FormControl>
-                                        <Input placeholder="Ex: 1 ou Outros" className="w-28" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                    )}
-                                />
-                                <Button type="button" variant="destructive" size="icon" onClick={() => removeReadingPlan(index)}>
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
-                            </div>
-                            <FormField
-                                control={form.control}
-                                name={`readingPlan.${index}.status`}
-                                render={({ field }) => (
-                                    <FormItem className="space-y-3">
-                                    <FormLabel>Estado</FormLabel>
-                                    <FormControl>
-                                        <RadioGroup
-                                        onValueChange={field.onChange}
-                                        defaultValue={field.value}
-                                        className="flex items-center space-x-4"
-                                        >
-                                        <FormItem className="flex items-center space-x-2 space-y-0">
-                                            <FormControl>
-                                            <RadioGroupItem value="mandatory" />
-                                            </FormControl>
-                                            <FormLabel className="font-normal">Obrigatório</FormLabel>
-                                        </FormItem>
-                                        <FormItem className="flex items-center space-x-2 space-y-0">
-                                            <FormControl>
-                                            <RadioGroupItem value="recommended" />
-                                            </FormControl>
-                                            <FormLabel className="font-normal">Recomendado</FormLabel>
-                                        </FormItem>
-                                        </RadioGroup>
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                    ))}
-                    <Button
+              />
+              <div>
+                <h3 className="mb-4 text-lg font-medium">Plano de Leitura</h3>
+                {readingPlanFields.map((item, index) => (
+                  <div key={item.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 p-4 border rounded-md">
+                    <FormField
+                      control={form.control}
+                      name={`readingPlan.${index}.schoolId`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Escola</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione a escola" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {schools.map((school) => {
+                                return (
+                                  <SelectItem key={school.id} value={school.id}>
+                                    {`${school.name[language]}`}
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`readingPlan.${index}.grade`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Ano</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Ano (ex: 1, 2, Iniciação)" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`readingPlan.${index}.status`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Estado</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione o estado" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="mandatory">Obrigatório</SelectItem>
+                              <SelectItem value="recommended">Recomendado</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex items-end">
+                      <Button
                         type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => appendReadingPlan({ schoolId: '', grade: '', status: 'mandatory' })}
-                    >
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Adicionar ao Plano de Leitura
-                    </Button>
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => removeReadingPlan(index)}
+                        className="self-end"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
-                </div>
-
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => appendReadingPlan({ schoolId: "", grade: "", status: "mandatory" })}
+                  className="w-full"
+                >
+                  <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Item ao Plano de Leitura
+                </Button>
+              </div>
             </div>
-            <SheetFooter className="mt-auto pt-4">
+            <SheetFooter className="flex flex-col sm:flex-row sm:justify-end gap-2 mt-4">
               <SheetClose asChild>
                 <Button type="button" variant="outline">
                   Cancelar
                 </Button>
               </SheetClose>
               <Button type="submit" disabled={isSaving}>
-                {isSaving ? "A guardar..." : "Guardar Alterações"}
+                {isSaving ? "A Guardar..." : "Guardar Alterações"}
               </Button>
             </SheetFooter>
           </form>

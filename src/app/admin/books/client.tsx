@@ -96,7 +96,7 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
   };
 
   const handleDeleteBook = (book: Product) => {
-    deleteProduct(book.id, book.image);
+    deleteProduct(book.id);
   };
 
   const getSchoolAbbreviation = (schoolId: string) => {
@@ -199,7 +199,7 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
                       alt={getProductName(product)}
                       className="aspect-square rounded-md object-cover"
                       height="64"
-                      src={product.image || 'https://placehold.co/64x64.png'}
+                      src={'https://placehold.co/64x64.png'}
                       width="64"
                     />
                   </TableCell>
@@ -265,7 +265,7 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
         isOpen={isSheetOpen}
         setIsOpen={setSheetOpen}
         book={selectedBook}
-        onBookSaved={(updatedBook, oldImageUrl) => {
+        onBookSaved={(updatedBook: Product | undefined) => {
           if (updatedBook) {
             (setProducts as any)((prevProducts: Product[]) => {
               const existingIndex = prevProducts.findIndex(p => p.id === updatedBook.id);
@@ -277,9 +277,6 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
                 return [...prevProducts, updatedBook];
               }
             });
-            if (oldImageUrl && oldImageUrl !== updatedBook.image) {
-              deleteImageFromFirebase(oldImageUrl);
-            }
           }
           setSheetOpen(false);
         }}

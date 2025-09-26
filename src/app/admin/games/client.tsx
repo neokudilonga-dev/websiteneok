@@ -65,8 +65,8 @@ export default function GamesPageClient({ initialProducts, initialSchools }: Gam
   const gameProducts = useMemo(() => products.filter(p => p.type === 'game'), [products]);
   
   const getProductName = (product: Product) => {
-    if (!product || !product.name) return 'No Name';
-    return product.name[language] || product.name.pt || 'Unnamed Product';
+    if (!product || !product.name) return '';
+    return product.name[language] || product.name.pt || '';
   }
 
   const filteredProducts = useMemo(() => {
@@ -183,7 +183,7 @@ export default function GamesPageClient({ initialProducts, initialSchools }: Gam
                       alt={getProductName(product)}
                       className="aspect-square rounded-md object-cover"
                       height="64"
-                      src={product.images?.[0] || "https://placehold.co/64x64.png"}
+                      src={"https://placehold.co/64x64.png"}
                       width="64"
                     />
                   </TableCell>
@@ -207,7 +207,7 @@ export default function GamesPageClient({ initialProducts, initialSchools }: Gam
                     })}
                   </TableCell>
                   <TableCell className="hidden md:table-cell">
-                     <Badge variant="outline">{product.images?.length || 0}</Badge>
+                     <Badge variant="outline">{0}</Badge>
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
