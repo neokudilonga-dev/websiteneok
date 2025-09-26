@@ -1,4 +1,3 @@
-
 import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
 import type { Product, ReadingPlanItem } from '@/lib/types';
@@ -30,14 +29,16 @@ export async function POST(request: Request) {
     // Validate product
     const productResult = ProductSchema.safeParse(product);
     if (!productResult.success) {
+      console.error("Product validation error:", productResult.error); // Add more logging
       return NextResponse.json({
         error: 'Invalid product data',
-        details: productResult.error?.flatten?.() ?? 'Unknown validation error'
+        details: productResult.error.flatten().fieldErrors
       }, { status: 400 });
     }
 
     // Validate readingPlan
     if (!Array.isArray(readingPlan)) {
+      console.error("readingPlan is not an array:", readingPlan); // Add more logging
       return NextResponse.json({
         error: 'Invalid readingPlan data',
         details: 'readingPlan must be an array'
@@ -46,15 +47,17 @@ export async function POST(request: Request) {
     for (const item of readingPlan) {
       const planResult = ReadingPlanItemSchema.safeParse(item);
       if (!planResult.success) {
+        console.error("ReadingPlanItem validation error:", planResult.error); // Add more logging
         return NextResponse.json({
           error: 'Invalid readingPlan item',
-          details: planResult.error?.flatten?.() ?? 'Unknown validation error'
+          details: planResult.error.flatten().fieldErrors
         }, { status: 400 });
       }
     }
 
     // If product.image is too large, throw a specific error
     if (product.image && typeof product.image === 'string' && product.image.length > 1048487) {
+      console.error("Product image too large:", product.image.length); // Add more logging
       return NextResponse.json({
         error: 'Product image is too large. Please upload images to Firebase Storage and use a URL instead.'
       }, { status: 400 });
@@ -62,7 +65,7 @@ export async function POST(request: Request) {
 
     const newId = uuidv4();
     const newProduct: Product = {
-      ...product,
+      ...productResult.data, // Use validated data
       id: newId,
     };
 
@@ -84,12 +87,17 @@ export async function POST(request: Request) {
         batch.set(newPlanItemRef, newPlanItem);
     });
 
+    try {
     await batch.commit();
+    } catch (batchError: any) {
+      console.error("Batch commit error:", batchError);
+      return NextResponse.json({ error: 'Failed to commit batch', details: batchError.message }, { status: 500 });
+  }
 
     return NextResponse.json(newProduct, { status: 201 });
   } catch (error: any) {
     console.error('Error adding product:', error);
-    return NextResponse.json({ error: 'Failed to add product', details: error?.message }, { status: 500 });
-  }
+    return NextResponse.json({ error: 'Failed to add product', details: error.message }, { status: 500 });
+}
 }
 

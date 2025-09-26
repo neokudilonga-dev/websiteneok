@@ -1,4 +1,3 @@
-
 export function NeokudilongaLogo({ className }: { className?: string }) {
   return (
     <svg
