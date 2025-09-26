@@ -55,7 +55,7 @@ export interface Product {
   price: number;
   stock?: number;
   image: string;
-  images: string[];
+  images?: string[];
   type: "book" | "game";
   dataAiHint?: string;
   category?: string;

@@ -56,7 +56,7 @@ const bookFormSchema = z.object({
   description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
   price: z.coerce.number().min(0, "O preço deve ser um número positivo."),
   stock: z.coerce.number().min(0, "O stock deve ser um número positivo."),
-  image: z.string().min(1, "A imagem é obrigatória."),
+  image: z.string().optional(),
   category: z.string().min(1, "A categoria é obrigatória."), // Will store the i18n name
   publisher: z.string().optional(),
   stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out']),
@@ -331,7 +331,7 @@ export function AddEditBookSheet({
                   <FormControl>
                     <Input placeholder="Nome do Livro" {...field} />
                   </FormControl>
-                  <FormMessage />
+
                 </FormItem>
               )}
             />

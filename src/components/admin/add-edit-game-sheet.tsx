@@ -53,7 +53,7 @@ const gameFormSchema = z.object({
   description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
   price: z.coerce.number().min(0, "O preço deve ser um número positivo."),
   stock: z.coerce.number().min(0, "O stock deve ser um número positivo."),
-  images: z.array(z.string()).min(1, "Pelo menos uma imagem é obrigatória."),
+  images: z.array(z.string()).optional(),
   stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out']),
   readingPlan: z.array(readingPlanItemSchema).optional(),
 });
@@ -287,7 +287,7 @@ export function AddEditGameSheet({
                             Pode colar imagens aqui
                         </div>
                     </div>
-                    <FormMessage />
+
                   </FormItem>
                 )}
               />
