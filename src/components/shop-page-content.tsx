@@ -105,8 +105,8 @@ export default function ShopPageContent() {
   const filteredBooks = useMemo(() => {
     return products.filter(p => 
         p.type === 'book' && 
-        p.stockStatus !== 'sold_out' &&
-        (p.name[language] || p.name.pt).toLowerCase().includes(bookSearchQuery.toLowerCase()) &&
+        p.stockStatus !== 'sold_out' && 
+        (p.name && ((p.name[language] || p.name.pt) || '')).toLowerCase().includes(bookSearchQuery.toLowerCase()) && 
         (selectedBookCategory === 'all' || p.category === selectedBookCategory)
     )
   }, [products, bookSearchQuery, selectedBookCategory, language]);

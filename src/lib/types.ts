@@ -53,6 +53,7 @@ export interface Product {
     en: string;
   };
   description: string;
+  image?: string; // Add this line
   price: number;
   stock?: number;
   type: "book" | "game";
