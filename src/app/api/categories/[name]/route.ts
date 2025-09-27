@@ -1,11 +1,11 @@
 
 
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
 
 export async function DELETE(
-  request: Request, 
-  context
+  request: NextRequest, 
+  context: { params: { name: string } }
 ) {
   const { params } = context;
     try {
