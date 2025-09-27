@@ -4,7 +4,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function DELETE(request: NextRequest, context: { params: { name: string } }) {
+export async function DELETE(request: NextRequest, context: any) {
     try {
         const { name } = context.params;
         if (!name) {

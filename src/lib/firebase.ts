@@ -1,4 +1,4 @@
-import { initializeApp, FirebaseError } from "firebase/app";
+import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getStorage, ref, deleteObject } from "firebase/storage";
 import { getFirestore } from "firebase/firestore";

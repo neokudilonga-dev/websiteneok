@@ -1,7 +1,8 @@
 
-import { getDisplayName } from "@/lib/utils";
-
 "use client";
+
+// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+import { getDisplayName } from "@/lib/utils";
 
 import { useState, useMemo, useEffect } from "react";
 import {

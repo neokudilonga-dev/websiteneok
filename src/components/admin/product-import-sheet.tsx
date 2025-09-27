@@ -24,7 +24,7 @@ interface ProductImportSheetProps {
 export function ProductImportSheet({ isOpen, onClose, onSuccess }: ProductImportSheetProps) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<any[]>([]);
+  const [_results, setResults] = useState<any[]>([]);
   const { toast } = useToast();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

@@ -11,7 +11,7 @@ export async function PUT(request: Request, context: any) {
     
     const schoolRef = firestore.collection('schools').doc(id);
     // Remove id from body to avoid duplicate keys
-    const { id: bodyId, ...updateData } = body;
+    const { id: _bodyId, ...updateData } = body;
     await schoolRef.update(updateData);
     return NextResponse.json({ ...updateData, id }, { status: 200 });
   } catch (error) {

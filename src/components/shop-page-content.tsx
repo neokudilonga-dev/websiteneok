@@ -14,7 +14,7 @@ import { useCart } from "@/context/cart-context";
 
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useData, useGlobalLoading } from "@/context/data-context";
+import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
 import { getDisplayName } from "@/lib/utils";
 import type { School, Product, ReadingPlanItem, Category } from "@/lib/types";
