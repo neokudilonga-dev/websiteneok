@@ -3,11 +3,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from "next/link";
-import Image from "next/image";
 import Header from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, BookOpen, Gamepad2, ShoppingBag } from "lucide-react";
+import { BookOpen, Gamepad2, ShoppingBag } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
 import { AdminButton } from "@/components/admin-button";
 

@@ -10,7 +10,7 @@ export async function GET() {
     const gameList = gameSnapshot.docs.map((doc) => {
       const data = doc.data();
       // Exclude image links
-      const { images, ...rest } = data;
+      const { _images, ...rest } = data; // eslint-disable-line @typescript-eslint/no-unused-vars
       return rest;
     });
 

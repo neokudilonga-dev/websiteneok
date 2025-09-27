@@ -19,10 +19,10 @@ import { useLanguage } from "@/context/language-context";
 
 interface ProductCardProps {
   product: Product;
-  renderBadge?: (product: Product) => React.ReactNode;
+  productBadgeRenderer?: (product: Product) => React.ReactNode;
 }
 
-export default function ProductCard({ product, renderBadge }: ProductCardProps) {
+export default function ProductCard({ product, productBadgeRenderer }: ProductCardProps) {
   const { addToCart } = useCart();
   const { t, language } = useLanguage();
   
@@ -79,7 +79,7 @@ export default function ProductCard({ product, renderBadge }: ProductCardProps) 
           </div>
         )}
         <div className="absolute top-2 flex w-full justify-end gap-2 pr-2">
-            {renderBadge ? renderBadge(product) : null}
+            {productBadgeRenderer ? productBadgeRenderer(product) : null}
             {isOutOfStock && <Badge variant="secondary" className="bg-yellow-500/80 text-black">{t('stock_status.out_of_stock')}</Badge>}
             <Badge
                 className="capitalize"

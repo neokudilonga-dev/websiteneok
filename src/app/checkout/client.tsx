@@ -6,8 +6,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import { useLanguage } from "@/context/language-context";
+import { getDisplayName } from "@/lib/utils";
 import CheckoutForm from "@/components/checkout-form";
-
 
 export default function CheckoutClient() {
   const { cartItems, cartTotal } = useCart();
@@ -42,17 +42,15 @@ export default function CheckoutClient() {
                       <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border">
                         <Image
                           src={
-                            item.type === "book"
-                              ? item.image || "https://placehold.co/64x64.png"
-                              : item.images?.[0] || "https://placehold.co/64x64.png"
+                            (typeof item.image === 'string' ? item.image : item.image?.[0]) || "https://placehold.co/64x64.png"
                           }
-                          alt={item.name[language] || item.name.pt}
+                          alt={getDisplayName(item.name, language)}
                           fill
                           className="object-cover"
                         />
                       </div>
                       <div className="flex-1">
-                        <p className="font-semibold">{item.name[language] || item.name.pt}</p>
+                        <p className="font-semibold">{getDisplayName(item.name, language)}</p>
                         <p className="text-sm text-muted-foreground">
                           {item.quantity} x{" "}
                           {item.price.toLocaleString("pt-PT", {

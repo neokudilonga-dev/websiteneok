@@ -65,7 +65,7 @@ export async function POST(request: Request) {
 
     const newProduct: Product = {
       ...productResult.data, // Use validated data
-      id: productResult.data.name, // Use user-provided name as ID
+      id: productResult.data.name ?? '', // Use user-provided name as ID, with fallback
       name: productResult.data.name, // Ensure name field also stores the user-provided name
     };
 

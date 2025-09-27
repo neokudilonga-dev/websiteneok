@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { LogOut } from "lucide-react";
-import { getAuth, signOut } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { app } from "../../lib/firebase";
 
 export function LogoutButton() {

@@ -1,10 +1,11 @@
 
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
 
-export async function PUT(request: Request, context: any) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function PUT(request: NextRequest, context: { params: { reference: string } }) {
   try {
-    const { reference } = params;
+    const { reference } = context.params;
     const body = await request.json();
     
     if (!body.paymentStatus && !body.deliveryStatus) {

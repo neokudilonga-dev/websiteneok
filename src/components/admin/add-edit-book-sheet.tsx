@@ -23,19 +23,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form";
 import type { Product } from "@/lib/types";
-import { useEffect, useState, ChangeEvent, useMemo } from "react";
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
-import { app } from "@/lib/firebase";
-import { PlusCircle, Trash2, Upload } from "lucide-react";
+import { useEffect, useState, useMemo } from "react";
+import { PlusCircle, Trash2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import Image from "next/image";
 import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
-import imageCompression from 'browser-image-compression';
 import { getDisplayName } from "@/lib/utils";
 
 const readingPlanItemSchema = z.object({
@@ -114,7 +109,7 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
             const data = await res.json();
             setCategories(data);
           }
-        } catch (e) {
+        } catch {
           // ignore
         }
       }
@@ -220,7 +215,7 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
                     <Input
                       placeholder={t('books_page.name_placeholder')}
                       value={typeof field.value === 'string' ? field.value : (field.value?.[language] || '')}
-                      onChange={(e) =>
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         field.onChange(
                           typeof field.value === 'string'
                             ? e.target.value
@@ -246,7 +241,7 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
                     <Textarea
                       placeholder={t('books_page.description_placeholder')}
                       value={typeof field.value === 'string' ? field.value : (field.value?.[language] || '')}
-                      onChange={(e) =>
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                         field.onChange(
                           typeof field.value === 'string'
                             ? e.target.value

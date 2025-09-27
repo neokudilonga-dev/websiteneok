@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/select";
 import type { School } from "@/lib/types";
 import { useLanguage } from "@/context/language-context";
+import { getDisplayName } from "@/lib/utils";
 
 interface SchoolSelectorProps {
   schools: School[];
@@ -23,7 +24,7 @@ export default function SchoolSelector({
   onSchoolChange,
   isLoading
 }: SchoolSelectorProps) {
-    const { language, t } = useLanguage();
+  const { language } = useLanguage();
 
   return (
     <Select onValueChange={onSchoolChange} value={selectedSchool?.id}>
@@ -33,7 +34,7 @@ export default function SchoolSelector({
       <SelectContent>
         {schools.map((school) => (
           <SelectItem key={school.id} value={school.id}>
-            {school.name}
+            {getDisplayName(school.name, language)}
           </SelectItem>
         ))}
       </SelectContent>

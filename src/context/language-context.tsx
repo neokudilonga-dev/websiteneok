@@ -1,4 +1,6 @@
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
 
 import { createContext, useContext, useState, ReactNode, useCallback, useEffect } from "react";
@@ -18,8 +20,13 @@ const translations = { pt, en };
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 // Helper function to get nested keys
-const getNestedValue = (obj: any, key: string): string | undefined => {
-  return key.split('.').reduce((o, i) => (o ? o[i] : undefined), obj);
+const getNestedValue = (obj: Record<string, unknown>, key: string): string | undefined => {
+  return key.split('.').reduce((o: Record<string, unknown> | undefined, i: string) => {
+    if (o && typeof o === 'object' && i in o) {
+      return (o as Record<string, unknown>)[i] as Record<string, unknown> | undefined;
+    }
+    return undefined;
+  }, obj) as string | undefined;
 };
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {

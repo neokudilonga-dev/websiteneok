@@ -9,7 +9,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, MoreHorizontal, Search, Filter, Upload } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Search, Filter } from "lucide-react";
 import {
   Table,
   TableHeader,
@@ -159,7 +159,6 @@ export default function GamesPageClient({ initialProducts, initialSchools }: Gam
               {t('games_page.add_new_game')}
             </Button>
             <Button onClick={() => setImportSheetOpen(true)} className="shrink-0">
-              <Upload className="mr-2" />
               Importar/Exportar Jogos
             </Button>
           </div>

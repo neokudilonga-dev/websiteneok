@@ -4,8 +4,10 @@
 import Link from "next/link";
 import Cart from "./cart";
 import { NeokudilongaLogo } from "./logo";
-import { Button } from "./ui/button";
+import { } from "lucide-react";
+import { } from "@/context/cart-context";
 import { useLanguage } from "@/context/language-context";
+import { } from "@/components/ui/sheet";
 import LanguageSwitcher from "./language-switcher";
 
 export default function Header() {

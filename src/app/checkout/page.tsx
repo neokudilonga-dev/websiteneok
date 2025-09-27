@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, Suspense } from 'react';
 import Header from "@/components/header";
 import CheckoutClient from "./client";
 import { useData } from '@/context/data-context';

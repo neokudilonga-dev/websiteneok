@@ -1,7 +1,7 @@
 
 "use client";
 
-import { createContext, useContext, useState, ReactNode, useCallback } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 import type { School, Product, ReadingPlanItem, Order, Category, PaymentStatus, DeliveryStatus } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "./language-context";
@@ -78,10 +78,7 @@ export const DataProvider = ({
   const [orders, setOrders] = useState<Order[]>([]);
   const { toast } = useToast();
   
-  const refetchData = useCallback(async () => {
-    // This function will now be called by individual pages after they fetch their initial data
-    // to update the context state.
-  }, []);
+
 
 
   // School mutations

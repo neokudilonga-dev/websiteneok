@@ -1,4 +1,5 @@
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -12,7 +13,6 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import CartItem from "./cart-item";
@@ -22,7 +22,7 @@ import { useLanguage } from "@/context/language-context";
 
 export default function Cart() {
   const { cartItems, cartCount, cartTotal } = useCart();
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   const individualItems = cartItems.filter(item => !item.kitId);
   const kitItems: Record<string, CartItemType[]> = cartItems.reduce((acc, item) => {
@@ -76,6 +76,7 @@ export default function Cart() {
 
               <div className="flex items-center justify-between text-lg font-semibold">
                 <span>{t('common.total')} ..</span>
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 <span>{cartTotal.toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
               </div>
               <SheetClose asChild>

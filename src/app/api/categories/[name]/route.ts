@@ -3,13 +3,10 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
 
-export async function DELETE(
-  request: NextRequest, 
-  context: any
-) {
-  const { params } = context;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function DELETE(request: NextRequest, context: { params: { name: string } }) {
     try {
-        const name = decodeURIComponent(params.name);
+        const { name } = context.params;
         if (!name) {
             return NextResponse.json({ error: 'Category name is required' }, { status: 400 });
         }

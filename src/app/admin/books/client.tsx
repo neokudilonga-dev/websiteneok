@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import {
   Card,
   CardHeader,
@@ -35,7 +35,7 @@ import { AddEditBookSheet } from "@/components/admin/add-edit-book-sheet";
 import { Input } from "@/components/ui/input";
 import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
-import { deleteImageFromFirebase } from "@/lib/firebase";
+
 import { getDisplayName } from "@/lib/utils";
 import { ProductImportSheet } from "@/components/admin/product-import-sheet";
 
@@ -75,16 +75,20 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
     return product.id; // Now returns the document ID as the name
   }
 
+  const getBookReadingPlan = useCallback((productId: string) => {
+    return readingPlan.filter((item: ReadingPlanItem) => item.productId === productId);
+  }, [readingPlan]);
+
   const filteredProducts = useMemo(() => {
     return bookProducts.filter((product) => {
       const name = getProductName(product) || '';
       const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStock = stockFilter === 'all' || product.stockStatus === stockFilter;
       const matchesPublisher = publisherFilter === 'all' || product.publisher === publisherFilter;
-      const matchesSchool = schoolFilter === 'all' || getBookReadingPlan(product.id).some(item => item.schoolId === schoolFilter);
+      const matchesSchool = schoolFilter === 'all' || getBookReadingPlan(product.id).some((item: ReadingPlanItem) => item.schoolId === schoolFilter);
       return matchesSearch && matchesStock && matchesPublisher && matchesSchool;
     });
-  }, [bookProducts, searchQuery, stockFilter, publisherFilter, schoolFilter]); // Removed language from dependency array
+  }, [bookProducts, searchQuery, stockFilter, publisherFilter, schoolFilter, getBookReadingPlan]); // Removed language from dependency array
 
   const handleAddBook = () => {
     setSelectedBook(undefined);
@@ -102,10 +106,6 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
 
   const getSchoolAbbreviation = (schoolId: string) => {
     return schools.find(s => s.id === schoolId)?.abbreviation || schoolId;
-  }
-  
-  const getBookReadingPlan = (productId: string) => {
-    return readingPlan.filter(item => item.productId === productId);
   }
   
   const getStatusLabel = (status: Product['stockStatus']) => {
@@ -285,6 +285,12 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
       <ProductImportSheet
         isOpen={isImportSheetOpen}
         onClose={() => setImportSheetOpen(false)}
+        onSuccess={() => {
+          // Optionally refresh products after successful import
+          // This might involve refetching data or updating state
+          // For now, we'll just close the sheet
+          setImportSheetOpen(false);
+        }}
       />
     </>
   );

@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
+import { getDisplayName } from "@/lib/utils";
 
 import {
   Form,
@@ -38,16 +39,16 @@ const checkoutSchema = z.object({
     "levantamento-local",
   ]),
   deliveryAddress: z.string().optional(),
-  paymentMethod: z.enum(["numerario", "multicaixa", "transferencia"]),
 });
 
 
 export default function CheckoutForm() {
     const router = useRouter();
     const { toast } = useToast();
+    const { t } = useLanguage();
     const { cartItems, cartTotal, clearCart } = useCart();
     const { readingPlan, schools, addOrder } = useData();
-    const { t, language } = useLanguage();
+    const { language } = useLanguage();
 
     const readingPlanProductIdsInCart = useMemo(() => {
         const readingPlanProductIds = new Set(readingPlan.map(item => item.productId));
@@ -59,7 +60,7 @@ export default function CheckoutForm() {
     const schoolsInCart = useMemo(() => {
         const schoolIdsInCart = new Set(readingPlan.filter(rp => readingPlanProductIdsInCart.some(ci => ci.id === rp.productId)).map(rp => rp.schoolId));
         return schools.filter(school => schoolIdsInCart.has(school.id));
-    }, [readingPlanProductIdsInCart, schools]);
+    }, [readingPlanProductIdsInCart, schools, readingPlan]);
 
     const allowPickupAtSchool = useMemo(() => {
         return requiresStudentInfo && schoolsInCart.some(school => school.allowPickup);
@@ -100,12 +101,10 @@ export default function CheckoutForm() {
             email: "",
             deliveryOption: "tala-morro",
             deliveryAddress: "",
-            paymentMethod: "numerario",
         },
     });
 
     const deliveryOption = form.watch("deliveryOption");
-    const paymentMethod = form.watch("paymentMethod");
 
     const getDeliveryFee = () => {
         switch (deliveryOption) {
@@ -142,11 +141,12 @@ export default function CheckoutForm() {
 
         const orderReference = generateOrderReference();
         const schoolInCart = schoolsInCart.length > 0 ? schoolsInCart[0] : undefined;
-        const schoolName = schoolInCart ? (schoolInCart.name[language] || schoolInCart.name.pt) : undefined;
+        const schoolName = schoolInCart ? getDisplayName(schoolInCart.name, language) : undefined;
         
         try {
             await addOrder({
                 ...data,
+                paymentMethod: "unspecified", // Add this line
                 deliveryAddress: data.deliveryAddress || null,
                 items: cartItems,
                 total: finalTotal,
@@ -160,7 +160,6 @@ export default function CheckoutForm() {
             clearCart();
             const urlParams = new URLSearchParams();
             urlParams.set("ref", orderReference);
-            urlParams.set("payment", data.paymentMethod);
             router.push(`/order-confirmation?${urlParams.toString()}`);
 
             toast({
@@ -296,33 +295,7 @@ export default function CheckoutForm() {
 
                  <div className="space-y-4 rounded-lg border bg-card p-6">
                     <h3 className="text-xl font-semibold">{t('checkout_form.payment_method')}</h3>
-                     <FormField
-                        control={form.control}
-                        name="paymentMethod"
-                        render={({ field }) => (
-                            <FormItem className="space-y-3">
-                                <FormControl>
-                                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex flex-col space-y-2">
-                                        <FormItem className="flex items-center space-x-3 space-y-0">
-                                            <FormControl><RadioGroupItem value="numerario" /></FormControl>
-                                            <FormLabel className="font-normal">{t('checkout_form.payment_method_1')}</FormLabel>
-                                        </FormItem>
-                                        { (deliveryOption === 'levantamento' || deliveryOption === 'levantamento-local') && (
-                                            <FormItem className="flex items-center space-x-3 space-y-0">
-                                                <FormControl><RadioGroupItem value="multicaixa" /></FormControl>
-                                                <FormLabel className="font-normal">{t('checkout_form.payment_method_2')}</FormLabel>
-                                            </FormItem>
-                                        )}
-                                        <FormItem className="flex items-center space-x-3 space-y-0">
-                                            <FormControl><RadioGroupItem value="transferencia" /></FormControl>
-                                            <FormLabel className="font-normal">{t('checkout_form.payment_method_3')}</FormLabel>
-                                        </FormItem>
-                                    </RadioGroup>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                     
                 </div>
 
                 <Button type="submit" size="lg" className="w-full">

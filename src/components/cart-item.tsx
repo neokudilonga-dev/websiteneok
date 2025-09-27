@@ -3,7 +3,6 @@
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useCart } from "@/context/cart-context";
 import type { CartItem as CartItemType } from "@/lib/types";
 import { Minus, Plus, X } from "lucide-react";

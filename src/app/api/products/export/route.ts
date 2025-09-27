@@ -10,7 +10,7 @@ export async function GET() {
     const productList = productSnapshot.docs.map((doc) => {
       const data = doc.data();
       const id = doc.id; // Get the document ID
-      const { name, images, ...rest } = data; // Exclude name and images from data
+      const { ...rest } = data; // Exclude name and images from data
       return { id, ...rest }; // Combine id with the rest of the data
     });
 

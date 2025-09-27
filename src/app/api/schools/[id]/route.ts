@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
 import type { School } from '@/lib/types';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function PUT(request: Request, context: any) {
   try {
     const { id } = context.params;
@@ -10,7 +11,7 @@ export async function PUT(request: Request, context: any) {
     
     const schoolRef = firestore.collection('schools').doc(id);
     // Remove id from body to avoid duplicate keys
-    const { id: _id, ...updateData } = body;
+    const { id: bodyId, ...updateData } = body;
     await schoolRef.update(updateData);
     return NextResponse.json({ ...updateData, id }, { status: 200 });
   } catch (error) {
@@ -19,6 +20,7 @@ export async function PUT(request: Request, context: any) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function DELETE(request: Request, context: any) {
     try {
         const { id } = context.params;

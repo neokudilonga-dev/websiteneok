@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { z } from "zod";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -24,14 +23,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form";
 import type { Product } from "@/lib/types";
-import { useEffect, ChangeEvent, useState } from "react";
-import { PlusCircle, Trash2, Upload } from "lucide-react";
+import { useEffect, useState } from "react";
+import { PlusCircle, Trash2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import Image from "next/image";
 import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
 import { getDisplayName } from "@/lib/utils";
@@ -123,7 +120,7 @@ export function AddEditGameSheet({
         });
       }
     }
-  }, [game, form, isOpen, readingPlan]);
+  }, [game, form, isOpen, readingPlan, language]);
 
   const onSubmit = async (data: GameFormValues) => {
     setAsyncError(null);

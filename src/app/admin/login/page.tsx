@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
@@ -33,33 +33,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  // ✅ Automatically redirect if already signed in
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const email = user.email || "";
-        const allowedAdmins = [
-          "neokudilonga@gmail.com",
-          "anaruimelo@gmail.com",
-          "joaonfmelo@gmail.com"
-        ];
-        if (allowedAdmins.includes(email)) {
-          const idToken = await user.getIdToken();
-          await handleLoginSuccess(idToken);
-        } else {
-          toast({
-            title: "Access Denied",
-            description: "You are not an admin.",
-            variant: "destructive",
-          });
-        }
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  const handleLoginSuccess = async (idToken: string) => {
+  const handleLoginSuccess = useCallback(async (idToken: string) => {
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
@@ -91,7 +65,33 @@ export default function LoginPage() {
       });
       setLoading(false);
     }
-  };
+  }, [router, toast]);
+
+  // ✅ Automatically redirect if already signed in
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const email = user.email || "";
+        const allowedAdmins = [
+          "neokudilonga@gmail.com",
+          "anaruimelo@gmail.com",
+          "joaonfmelo@gmail.com"
+        ];
+        if (allowedAdmins.includes(email)) {
+          const idToken = await user.getIdToken();
+          await handleLoginSuccess(idToken);
+        } else {
+          toast({
+            title: "Access Denied",
+            description: "You are not an admin.",
+            variant: "destructive",
+          });
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, [handleLoginSuccess, toast]);
 
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();

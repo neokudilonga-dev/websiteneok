@@ -44,7 +44,7 @@ interface CategoriesPageClientProps {
 
 export default function CategoriesPageClient({ initialCategories }: CategoriesPageClientProps) {
   const { categories, addCategory, deleteCategory, setCategories } = useData();
-  const { t, language } = useLanguage();
+  const { t, language } = useLanguage(); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [newCategoryNamePT, setNewCategoryNamePT] = useState('');
   const [newCategoryNameEN, setNewCategoryNameEN] = useState('');
   const [newCategoryType, setNewCategoryType] = useState<'book' | 'game'>('book');
@@ -64,7 +64,7 @@ export default function CategoriesPageClient({ initialCategories }: CategoriesPa
           c.name.en.toLowerCase() === newCategoryNameEN.toLowerCase()
       )
     ) {
-      addCategory({ name: { pt: newCategoryNamePT, en: newCategoryNameEN }, type: newCategoryType });
+      addCategory({ id: Date.now().toString(), name: { pt: newCategoryNamePT, en: newCategoryNameEN }, type: newCategoryType });
       setNewCategoryNamePT('');
       setNewCategoryNameEN('');
       setNewCategoryType('book');
@@ -121,14 +121,14 @@ export default function CategoriesPageClient({ initialCategories }: CategoriesPa
               </TableRow>
             </TableHeader>
             <TableBody>
-              {categories.length === 0 ? (
+              {(categories && categories.length === 0) ? (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center text-muted-foreground">
                     Nenhuma categoria cadastrada ainda.
                   </TableCell>
                 </TableRow>
               ) : (
-                categories.map((category: Category, idx: number) => {
+                categories && categories.map((category: Category, idx: number) => {
                   let pt = '-';
                   let en = '-';
                   if (typeof category.name === 'string') {

@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { NeokudilongaLogo } from "@/components/logo";
 import type { Order } from "@/lib/types";
 import { Download, Printer } from "lucide-react";
+import { getDisplayName } from "@/lib/utils";
 
 interface OrderReceiptSheetProps {
   isOpen: boolean;
@@ -139,7 +140,7 @@ export function OrderReceiptSheet({
                 <tbody>
                     {order.items.map(item => (
                         <tr key={item.id} className="border-b">
-                            <td className="p-2 border border-black">{item.name}</td>
+                            <td className="p-2 border border-black">{getDisplayName(item.name, "pt")}</td>
                             <td className="p-2 border border-black text-right">{item.price.toLocaleString('pt-PT')}Kz</td>
                         </tr>
                     ))}

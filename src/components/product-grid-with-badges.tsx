@@ -25,7 +25,7 @@ const ProductGridWithBadges: React.FC<ProductGridWithBadgesProps> = ({
   return (
     <ProductGrid
       products={products}
-      renderBadge={(product) => {
+      productBadgeRenderer={(product: Product) => {
         const planItem = gradePlan.find((gp) => gp.productId === product.id);
         if (planItem) {
           return (

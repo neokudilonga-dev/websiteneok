@@ -12,6 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
+import { getDisplayName } from "@/lib/utils";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -70,7 +72,7 @@ export function AddEditSchoolSheet({
     if (isOpen) {
       if (school) {
         form.reset({
-          name: school.name,
+          name: getDisplayName(school.name, "pt"), // Assuming 'pt' as default language for admin
           id: school.id,
           abbreviation: school.abbreviation,
           allowPickup: school.allowPickup || false,

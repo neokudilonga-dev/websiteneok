@@ -1,4 +1,6 @@
 
+import { getDisplayName } from "@/lib/utils";
+
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
@@ -109,7 +111,7 @@ export default function OrdersPageClient({ initialOrders, initialSchools }: Orde
   const getSchoolName = (schoolId: string | undefined) => {
     if (!schoolId || schoolId === 'livraria') return t('orders_page.bookstore_client');
     const school = schools.find(s => s.id === schoolId)
-    return school ? (school.name[language] || school.name.pt) : schoolId;
+    return school ? getDisplayName(school.name, language) : schoolId;
   }
 
   return (
@@ -139,7 +141,7 @@ export default function OrdersPageClient({ initialOrders, initialSchools }: Orde
                     <SelectContent>
                         <SelectItem value="all">{t('orders_page.all_clients')}</SelectItem>
                         {schools.map(school => (
-                            <SelectItem key={school.id} value={school.id}>{school.name[language] || school.name.pt}</SelectItem>
+                            <SelectItem key={school.id} value={school.id}>{getDisplayName(school.name, language)}</SelectItem>
                         ))}
                         <SelectItem value="livraria">{t('orders_page.bookstore_client')}</SelectItem>
                     </SelectContent>

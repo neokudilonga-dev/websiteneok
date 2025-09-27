@@ -1,6 +1,6 @@
 
 import { firestore } from "@/lib/firebase-admin";
-import type { Product, ReadingPlanItem, School, Category } from "@/lib/types";
+import type { Product, ReadingPlanItem, School } from "@/lib/types";
 import BooksPageClient from "./client";
 
 async function getAdminData() {

@@ -35,7 +35,7 @@ export interface ReadingPlanItem {
 
 export interface School {
   id: string;
-  name: string | {
+  name?: string | {
     pt: string;
     en: string;
   };

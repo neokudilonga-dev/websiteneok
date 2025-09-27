@@ -13,16 +13,15 @@ import {
   SheetTitle,
   SheetClose
 } from "@/components/ui/sheet";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Spinner from "@/components/ui/spinner";
 
 interface ProductImportSheetProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess: () => void;
 }
 
-export function ProductImportSheet({ isOpen, onClose }: ProductImportSheetProps) {
+export function ProductImportSheet({ isOpen, onClose, onSuccess }: ProductImportSheetProps) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any[]>([]);
@@ -75,7 +74,7 @@ export function ProductImportSheet({ isOpen, onClose }: ProductImportSheetProps)
           title: "Import successful",
           description: data.message,
         });
-        setResults(data.results);
+        onSuccess();
       } else {
         toast({
           title: "Import failed",

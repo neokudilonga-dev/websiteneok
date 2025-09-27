@@ -20,7 +20,7 @@ import { useLanguage } from "@/context/language-context";
 
 export function AdminSidebarMenu() {
     const pathname = usePathname();
-    const { t } = useLanguage();
+    const { t } = useLanguage(); // eslint-disable-line @typescript-eslint/no-unused-vars
 
     const isActive = (path: string) => pathname === path;
     const isPartiallyActive = (path: string) => pathname.startsWith(path);
@@ -29,7 +29,6 @@ export function AdminSidebarMenu() {
         <SidebarMenu>
             <SidebarMenuItem>
                 <SidebarMenuButton
-                href="/admin"
                 asChild
                 isActive={isActive("/admin")}
                 tooltip={'Dashboard'}
@@ -42,7 +41,6 @@ export function AdminSidebarMenu() {
             </SidebarMenuItem>
             <SidebarMenuItem>
                 <SidebarMenuButton
-                href="/admin/books"
                 asChild
                 isActive={isPartiallyActive("/admin/books")}
                 tooltip={'Books'}
@@ -55,7 +53,6 @@ export function AdminSidebarMenu() {
             </SidebarMenuItem>
             <SidebarMenuItem>
                 <SidebarMenuButton
-                href="/admin/games"
                 asChild
                 isActive={isPartiallyActive("/admin/games")}
                 tooltip={'Games'}
@@ -68,7 +65,6 @@ export function AdminSidebarMenu() {
             </SidebarMenuItem>
             <SidebarMenuItem>
                 <SidebarMenuButton
-                href="/admin/schools"
                 asChild
                 isActive={isPartiallyActive("/admin/schools")}
                 tooltip={'Schools'}
@@ -81,7 +77,6 @@ export function AdminSidebarMenu() {
             </SidebarMenuItem>
             <SidebarMenuItem>
                 <SidebarMenuButton
-                href="/admin/categories"
                 asChild
                 isActive={isPartiallyActive("/admin/categories")}
                 tooltip={'Categories'}
@@ -94,7 +89,6 @@ export function AdminSidebarMenu() {
             </SidebarMenuItem>
             <SidebarMenuItem>
                 <SidebarMenuButton
-                href="/admin/publishers"
                 asChild
                 isActive={isPartiallyActive("/admin/publishers")}
                 tooltip={'Publishers'}
@@ -107,7 +101,6 @@ export function AdminSidebarMenu() {
             </SidebarMenuItem>
             <SidebarMenuItem>
                 <SidebarMenuButton
-                href="/admin/orders"
                 asChild
                 isActive={isPartiallyActive("/admin/orders")}
                 tooltip={'Orders'}

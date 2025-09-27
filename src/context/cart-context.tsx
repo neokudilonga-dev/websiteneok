@@ -6,6 +6,7 @@ import type { CartItem, Product } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from 'uuid';
 import { useLanguage } from "./language-context";
+import { getDisplayName } from "@/lib/utils";
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -39,7 +40,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     });
     toast({
       title: t('cart.toast.added_title'),
-      description: t('cart.toast.added_description', { name: product.name[language] || product.name.pt }),
+      description: t('cart.toast.added_description', { name: getDisplayName(product.name, language) }),
     });
   };
 
@@ -54,7 +55,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       return newItems;
     });
 
-    const productNames = products.map(p => p.name[language] || p.name.pt).join(', ');
+    const productNames = products.map(p => getDisplayName(p.name, language)).join(', ');
     toast({
       title: t('cart.toast.kit_added_title'),
       description: (
@@ -73,7 +74,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     );
      toast({
       title: t('cart.toast.removed_title'),
-      description: t('cart.toast.removed_description', { name: itemToRemove?.name[language] || itemToRemove?.name.pt || '' }),
+      description: t('cart.toast.removed_description', { name: getDisplayName(itemToRemove?.name, language) }),
       variant: 'destructive'
     });
   };

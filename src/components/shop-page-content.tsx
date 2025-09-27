@@ -11,14 +11,13 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ShoppingCart, Search, ArrowLeft } from "lucide-react";
 import { useCart } from "@/context/cart-context";
-import { Badge } from "@/components/ui/badge";
+
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useData } from "@/context/data-context";
+import { useData, useGlobalLoading } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
 import { getDisplayName } from "@/lib/utils";
 import type { School, Product, ReadingPlanItem, Category } from "@/lib/types";
-import ProductCard from "./product-card";
 import { SidebarMenuSkeleton } from "@/components/ui/sidebar";
 
 
@@ -67,7 +66,7 @@ export const ShopPageContent = ({
 
   const [gameSearchQuery, setGameSearchQuery] = useState("");
   const [selectedGameCategory, setSelectedGameCategory] = useState("all");
-  
+
   useEffect(() => {
     // Sync tab state if URL changes
     const tabFromUrl = searchParams.get('tab');
@@ -76,11 +75,6 @@ export const ShopPageContent = ({
     }
   }, [searchParams, activeTab]);
 
-  const handleSchoolSelect = (schoolId: string) => {
-    const school = schools.find(s => s.id === schoolId);
-    setSelectedSchool(school);
-    setShowIndividual(null); // Reset when school changes
-  };
 
   const handleGoBackToSchoolSelection = () => {
     setSelectedSchool(undefined);
@@ -132,8 +126,8 @@ export const ShopPageContent = ({
     })
   }, [products, gameSearchQuery, selectedGameCategory, language]);
 
-  const bookCategories = useMemo(() => categories.filter(c => c.type === 'book'), [categories]);
-  const gameCategories = useMemo(() => categories.filter(c => c.type === 'game'), [categories]);
+  const bookCategories = useMemo(() => categories.filter(cat => cat.type === 'book'), [categories]);
+  const gameCategories = useMemo(() => categories.filter(cat => cat.type === 'game'), [categories]);
 
 
   const filteredBooks = useMemo(() => {
@@ -179,35 +173,12 @@ export const ShopPageContent = ({
     }
   };
 
-  const renderProductGridWithBadges = (products: Product[], grade: string) => {
-    const gradePlan = schoolReadingPlan.filter(p => String(p.grade) === grade);
-
-    const bookCategories = useMemo(() => categories.filter(cat => cat.type === 'book'), [categories]);
-  const gameCategories = useMemo(() => categories.filter(cat => cat.type === 'game'), [categories]);
-
-  return (
-      <ProductGrid products={products} renderBadge={(product) => {
-        const planItem = gradePlan.find(gp => gp.productId === product.id);
-        if (planItem) {
-          return (
-            <Badge
-              variant={planItem.status === 'mandatory' ? 'default' : 'secondary'}
-              className="capitalize"
-            >
-              {planItem.status === 'mandatory' ? t('shop.mandatory') : t('shop.recommended')}
-            </Badge>
-          );
-        }
-        return null;
-      }} />
-    );
-  };
   
   const calculateKitPrice = (products: Product[]) => {
     return products.reduce((acc, product) => acc + product.price, 0);
   }
 
-  const customGradeSort = (a: [string, any], b: [string, any]) => {
+  const customGradeSort = (a: [string, GradeProducts], b: [string, GradeProducts]) => {
       const gradeA = a[0];
       const gradeB = b[0];
 
@@ -222,6 +193,10 @@ export const ShopPageContent = ({
       const orderB = getOrder(gradeB);
 
       return orderA - orderB;
+  };
+
+  const sortGradeKeys = (gradeA: string, gradeB: string) => {
+    return customGradeSort([gradeA, { mandatory: [], recommended: [], all: [] }], [gradeB, { mandatory: [], recommended: [], all: [] }]);
   };
 
   const getGradeDisplayName = (grade: string) => {
@@ -259,7 +234,7 @@ export const ShopPageContent = ({
                       </Button>
                   </div>
                  {Object.keys(productsByGrade).length > 0 ? (
-                  <Accordion type="single" collapsible className="w-full" defaultValue={`item-${Object.keys(productsByGrade).sort((a,b) => customGradeSort([a,0],[b,0]))[0]}`} onValueChange={() => setShowIndividual(null)}>
+                  <Accordion type="single" collapsible className="w-full" defaultValue={`item-${(Object.keys(productsByGrade).sort(sortGradeKeys) as string[])[0] || ''}`} onValueChange={() => setShowIndividual(null)}>
                     {Object.entries(productsByGrade).sort(customGradeSort).map(([grade, gradeProducts]) => (
                       <AccordionItem value={`item-${grade}`} key={grade}>
                         <AccordionTrigger className="text-xl font-semibold">
@@ -334,15 +309,12 @@ export const ShopPageContent = ({
                            <button
                             key={school.id}
                             onClick={() => setSelectedSchool(school)}
-                            className="flex flex-col items-center justify-center rounded-lg border p-6 text-center transition-all hover:shadow-lg"
+                            className="flex flex-col items-center justify-center rounded-lg border bg-secondary p-6 text-center transition-all hover:shadow-lg"
                           >
                             <h3 className="font-headline text-xl font-semibold tracking-tight">
                               {getDisplayName(school.name, language)}
                             </h3>
-                            <p className="mt-1 text-muted-foreground">
-                              {getDisplayName(school.description, language)}
-                            </p>
-                          </button>
+                            </button>
                       ))}
                   </div>
               )}
