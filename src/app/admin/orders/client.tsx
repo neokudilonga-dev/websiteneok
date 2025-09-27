@@ -39,6 +39,17 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface OrdersPageClientProps {
     initialOrders: Order[];
@@ -46,7 +57,7 @@ interface OrdersPageClientProps {
 }
 
 export default function OrdersPageClient({ initialOrders, initialSchools }: OrdersPageClientProps) {
-  const { orders, schools, updateOrderPaymentStatus, updateOrderDeliveryStatus, setOrders, setSchools } = useData();
+  const { orders, schools, updateOrderPaymentStatus, updateOrderDeliveryStatus, setOrders, setSchools, deleteOrder } = useData();
   const { t, language } = useLanguage();
 
   useEffect(() => {
@@ -57,9 +68,18 @@ export default function OrdersPageClient({ initialOrders, initialSchools }: Orde
 
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isReceiptOpen, setReceiptOpen] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
   
   const [searchQuery, setSearchQuery] = useState("");
   const [schoolFilter, setSchoolFilter] = useState("all");
+
+  const handleDeleteOrder = async () => {
+    if (orderToDelete) {
+      await deleteOrder(orderToDelete.reference);
+      setOrderToDelete(null);
+    }
+  };
+
   const [paymentStatusFilter, setPaymentStatusFilter] = useState<PaymentStatus | "all">("all");
   const [deliveryStatusFilter, setDeliveryStatusFilter] = useState<DeliveryStatus | "all">("all");
 
@@ -243,13 +263,24 @@ export default function OrdersPageClient({ initialOrders, initialSchools }: Orde
                     </DropdownMenu>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => viewReceipt(order)}
-                    >
-                      {t('orders_page.view_receipt')}
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">{t('common.open_menu')}</span>
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>{t('common.actions')}</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => viewReceipt(order)}>
+                          {t('orders_page.view_receipt')}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => setOrderToDelete(order)} className="text-red-600">
+                          {t('common.delete')}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}
@@ -265,6 +296,22 @@ export default function OrdersPageClient({ initialOrders, initialSchools }: Orde
           order={selectedOrder}
         />
       )}
+      <AlertDialog open={!!orderToDelete} onOpenChange={() => setOrderToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('orders_page.confirm_delete_title')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('orders_page.confirm_delete_description', { orderRef: orderToDelete?.reference || '' })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteOrder} className="bg-red-600 hover:bg-red-700">
+              {t('common.delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

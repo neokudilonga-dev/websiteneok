@@ -47,6 +47,7 @@ interface DataContextType {
   addOrder: (order: Omit<Order, 'paymentStatus' | 'deliveryStatus'>) => Promise<void>;
   updateOrderPaymentStatus: (orderReference: string, status: PaymentStatus) => Promise<void>;
   updateOrderDeliveryStatus: (orderReference: string, status: DeliveryStatus) => Promise<void>;
+  deleteOrder: (orderReference: string) => Promise<void>;
 
 
 }
@@ -387,6 +388,25 @@ export const DataProvider = ({
         setLoading(false);
     }
   }
+  const deleteOrder = async (orderReference: string) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/orders/${orderReference}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Failed to delete order');
+      // Refetch orders from backend
+      const updated = await fetch('/api/orders');
+      const updatedOrders = await updated.json();
+      setOrders(updatedOrders);
+      toast({ title: "Order Deleted", description: `Order ${orderReference} was deleted successfully.` });
+    } catch (error) {
+      console.error(error);
+      toast({ title: "Error", description: "Could not delete order.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <DataContext.Provider
@@ -399,7 +419,7 @@ export const DataProvider = ({
         readingPlan, setReadingPlan,
         categories, setCategories, addCategory, deleteCategory,
         publishers, setPublishers, addPublisher, deletePublisher,
-        orders, setOrders, addOrder, updateOrderPaymentStatus, updateOrderDeliveryStatus,
+        orders, setOrders, addOrder, updateOrderPaymentStatus, updateOrderDeliveryStatus, deleteOrder,
       }}
     >
       {children}

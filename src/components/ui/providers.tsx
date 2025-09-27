@@ -26,7 +26,6 @@ export default function Providers({
   initialReadingPlan,
   initialCategories,
 }: ProvidersProps) {
-  const loading = useGlobalLoading();
   return (
     <ThemeProvider
       attribute="class"
@@ -41,16 +40,25 @@ export default function Providers({
           initialReadingPlan={initialReadingPlan}
           initialCategories={initialCategories}
         >
-          <CartProvider>
-            <RouteLoadingHandler />
-            <Toaster />
-            <WhatsAppButton />
-            <LoadingOverlay show={loading} />
+          <ProvidersContent>
             {children}
-          </CartProvider>
+          </ProvidersContent>
         </DataProvider>
       </LanguageProvider>
     </ThemeProvider>
+  );
+}
+
+function ProvidersContent({ children }: { children: ReactNode }) {
+  const loading = useGlobalLoading();
+  return (
+    <CartProvider>
+      <RouteLoadingHandler />
+      <Toaster />
+      <WhatsAppButton />
+      <LoadingOverlay show={loading} />
+      {children}
+    </CartProvider>
   );
 }
 
