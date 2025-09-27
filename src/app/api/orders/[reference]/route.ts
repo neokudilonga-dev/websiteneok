@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
 
-export async function PUT(request: Request, { params }: { params: { reference: string } }) {
+export async function PUT(request: Request, context: any) {
   try {
     const { reference } = params;
     const body = await request.json();
