@@ -5,9 +5,9 @@ import type { Product, ReadingPlanItem } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
 import { deleteImageFromFirebase } from '@/lib/firebase';
 
-export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(request: Request, context: any) {
   try {
-    const { id } = await params;
+    const { id } = context.params;
     const { product, readingPlan }: { product: Product, readingPlan: {schoolId: string, grade: number | string, status: 'mandatory' | 'recommended'}[] } = await request.json();
     
     const productRef = firestore.collection('products').doc(id);
@@ -51,9 +51,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(request: Request, context: any) {
   try {
-    const { id } = await params;
+    const { id } = context.params;
     const { imageUrl } = await request.json();
 
     if (imageUrl) {
