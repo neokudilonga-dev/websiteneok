@@ -3,9 +3,9 @@ import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
 import type { School } from '@/lib/types';
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, context: any) {
   try {
-    const { id } = params;
+    const { id } = context.params;
     const body: School = await request.json();
     
     const schoolRef = firestore.collection('schools').doc(id);
@@ -19,9 +19,9 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, context: any) {
     try {
-        const { id } = params;
+        const { id } = context.params;
         const schoolRef = firestore.collection('schools').doc(id);
         await schoolRef.delete();
         
