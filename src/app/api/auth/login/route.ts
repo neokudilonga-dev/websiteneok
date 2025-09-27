@@ -1,55 +1,34 @@
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/firebase-admin';
 
-export async function POST(request: Request) {
-  console.log('[/api/auth/login] - POST request received.');
-
+export async function POST(request: NextRequest) {
   try {
-    const authorization = request.headers.get('Authorization');
-    if (!authorization?.startsWith('Bearer ')) {
-      console.log('[/api/auth/login] - Unauthorized: No Bearer token found.');
-      return NextResponse.json({ error: 'Unauthorized: Missing Bearer token.' }, { status: 401 });
+    const { idToken } = await request.json();
+
+    if (!idToken) {
+      return NextResponse.json({ message: 'ID token is required' }, { status: 400 });
     }
 
-    const idToken = authorization.split('Bearer ')[1];
-    
     console.log('[/api/auth/login] - Verifying ID token...');
     const decodedToken = await auth.verifyIdToken(idToken);
     console.log('[/api/auth/login] - ID Token verified successfully for UID:', decodedToken.uid);
-    
+
     // Session cookie will be valid for 5 days.
-    const expiresIn = 60 * 60 * 24 * 5 * 1000;
+    const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
     const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn });
 
-    const options = {
-      name: 'session',
-      value: sessionCookie,
+    const response = NextResponse.json({ message: 'Logged in successfully' }, { status: 200 });
+    response.cookies.set('session', sessionCookie, {
       maxAge: expiresIn,
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       path: '/',
-    };
-
-    const response = NextResponse.json({ status: 'success' }, { status: 200 });
-    response.cookies.set(options);
-
-    console.log('[/api/auth/login] - Sending success response with session cookie.');
-    return response;
-
-  } catch (error: any) {
-    console.error('[/api/auth/login] - CRITICAL ERROR:', {
-        message: error?.message,
-        code: error?.code,
-        name: error?.name,
     });
-    return NextResponse.json({ 
-      error: 'Internal Server Error during authentication.', 
-      debug: {
-        message: error?.message,
-        code: error?.code,
-        name: error?.name,
-      }
-    }, { status: 500 });
+
+    return response;
+  } catch (error) {
+    console.error('[/api/auth/login] - Error logging in:', error);
+    return NextResponse.json({ message: 'Failed to log in' }, { status: 500 });
   }
 }

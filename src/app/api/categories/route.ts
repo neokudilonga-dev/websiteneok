@@ -1,37 +1,37 @@
 
-import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
-import type { Category } from '@/lib/types';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
-    try {
-        const categoriesCollection = firestore.collection('categories');
-        const snapshot = await categoriesCollection.get();
-        const categories: Category[] = [];
-        snapshot.forEach(doc => {
-            categories.push(doc.data() as Category);
-        });
-        return NextResponse.json(categories, { status: 200 });
-    } catch (error) {
-        console.error('Error fetching categories:', error);
-        return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 });
-    }
+  try {
+    const categoriesRef = firestore.collection('categories');
+    const snapshot = await categoriesRef.get();
+    const categories: { name: string; ptName: string }[] = [];
+    snapshot.forEach(doc => {
+      categories.push(doc.data() as { name: string; ptName: string });
+    });
+    return NextResponse.json(categories, { status: 200 });
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return NextResponse.json({ message: 'Error fetching categories' }, { status: 500 });
+  }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const body: Category = await request.json();
-    if (!body.name || !body.type) {
-        return NextResponse.json({ error: 'Category name and type are required' }, { status: 400 });
+    const { name, ptName } = await request.json();
+
+    if (!name || !ptName) {
+      return NextResponse.json({ message: 'Category name and Portuguese name are required' }, { status: 400 });
     }
 
-  // Use pt name as the document ID for simplicity, assuming pt names are unique
-  const categoryRef = firestore.collection('categories').doc(body.name.pt);
-  await categoryRef.set(body);
+    // Use ptName as doc ID
+    const docRef = firestore.collection('categories').doc(ptName);
+    await docRef.set({ name, ptName });
 
-    return NextResponse.json(body, { status: 201 });
+    return NextResponse.json({ message: 'Category added successfully' }, { status: 201 });
   } catch (error) {
     console.error('Error adding category:', error);
-    return NextResponse.json({ error: 'Failed to add category' }, { status: 500 });
+    return NextResponse.json({ message: 'Error adding category' }, { status: 500 });
   }
 }

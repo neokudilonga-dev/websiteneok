@@ -1,25 +1,19 @@
-import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/firebase-admin';
 
-export async function GET() {
-  const session = (await cookies()).get('session')?.value || '';
-
-  if (!session) {
-    return NextResponse.json({ isLogged: false }, { status: 401 });
-  }
-  
+export async function GET(request: NextRequest) {
   try {
-    const decodedClaims = await auth.verifySessionCookie(session, true);
+    const sessionCookie = request.cookies.get('session')?.value || '';
 
-    if (!decodedClaims) {
-      return NextResponse.json({ isLogged: false }, { status: 401 });
+    if (!sessionCookie) {
+      return NextResponse.json({ isAuthenticated: false }, { status: 200 });
     }
 
-    return NextResponse.json({ isLogged: true, uid: decodedClaims.uid }, { status: 200 });
+    const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+    return NextResponse.json({ isAuthenticated: true, uid: decodedClaims.uid }, { status: 200 });
   } catch (error) {
-    console.error('[/api/auth/verify] - Session cookie verification failed. Error:', error);
-    return NextResponse.json({ isLogged: false }, { status: 401 });
+    console.error('Error verifying session cookie:', error);
+    return NextResponse.json({ isAuthenticated: false }, { status: 200 });
   }
 }
 

@@ -1,37 +1,30 @@
 
-import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
-import type { Order } from '@/lib/types';
+import { NextRequest, NextResponse } from 'next/server';
+import { Order } from '@/lib/types';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const body: Order = await request.json();
-    if (!body.reference) {
-        return NextResponse.json({ error: 'Order reference is required' }, { status: 400 });
-    }
-    
-    // Set payment and delivery status on creation
-    body.paymentStatus = body.paymentMethod === 'transferencia' ? 'unpaid' : 'cod';
-    body.deliveryStatus = 'not_delivered';
-
-    const orderRef = firestore.collection('orders').doc(body.reference);
-    await orderRef.set(body);
-
-    return NextResponse.json(body, { status: 201 });
+    const order: Order = await request.json();
+    const orderRef = firestore.collection('orders').doc(order.reference);
+    await orderRef.set(order);
+    return NextResponse.json({ message: 'Order created successfully' }, { status: 201 });
   } catch (error) {
-    console.error('Error adding order:', error);
-    return NextResponse.json({ error: 'Failed to add order' }, { status: 500 });
+    console.error('Error creating order:', error);
+    return NextResponse.json({ message: 'Error creating order' }, { status: 500 });
   }
 }
 
 export async function GET() {
   try {
-    const ordersCollection = firestore.collection('orders');
-    const ordersSnapshot = await ordersCollection.orderBy('date', 'desc').get();
-    const orders = ordersSnapshot.docs.map(doc => doc.data());
+    const ordersSnapshot = await firestore.collection('orders').get();
+    const orders: Order[] = [];
+    ordersSnapshot.forEach(doc => {
+      orders.push(doc.data() as Order);
+    });
     return NextResponse.json(orders, { status: 200 });
   } catch (error) {
     console.error('Error fetching orders:', error);
-    return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 });
+    return NextResponse.json({ message: 'Error fetching orders' }, { status: 500 });
   }
 }

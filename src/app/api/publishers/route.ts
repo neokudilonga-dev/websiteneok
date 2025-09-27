@@ -1,21 +1,22 @@
 
-import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const { name }: { name: string } = await request.json();
+    const { name } = await request.json();
+
     if (!name) {
-        return NextResponse.json({ error: 'Publisher name is required' }, { status: 400 });
+      return NextResponse.json({ message: 'Publisher name is required' }, { status: 400 });
     }
 
-    const publisherRef = firestore.collection('publishers').doc(name);
-    // We can set an empty object, we only care about the document ID (the name)
-    await publisherRef.set({});
+    // Use publisher name as doc ID
+    const docRef = firestore.collection('publishers').doc(name);
+    await docRef.set({ name });
 
-    return NextResponse.json({ name }, { status: 201 });
+    return NextResponse.json({ message: 'Publisher added successfully' }, { status: 201 });
   } catch (error) {
     console.error('Error adding publisher:', error);
-    return NextResponse.json({ error: 'Failed to add publisher' }, { status: 500 });
+    return NextResponse.json({ message: 'Error adding publisher' }, { status: 500 });
   }
 }

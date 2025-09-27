@@ -1,23 +1,31 @@
 
-import { NextResponse, NextRequest } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
+import { NextRequest, NextResponse } from 'next/server';
+import { Order } from '@/lib/types';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function PUT(request: NextRequest, context: any) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ reference: string }> }
+) {
   try {
-    const { reference } = context.params;
-    const body = await request.json();
-    
-    if (!body.paymentStatus && !body.deliveryStatus) {
-        return NextResponse.json({ error: 'Either paymentStatus or deliveryStatus is required' }, { status: 400 });
+    const { reference } = await params;
+    const updatedOrder: Order = await request.json();
+
+    if (!reference) {
+      return NextResponse.json({ message: 'Order reference is required' }, { status: 400 });
     }
 
     const orderRef = firestore.collection('orders').doc(reference);
-    await orderRef.update(body);
+    const { paymentStatus, deliveryStatus } = updatedOrder;
 
-    return NextResponse.json({ reference, ...body }, { status: 200 });
+    await orderRef.update({
+      paymentStatus,
+      deliveryStatus,
+    });
+
+    return NextResponse.json({ message: 'Order updated successfully' }, { status: 200 });
   } catch (error) {
     console.error('Error updating order:', error);
-    return NextResponse.json({ error: 'Failed to update order' }, { status: 500 });
+    return NextResponse.json({ message: 'Error updating order' }, { status: 500 });
   }
 }

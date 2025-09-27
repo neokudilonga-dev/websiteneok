@@ -1,26 +1,25 @@
 
 
-import { NextResponse, NextRequest } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
+import { NextRequest, NextResponse } from 'next/server';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function DELETE(request: NextRequest, context: any) {
-    try {
-        const { name } = context.params;
-        if (!name) {
-            return NextResponse.json({ error: 'Category name is required' }, { status: 400 });
-        }
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ name: string }> }
+) {
+  try {
+    const { name } = await params;
 
-        // Use pt name as doc ID
-        const docRef = firestore.collection('categories').doc(name);
-        const doc = await docRef.get();
-        if (!doc.exists) {
-            return NextResponse.json({ error: 'Category not found' }, { status: 404 });
-        }
-        await docRef.delete();
-        return NextResponse.json({ message: 'Category deleted successfully' }, { status: 200 });
-    } catch (error) {
-        console.error('Error deleting category:', error);
-        return NextResponse.json({ error: 'Failed to delete category' }, { status: 500 });
+    if (!name) {
+      return NextResponse.json({ message: 'Category name is required' }, { status: 400 });
     }
+
+    const categoryRef = firestore.collection('categories').doc(name);
+    await categoryRef.delete();
+
+    return NextResponse.json({ message: 'Category deleted successfully' }, { status: 200 });
+  } catch (error) {
+    console.error('Error deleting category:', error);
+    return NextResponse.json({ message: 'Error deleting category' }, { status: 500 });
+  }
 }
