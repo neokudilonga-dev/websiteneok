@@ -5,7 +5,7 @@ import { firestore } from '@/lib/firebase-admin';
 
 export async function DELETE(
   request: NextRequest, 
-  context: { params: { name: string } }
+  context: any
 ) {
   const { params } = context;
     try {
