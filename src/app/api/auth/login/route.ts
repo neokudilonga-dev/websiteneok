@@ -31,15 +31,23 @@ export async function POST(request: NextRequest) {
     console.log('[/api/auth/login] - ID Token verified successfully for UID:', decodedToken.uid);
 
     // Session cookie will be valid for 5 days.
-    const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
+    const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days in milliseconds for Firebase Admin
     const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn });
 
     const response = NextResponse.json({ message: 'Logged in successfully' }, { status: 200 });
+    // Ensure proxies/CDN do not cache this and that Set-Cookie is honored
+    response.headers.set('Cache-Control', 'no-store');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+
     response.cookies.set('session', sessionCookie, {
-      maxAge: expiresIn,
+      // maxAge for cookies is in SECONDS
+      maxAge: Math.floor(expiresIn / 1000),
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: request.nextUrl.protocol === 'https:',
+      sameSite: 'lax',
       path: '/',
+      // host-only cookie (no Domain attribute) for App Hosting compatibility
     });
 
     return response;

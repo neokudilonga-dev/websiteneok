@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signInWithRedirect, getRedirectResult } from "firebase/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -37,14 +37,17 @@ export default function LoginPage() {
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${idToken}`,
         },
+        body: JSON.stringify({ idToken }),
       });
 
       if (response.ok) {
-        router.push("/admin");
+        // Use full page navigation to ensure middleware sees the persisted cookie
+        window.location.assign("/admin");
       } else {
         const errorData = await response.json().catch(() => ({
           error: "An unknown server error occurred.",
@@ -65,7 +68,7 @@ export default function LoginPage() {
       });
       setLoading(false);
     }
-  }, [router, toast]);
+  }, [toast]);
 
   // ✅ Automatically redirect if already signed in
   useEffect(() => {
@@ -93,34 +96,55 @@ export default function LoginPage() {
     return () => unsubscribe();
   }, [handleLoginSuccess, toast]);
 
+  // ✅ Process redirect result on mount to handle environments where popups are restricted
+  useEffect(() => {
+    (async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result?.user) {
+          const email = result.user.email || "";
+          const allowedAdmins = [
+            "neokudilonga@gmail.com",
+            "anaruimelo@gmail.com",
+            "joaonfmelo@gmail.com"
+          ];
+          if (!allowedAdmins.includes(email)) {
+            toast({
+              title: "Access Denied",
+              description: "You are not an admin.",
+              variant: "destructive",
+            });
+            setLoading(false);
+            return;
+          }
+          const idToken = await result.user.getIdToken();
+          await handleLoginSuccess(idToken);
+        } else {
+          setLoading(false);
+        }
+      } catch (error: any) {
+        console.error("getRedirectResult error:", error);
+        if (error.code !== "auth/no-auth-event") {
+          toast({
+            title: "Login Failed",
+            description: error.message || "Sign-In failed.",
+            variant: "destructive",
+          });
+        }
+        setLoading(false);
+      }
+    })();
+  }, [auth, handleLoginSuccess, toast]);
+
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
     setLoading(true);
     try {
-      const userCredential = await signInWithPopup(auth, provider);
-      const email = userCredential.user.email;
-
-      const allowedAdmins = [
-        "neokudilonga@gmail.com",
-        "anaruimelo@gmail.com",
-        "joaonfmelo@gmail.com"
-      ];
-
-      if (!allowedAdmins.includes(email || "")) {
-        toast({
-          title: "Access Denied",
-          description: "You are not an admin.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-
-      const idToken = await userCredential.user.getIdToken();
-      await handleLoginSuccess(idToken);
+      // Use redirect to avoid Cross-Origin-Opener-Policy blocking popup close on hosted environments
+      await signInWithRedirect(auth, provider);
     } catch (error: any) {
-      console.error("Google Sign-In error:", error);
-      if (error.code !== "auth/popup-closed-by-user") {
+      console.error("Google Sign-In redirect error:", error);
+      if (error.code !== "auth/cancelled-popup-request") {
         toast({
           title: "Login Failed",
           description: error.message || "Google Sign-In failed.",

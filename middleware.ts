@@ -33,6 +33,13 @@ export async function middleware(request: NextRequest) {
             return redirectResponse;
         }
 
+        const data = await response.json();
+        if (!data?.isAuthenticated) {
+            const redirectResponse = NextResponse.redirect(new URL('/admin/login', request.url));
+            redirectResponse.cookies.delete('session');
+            return redirectResponse;
+        }
+
     } catch (error) {
         console.error('Middleware verification error:', error);
         const redirectResponse = NextResponse.redirect(new URL('/admin/login', request.url));
