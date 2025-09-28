@@ -1,38 +1,65 @@
 
 import 'server-only';
 
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getAuth } from 'firebase-admin/auth';
-import { getFirestore } from 'firebase-admin/firestore';
+import { initializeApp, getApps, cert, applicationDefault } from 'firebase-admin/app';
+import { getAuth, Auth } from 'firebase-admin/auth';
+import { getFirestore, Firestore } from 'firebase-admin/firestore';
 
-let auth: ReturnType<typeof getAuth>;
-let firestore: ReturnType<typeof getFirestore>;
+let _auth: Auth | null = null;
+let _firestore: Firestore | null = null;
 
-// Initialize Firebase Admin SDK only in server environments
-if (typeof window === 'undefined' && (process.env.NEXT_RUNTIME === 'nodejs' || process.env.NEXT_RUNTIME === 'edge')) {
-  if (!getApps().length) {
-    console.log('[firebase-admin] Initializing Firebase Admin SDK...');
-    const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-
-    if (!serviceAccountKey) {
-      throw new Error("The FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set.");
+function ensureInitialized() {
+  if (!_auth || !_firestore) {
+    if (!getApps().length) {
+      const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+      try {
+        if (serviceAccountKey) {
+          const decodedKey = Buffer.from(serviceAccountKey, 'base64').toString('utf8');
+          const serviceAccount = JSON.parse(decodedKey);
+          initializeApp({
+            credential: cert({
+              projectId: serviceAccount.project_id,
+              clientEmail: serviceAccount.client_email,
+              privateKey: String(serviceAccount.private_key || '').replace(/\\n/g, '\n'),
+            }),
+          });
+        } else if (
+          process.env.FIREBASE_PROJECT_ID &&
+          process.env.FIREBASE_CLIENT_EMAIL &&
+          process.env.FIREBASE_PRIVATE_KEY
+        ) {
+          initializeApp({
+            credential: cert({
+              projectId: process.env.FIREBASE_PROJECT_ID,
+              clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+              privateKey: String(process.env.FIREBASE_PRIVATE_KEY).replace(/\\n/g, '\n'),
+            }),
+          });
+        } else {
+          initializeApp({ credential: applicationDefault() });
+        }
+      } catch (error) {
+        console.error('[firebase-admin] Initialization error:', error);
+        throw error;
+      }
     }
-    
-    // Parse the service account key string into a JSON object
-    const serviceAccount = JSON.parse(serviceAccountKey);
-    
-    initializeApp({
-      credential: cert(serviceAccount),
-    });
-    
-    console.log('[firebase-admin] Firebase Admin SDK initialized successfully.');
+    _auth = getAuth();
+    _firestore = getFirestore();
   }
-  auth = getAuth();
-  firestore = getFirestore();
-} else {
-  // Provide mock objects for client-side or non-server environments
-  auth = {} as ReturnType<typeof getAuth>;
-  firestore = {} as ReturnType<typeof getFirestore>;
 }
 
-export { auth, firestore };
+export const auth = new Proxy({} as Auth, {
+  get(_target, prop) {
+    ensureInitialized();
+    // @ts-expect-error: Proxy dynamic access to Auth methods/props
+    return _auth![prop];
+  },
+});
+
+export const firestore = new Proxy({} as Firestore, {
+  get(_target, prop) {
+    ensureInitialized();
+    // @ts-expect-error: Proxy dynamic access to Firestore methods/props
+    return _firestore![prop];
+  },
+});

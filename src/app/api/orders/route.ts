@@ -28,3 +28,5 @@ export async function GET() {
     return NextResponse.json({ message: 'Error fetching orders' }, { status: 500 });
   }
 }
+
+export const dynamic = 'force-dynamic';

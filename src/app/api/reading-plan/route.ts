@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
 import type { ReadingPlanItem } from '@/lib/types';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const readingPlanCollection = firestore.collection('readingPlan');

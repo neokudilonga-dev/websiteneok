@@ -93,3 +93,5 @@ export async function DELETE(
     return NextResponse.json({ message: 'Error deleting product' }, { status: 500 });
   }
 }
+
+export const dynamic = 'force-dynamic';

@@ -42,3 +42,5 @@ export async function DELETE(request: Request, context: any) {
         return NextResponse.json({ error: 'Failed to delete school' }, { status: 500 });
     }
 }
+
+export const dynamic = 'force-dynamic';
