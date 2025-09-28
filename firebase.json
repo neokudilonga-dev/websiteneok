@@ -1,0 +1,16 @@
+{
+  "apphosting": [
+    {
+      "backendId": "websiteneok",
+      "rootDir": ".",
+      "ignore": [
+        "firebase.json",
+        "**/node_modules/**",
+        "**/.git/**",
+        "playwright-report/**",
+        "test-results/**",
+        "functions/**"
+      ]
+    }
+  ]
+}

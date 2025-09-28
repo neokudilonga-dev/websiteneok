@@ -18,3 +18,5 @@ export default async function PublishersPage() {
     />
   )
 }
+
+export const dynamic = 'force-dynamic';

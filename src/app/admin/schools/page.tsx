@@ -10,6 +10,7 @@ async function getSchoolsData() {
     return { schools };
 }
 
+export const dynamic = 'force-dynamic';
 export default async function SchoolsPage() {
   const { schools } = await getSchoolsData();
   

@@ -23,6 +23,7 @@ async function getAdminData() {
     return { products, readingPlan, schools, publishers };
 }
 
+export const dynamic = 'force-dynamic';
 
 export default async function BooksPage() {
   const { products, readingPlan, schools, publishers } = await getAdminData();

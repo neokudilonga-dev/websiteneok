@@ -26,3 +26,5 @@ export default async function GamesPage() {
     />
   )
 }
+
+export const dynamic = 'force-dynamic';

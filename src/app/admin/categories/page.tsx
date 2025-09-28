@@ -19,3 +19,5 @@ export default async function CategoriesPage() {
     />
   )
 }
+
+export const dynamic = 'force-dynamic';
