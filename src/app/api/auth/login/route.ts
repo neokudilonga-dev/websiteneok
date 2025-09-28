@@ -4,7 +4,23 @@ import { auth } from '@/lib/firebase-admin';
 
 export async function POST(request: NextRequest) {
   try {
-    const { idToken } = await request.json();
+    let idToken: string | undefined;
+
+    // Safely attempt to read JSON body
+    try {
+      const body = await request.json();
+      idToken = body?.idToken;
+    } catch {
+      // Ignore parse errors for empty body
+    }
+
+    // Fallback to Authorization header
+    if (!idToken) {
+      const authHeader = request.headers.get('authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        idToken = authHeader.substring(7);
+      }
+    }
 
     if (!idToken) {
       return NextResponse.json({ message: 'ID token is required' }, { status: 400 });
