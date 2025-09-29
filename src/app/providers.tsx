@@ -5,6 +5,8 @@ import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { School, Product, ReadingPlanItem, Category } from "@/lib/types";
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
 async function getInitialData(): Promise<{
   initialSchools: School[];
   initialProducts: Product[];
@@ -13,10 +15,10 @@ async function getInitialData(): Promise<{
 }> {
   try {
     const [schoolsRes, productsRes, readingPlanRes, categoriesRes] = await Promise.all([
-      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/schools`, { cache: 'no-store' }),
-      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`, { cache: 'no-store' }),
-      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/reading-plan`, { cache: 'no-store' }),
-      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories`, { cache: 'no-store' }),
+      fetch(`${baseUrl}/api/schools`, { cache: 'no-store' }),
+      fetch(`${baseUrl}/api/products`, { cache: 'no-store' }),
+      fetch(`${baseUrl}/api/reading-plan`, { cache: 'no-store' }),
+      fetch(`${baseUrl}/api/categories`, { cache: 'no-store' }),
     ]);
 
     const initialSchools = schoolsRes.ok ? await schoolsRes.json() : [];
