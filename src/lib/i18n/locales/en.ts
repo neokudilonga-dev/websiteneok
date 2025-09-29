@@ -41,7 +41,7 @@ export const en = {
     title: 'Contact Us',
     description: 'We are here to help. Get in touch with us through one of the following channels.',
     company_description: 'Your source for school books and games. Committed to education and development in Angola.',
-    whatsapp_description: 'Contact us for faster service. No phone service available.',
+    whatsapp_description: 'Contact us for faster service.',
     email_description: 'For formal inquiries or sending proof of payment.',
     location: 'Location',
     location_description: 'Schedule a visit to our premises (by appointment).',

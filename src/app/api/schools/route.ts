@@ -15,7 +15,7 @@ export async function GET() {
         });
         return NextResponse.json(schools, { status: 200 });
     } catch (error) {
-        console.error('Error fetching schools:', error);
+        console.error('Error fetching schools from Firestore:', error);
         return NextResponse.json({ error: 'Failed to fetch schools' }, { status: 500 });
     }
 }

@@ -41,7 +41,7 @@ export const pt = {
     title: 'Contacte-nos',
     description: 'Estamos aqui para ajudar. Entre em contacto connosco através de um dos seguintes canais.',
     company_description: 'A sua fonte de livros e jogos escolares. Comprometidos com a educação e o desenvolvimento em Angola.',
-    whatsapp_description: 'Contacte-nos para um atendimento mais rápido. Não há atendimento telefónico.',
+    whatsapp_description: 'Contacte-nos para um atendimento mais rápido.',
     email_description: 'Para questões formais ou envio de comprovativos.',
     location: 'Localização',
     location_description: 'Agende uma visita às nossas instalações (atendimento mediante marcação).',

@@ -25,11 +25,16 @@ export default function ContactosPage() {
 
                 <Card className="mt-12">
                     <CardContent className="grid grid-cols-1 gap-8 p-8 md:grid-cols-2">
-                        <div className="space-y-4">
-                            <h2 className="font-headline text-2xl font-semibold">Neokudilonga</h2>
-                            <p className="text-muted-foreground">
-                                {t('contact_page.company_description')}
-                            </p>
+                        <div className="h-[400px] w-full">
+                            <iframe
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3941.6706000000003!2d13.1945209!3d-8.888589!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zOMKwNTMnMTguOSJTIDEzwrAxMSc0OS41IkU!5e0!3m2!1sen!2sao!4v1678912345678!5m2!1sen!2sao"
+                                width="100%"
+                                height="100%"
+                                style={{ border: 0 }}
+                                allowFullScreen={true}
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                            ></iframe>
                         </div>
                         <div className="space-y-6 rounded-lg bg-muted/50 p-6">
                             <div className="flex items-start gap-4">
@@ -66,14 +71,6 @@ export default function ContactosPage() {
                                     <p className="mt-1 block">
                                         {t('contact_page.address')}
                                     </p>
-                                    <a
-                                      href="https://maps.google.com/?q=-8.888589,13.197091"
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="mt-1 block text-primary hover:underline"
-                                    >
-                                      {t('contact_page.view_on_map')}
-                                    </a>
                                 </div>
                             </div>
                         </div>
