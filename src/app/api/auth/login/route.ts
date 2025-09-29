@@ -30,6 +30,18 @@ export async function POST(request: NextRequest) {
     const decodedToken = await auth.verifyIdToken(idToken);
     console.log('[/api/auth/login] - ID Token verified successfully for UID:', decodedToken.uid);
 
+    // Enforce server-side admin allowlist to prevent bypassing client-only checks
+    const allowedAdmins = [
+      'neokudilonga@gmail.com',
+      'anaruimelo@gmail.com',
+      'joaonfmelo@gmail.com',
+    ];
+    const email = decodedToken.email || '';
+    if (!allowedAdmins.includes(email)) {
+      console.warn('[/api/auth/login] - Forbidden: user is not in admin allowlist:', email);
+      return NextResponse.json({ message: 'Forbidden: not an admin' }, { status: 403 });
+    }
+
     // Session cookie will be valid for 5 days.
     const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days in milliseconds for Firebase Admin
     const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn });
@@ -53,6 +65,15 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error) {
     console.error('[/api/auth/login] - Error logging in:', error);
-    return NextResponse.json({ message: 'Failed to log in' }, { status: 500 });
+    const msg = String((error as any)?.message || error);
+    const isPermissionError = /PERMISSION_DENIED|forbidden|serviceusage\.serviceUsageConsumer|identitytoolkit/i.test(msg);
+    const payload: Record<string, any> = {
+      message: 'Failed to log in',
+      error: msg,
+    };
+    if (isPermissionError) {
+      payload.hint = 'Grant roles/serviceusage.serviceUsageConsumer and Firebase Auth admin to the App Hosting backend service account for project biblioangola, or provide FIREBASE_SERVICE_ACCOUNT_KEY env var.';
+    }
+    return NextResponse.json(payload, { status: isPermissionError ? 403 : 500 });
   }
 }

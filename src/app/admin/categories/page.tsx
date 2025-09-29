@@ -1,5 +1,6 @@
 
 import { firestore } from "@/lib/firebase-admin";
+import { requireAdmin } from "@/lib/require-admin";
 import type { Category } from "@/lib/types";
 import CategoriesPageClient from "./client";
 
@@ -11,6 +12,7 @@ async function getCategoriesData() {
 }
 
 export default async function CategoriesPage() {
+  await requireAdmin();
   const { categories } = await getCategoriesData();
   
   return (

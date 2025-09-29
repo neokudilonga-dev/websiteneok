@@ -1,5 +1,6 @@
 
 import { firestore } from "@/lib/firebase-admin";
+import { requireAdmin } from "@/lib/require-admin";
 import type { Order, School } from "@/lib/types";
 import OrdersPageClient from "./client";
 
@@ -16,6 +17,7 @@ async function getOrdersData() {
 }
 
 export default async function OrdersPage() {
+  await requireAdmin();
   const { orders, schools } = await getOrdersData();
   
   return (

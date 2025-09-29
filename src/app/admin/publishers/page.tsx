@@ -1,5 +1,6 @@
 
 import { firestore } from "@/lib/firebase-admin";
+import { requireAdmin } from "@/lib/require-admin";
 import PublishersPageClient from "./client";
 
 async function getPublishersData() {
@@ -10,6 +11,7 @@ async function getPublishersData() {
 }
 
 export default async function PublishersPage() {
+  await requireAdmin();
   const { publishers } = await getPublishersData();
   
   return (

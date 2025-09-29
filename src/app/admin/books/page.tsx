@@ -1,5 +1,6 @@
 
 import { firestore } from "@/lib/firebase-admin";
+import { requireAdmin } from "@/lib/require-admin";
 import type { Product, ReadingPlanItem, School } from "@/lib/types";
 import BooksPageClient from "./client";
 
@@ -26,6 +27,7 @@ async function getAdminData() {
 export const dynamic = 'force-dynamic';
 
 export default async function BooksPage() {
+  await requireAdmin();
   const { products, readingPlan, schools, publishers } = await getAdminData();
   
   return (

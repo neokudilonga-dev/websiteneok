@@ -1,5 +1,6 @@
 
 import { firestore } from "@/lib/firebase-admin";
+import { requireAdmin } from "@/lib/require-admin";
 import type { Product } from "@/lib/types";
 import GamesPageClient from "./client";
 import type { School } from "@/lib/types";
@@ -17,6 +18,7 @@ async function getGamesData() {
 }
 
 export default async function GamesPage() {
+  await requireAdmin();
   const { products, schools } = await getGamesData();
   
   return (

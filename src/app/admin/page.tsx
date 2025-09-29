@@ -1,5 +1,6 @@
 
 import { firestore } from "@/lib/firebase-admin";
+import { requireAdmin } from "@/lib/require-admin";
 import type { Product, Order, School } from "@/lib/types";
 import AdminDashboardClient from "./client-dashboard";
 
@@ -20,6 +21,8 @@ async function getDashboardData() {
 }
 
 export default async function AdminDashboard() {
+  // Enforce server-side admin guard
+  await requireAdmin();
   try {
     const { products, orders, schools } = await getDashboardData();
     return (

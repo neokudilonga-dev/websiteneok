@@ -1,5 +1,6 @@
 
 import { firestore } from "@/lib/firebase-admin";
+import { requireAdmin } from "@/lib/require-admin";
 import type { School } from "@/lib/types";
 import SchoolsPageClient from "./client";
 
@@ -12,6 +13,7 @@ async function getSchoolsData() {
 
 export const dynamic = 'force-dynamic';
 export default async function SchoolsPage() {
+  await requireAdmin();
   const { schools } = await getSchoolsData();
   
   return (
