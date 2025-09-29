@@ -44,8 +44,9 @@ export const en = {
     whatsapp_description: 'Contact us for faster service. No phone service available.',
     email_description: 'For formal inquiries or sending proof of payment.',
     location: 'Location',
-    location_description: 'Visit our physical store.',
-    address: 'Luanda, Angola',
+    location_description: 'Schedule a visit to our premises (by appointment).',
+    address: 'Condomínio BCI 6 Casas, Casa 6, Morro Bento (behind Kero, in front of the lagoon)',
+    view_on_map: 'View on map',
   },
   shop: {
     reading_plan: 'Reading Plan',

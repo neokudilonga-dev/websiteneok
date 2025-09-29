@@ -66,6 +66,14 @@ export default function ContactosPage() {
                                     <p className="mt-1 block">
                                         {t('contact_page.address')}
                                     </p>
+                                    <a
+                                      href="https://maps.google.com/?q=-8.888589,13.197091"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="mt-1 block text-primary hover:underline"
+                                    >
+                                      {t('contact_page.view_on_map')}
+                                    </a>
                                 </div>
                             </div>
                         </div>

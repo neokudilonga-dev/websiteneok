@@ -44,8 +44,9 @@ export const pt = {
     whatsapp_description: 'Contacte-nos para um atendimento mais rápido. Não há atendimento telefónico.',
     email_description: 'Para questões formais ou envio de comprovativos.',
     location: 'Localização',
-    location_description: 'Visite a nossa loja física.',
-    address: 'Luanda, Angola',
+    location_description: 'Agende uma visita às nossas instalações (atendimento mediante marcação).',
+    address: 'Condomínio BCI 6 Casas, Casa 6, Morro Bento (atrás do Kero, em frente à lagoa)',
+    view_on_map: 'Ver no mapa',
   },
   shop: {
     reading_plan: 'Plano de Leitura',
