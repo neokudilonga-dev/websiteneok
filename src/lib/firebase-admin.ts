@@ -16,27 +16,40 @@ function ensureInitialized() {
         if (serviceAccountKey) {
           const decodedKey = Buffer.from(serviceAccountKey, 'base64').toString('utf8');
           const serviceAccount = JSON.parse(decodedKey);
+          console.log('[firebase-admin] Initializing with FIREBASE_SERVICE_ACCOUNT_KEY');
           initializeApp({
             credential: cert({
               projectId: serviceAccount.project_id,
               clientEmail: serviceAccount.client_email,
               privateKey: String(serviceAccount.private_key || '').replace(/\\n/g, '\n'),
             }),
+            projectId: serviceAccount.project_id,
           });
         } else if (
           process.env.FIREBASE_PROJECT_ID &&
           process.env.FIREBASE_CLIENT_EMAIL &&
           process.env.FIREBASE_PRIVATE_KEY
         ) {
+          console.log('[firebase-admin] Initializing with FIREBASE_* environment variables');
           initializeApp({
             credential: cert({
               projectId: process.env.FIREBASE_PROJECT_ID,
               clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
               privateKey: String(process.env.FIREBASE_PRIVATE_KEY).replace(/\\n/g, '\n'),
             }),
+            projectId: process.env.FIREBASE_PROJECT_ID,
           });
         } else {
-          initializeApp({ credential: applicationDefault() });
+          // Fallback to Application Default Credentials (ADC). Explicitly set projectId to avoid
+          // environments where it cannot be inferred automatically.
+          const projectId =
+            process.env.FIREBASE_PROJECT_ID ||
+            process.env.GOOGLE_CLOUD_PROJECT ||
+            process.env.GCLOUD_PROJECT ||
+            process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
+            'biblioangola';
+          console.log('[firebase-admin] Initializing with applicationDefault() credentials. projectId =', projectId);
+          initializeApp({ credential: applicationDefault(), projectId });
         }
       } catch (error) {
         console.error('[firebase-admin] Initialization error:', error);
