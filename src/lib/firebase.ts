@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { getStorage, ref, deleteObject } from "firebase/storage";
 import { getFirestore } from "firebase/firestore";
 
@@ -16,6 +16,7 @@ const firebaseConfig = {
 // Ensure Firebase App is initialized only once (avoids app/duplicate-app errors)
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
+setPersistence(auth, browserLocalPersistence);
 const storage = getStorage(app);
 const db = getFirestore(app);
 

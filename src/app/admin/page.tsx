@@ -20,15 +20,26 @@ async function getDashboardData() {
 }
 
 export default async function AdminDashboard() {
-  const { products, orders, schools } = await getDashboardData();
-  
-  return (
-    <AdminDashboardClient 
-        initialProducts={products} 
-        initialOrders={orders} 
-        initialSchools={schools} 
-    />
-  )
+  try {
+    const { products, orders, schools } = await getDashboardData();
+    return (
+      <AdminDashboardClient 
+          initialProducts={products} 
+          initialOrders={orders} 
+          initialSchools={schools} 
+      />
+    );
+  } catch (error: any) {
+    console.error('[AdminDashboard] Server component render error:', error);
+    const msg = error?.message || String(error);
+    return (
+      <div className="p-4">
+        <h2 className="text-xl font-semibold text-red-600">Admin data load failed</h2>
+        <p className="mt-2 text-sm">There was an error while loading admin data on the server.</p>
+        <pre className="mt-3 whitespace-pre-wrap break-words rounded bg-muted p-3 text-xs">{msg}</pre>
+      </div>
+    );
+  }
 }
 
 export const dynamic = 'force-dynamic';
