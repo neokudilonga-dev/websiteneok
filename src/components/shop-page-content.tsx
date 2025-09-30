@@ -210,9 +210,9 @@ export const ShopPageContent = ({
       <div className="mx-auto w-full max-w-7xl">
         <Tabs value={activeTab} className="w-full" onValueChange={setActiveTab}>
           <TabsList className="grid h-auto w-full grid-cols-1 sm:grid-cols-3">
-            <TabsTrigger value="planos" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">{t('shop.tabs.reading_plans')}</TabsTrigger>
-            <TabsTrigger value="catalogo" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">{t('shop.tabs.all_books')}</TabsTrigger>
-            <TabsTrigger value="jogos" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">{t('shop.tabs.games_and_others')}</TabsTrigger>
+            <TabsTrigger key="planos" value="planos" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">{t('shop.tabs.reading_plans')}</TabsTrigger>
+            <TabsTrigger key="catalogo" value="catalogo" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">{t('shop.tabs.all_books')}</TabsTrigger>
+            <TabsTrigger key="jogos" value="jogos" className="py-3 text-lg font-semibold text-muted-foreground data-[state=active]:bg-background/90 data-[state=active]:text-primary">{t('shop.tabs.games_and_others')}</TabsTrigger>
           </TabsList>
 
            <div className="mt-6">
