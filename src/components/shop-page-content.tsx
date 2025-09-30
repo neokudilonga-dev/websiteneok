@@ -249,7 +249,7 @@ export const ShopPageContent = ({
                                       {selectedSchool.hasRecommendedPlan ? (
                                           <>
                                               {gradeProducts.mandatory.length > 0 && (
-                                                  <div className="rounded-lg bg-card p-6">
+                                                  <div key="mandatory-kit" className="rounded-lg bg-card p-6">
                                                       <h3 className="font-headline text-2xl font-semibold">{t('shop.mandatory_kit', { count: gradeProducts.mandatory.length })}</h3>
                                                       <p className="mt-2 text-muted-foreground">{t('shop.buy_all_mandatory')}</p>
                                                       <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.mandatory, t('shop.mandatory_kit_name', { grade: getGradeDisplayName(grade), school: getDisplayName(selectedSchool.name, language) }))}>
@@ -259,7 +259,7 @@ export const ShopPageContent = ({
                                                   </div>
                                               )}
                                               {gradeProducts.recommended.length > 0 && (
-                                                  <div className="rounded-lg border bg-card p-6">
+                                                  <div key="recommended-kit" className="rounded-lg border bg-card p-6">
                                                       <h3 className="font-headline text-2xl font-semibold">{t('shop.recommended_kit', { count: gradeProducts.recommended.length })}</h3>
                                                       <p className="mt-2 text-muted-foreground">{t('shop.buy_all_recommended')}</p>
                                                       <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.recommended, t('shop.recommended_kit_name', { grade: getGradeDisplayName(grade), school: getDisplayName(selectedSchool.name, language) }))}>
@@ -271,7 +271,7 @@ export const ShopPageContent = ({
                                           </>
                                       ) : (
                                           gradeProducts.all.length > 0 &&
-                                          <div className="rounded-lg border bg-card p-6 lg:col-span-2">
+                                          <div key="complete-kit" className="rounded-lg border bg-card p-6 lg:col-span-2">
                                               <h3 className="font-headline text-2xl font-semibold">{t('shop.complete_kit', { grade: getGradeDisplayName(grade), count: gradeProducts.all.length })}</h3>
                                               <p className="mt-2 text-muted-foreground">{t('shop.buy_all_for_school_year')}</p>
                                               <Button size="lg" className="mt-4" onClick={() => addKitToCart(gradeProducts.all, t('shop.complete_kit_name', { grade: getGradeDisplayName(grade), school: getDisplayName(selectedSchool.name, language) }))}>
@@ -337,7 +337,7 @@ export const ShopPageContent = ({
                   <SelectValue placeholder={t('shop.filter_by_category')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t('common.all_categories')}</SelectItem>
+                  <SelectItem key="all-books" value="all">{t('common.all_categories')}</SelectItem>
                   {bookCategories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       {getDisplayName(category.name, language)}
@@ -376,7 +376,7 @@ export const ShopPageContent = ({
                   <SelectValue placeholder={t('shop.filter_by_category')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t('common.all_categories')}</SelectItem>
+                  <SelectItem key="all-games" value="all">{t('common.all_categories')}</SelectItem>
                   {gameCategories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       {getDisplayName(category.name, language)}

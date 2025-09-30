@@ -22,6 +22,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 // Helper function to get nested keys
 const getNestedValue = (obj: Record<string, unknown>, key: string): string | undefined => {
   return key.split('.').reduce((o: Record<string, unknown> | undefined, i: string) => {
+    console.log('obj:', obj, 'key:', key, 'o:', o, 'i:', i);
     if (o && typeof o === 'object' && i in o) {
       return (o as Record<string, unknown>)[i] as Record<string, unknown> | undefined;
     }
