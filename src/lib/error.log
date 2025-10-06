@@ -1,0 +1,44 @@
+2025-10-06T15:54:24.338Z - Error fetching schools in GET function: Bad control character in string literal in JSON at position 347 (line 1 column 348)
+2025-10-06T15:54:40.744Z - Error fetching schools in GET function: Cannot read properties of undefined (reading 'collection')
+2025-10-06T15:54:50.294Z - Error fetching schools in GET function: Cannot read properties of undefined (reading 'collection')
+2025-10-06T15:55:14.211Z - Error fetching schools in GET function: Cannot read properties of undefined (reading 'collection')
+2025-10-06T15:55:19.219Z - Error fetching schools in GET function: Cannot read properties of undefined (reading 'collection')
+2025-10-06T15:55:29.891Z - Error fetching schools in GET function: Bad control character in string literal in JSON at position 347 (line 1 column 348)
+2025-10-06T15:55:53.905Z - Error fetching schools in GET function: Bad control character in string literal in JSON at position 347 (line 1 column 348)
+2025-10-06T15:55:58.195Z - Error fetching schools in GET function: Bad control character in string literal in JSON at position 347 (line 1 column 348)
+2025-10-06T15:56:09.279Z - Error fetching schools in GET function: Bad control character in string literal in JSON at position 347 (line 1 column 348)
+2025-10-06T16:02:16.402Z - Error fetching schools in GET function: Unexpected token '�', "��� ��!P"... is not valid JSON
+2025-10-06T16:02:16.522Z - Error fetching schools in GET function: Unexpected token '�', "��� ��!P"... is not valid JSON
+2025-10-06T16:02:22.857Z - Error fetching schools in GET function: Unexpected token '�', "��� ��!P"... is not valid JSON
+2025-10-06T16:02:31.913Z - Error fetching schools in GET function: Unexpected token '�', "��� ��!P"... is not valid JSON
+2025-10-06T16:06:56.515Z - Error fetching schools in GET function: Bad escaped character in JSON at position 231 (line 1 column 232)
+2025-10-06T16:07:01.235Z - Error fetching schools in GET function: Bad escaped character in JSON at position 231 (line 1 column 232)
+2025-10-06T16:11:10.621Z - Error fetching schools in GET function: Bad escaped character in JSON at position 231 (line 1 column 232)
+2025-10-06T16:17:05.332Z - Error fetching schools in GET function: Bad escaped character in JSON at position 840 (line 1 column 841)
+2025-10-06T16:17:13.096Z - Error fetching schools in GET function: Bad escaped character in JSON at position 840 (line 1 column 841)
+2025-10-06T16:19:07.033Z - Error fetching schools in GET function: Bad escaped character in JSON at position 840 (line 1 column 841)
+2025-10-06T16:19:27.938Z - Error fetching schools in GET function: Bad escaped character in JSON at position 840 (line 1 column 841)
+2025-10-06T16:19:44.334Z - Error fetching schools in GET function: Bad escaped character in JSON at position 840 (line 1 column 841)
+2025-10-06T16:23:10.348Z - Error fetching schools in GET function: Bad escaped character in JSON at position 840 (line 1 column 841)
+2025-10-06T16:23:36.446Z - Error fetching schools in GET function: Bad escaped character in JSON at position 840 (line 1 column 841)
+2025-10-06T16:24:16.844Z - Error fetching schools in GET function: Bad escaped character in JSON at position 840 (line 1 column 841)
+2025-10-06T16:25:50.074Z - Error fetching schools in GET function: Bad escaped character in JSON at position 840 (line 1 column 841)
+2025-10-06T16:25:57.627Z - Error fetching schools in GET function: Bad escaped character in JSON at position 840 (line 1 column 841)
+2025-10-06T16:26:00.017Z - Error fetching schools in GET function: Bad escaped character in JSON at position 840 (line 1 column 841)
+2025-10-06T16:26:00.100Z - Error fetching schools in GET function: Bad escaped character in JSON at position 840 (line 1 column 841)
+2025-10-06T16:26:00.180Z - Error fetching schools in GET function: Bad escaped character in JSON at position 840 (line 1 column 841)
+2025-10-06T16:27:25.859Z - Error fetching schools in GET function: Bad escaped character in JSON at position 807 (line 1 column 808)
+2025-10-06T16:27:34.359Z - Error fetching schools in GET function: Bad escaped character in JSON at position 807 (line 1 column 808)
+2025-10-06T18:50:33.132Z - Error fetching schools in GET function: Bad escaped character in JSON at position 807 (line 1 column 808)
+2025-10-06T18:50:33.720Z - Error fetching schools in GET function: Bad escaped character in JSON at position 807 (line 1 column 808)
+2025-10-06T19:13:34.826Z - Error fetching schools in GET function: Unterminated string in JSON at position 3180 (line 1 column 3181)
+2025-10-06T19:13:34.950Z - Error fetching schools in GET function: Unterminated string in JSON at position 3180 (line 1 column 3181)
+2025-10-06T19:13:35.079Z - Error fetching schools in GET function: Unterminated string in JSON at position 3180 (line 1 column 3181)
+2025-10-06T19:13:40.136Z - Error fetching schools in GET function: Unterminated string in JSON at position 3180 (line 1 column 3181)
+2025-10-06T19:13:41.182Z - Error fetching schools in GET function: Unterminated string in JSON at position 3180 (line 1 column 3181)
+2025-10-06T19:13:43.339Z - Error fetching schools in GET function: Unterminated string in JSON at position 3180 (line 1 column 3181)
+2025-10-06T19:34:14.225Z - Error fetching schools in GET function: Unexpected token 'e', "eyJ0eXBlIj"... is not valid JSON
+2025-10-06T19:34:20.924Z - Error fetching schools in GET function: Unexpected token 'e', "eyJ0eXBlIj"... is not valid JSON
+2025-10-06T19:54:40.928Z - Error fetching schools in GET function: Unexpected token 'e', "eyJ0eXBlIj"... is not valid JSON
+2025-10-06T19:54:45.919Z - Error fetching schools in GET function: Unexpected token 'e', "eyJ0eXBlIj"... is not valid JSON
+2025-10-06T20:03:36.540Z - Error fetching schools in GET function: Unexpected token 'e', "eyJ0eXBlIj"... is not valid JSON
