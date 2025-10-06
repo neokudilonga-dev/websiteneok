@@ -37,7 +37,7 @@ function ensureInitialized() {
           const looksLikeBase64 = (s: string) => /^[A-Za-z0-9+/=]+$/.test(s) && s.length % 4 === 0;
           const normalizeEscapes = (s: string) => s.replace(/\\(?!["\\\/bfnrtu])/g, '\\\\');
 
-          let candidate = String(serviceAccountKey);
+          const candidate = String(serviceAccountKey);
           // First attempt: decode base64
           try {
             const onceDecoded = Buffer.from(candidate, 'base64').toString('utf8');

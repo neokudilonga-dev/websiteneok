@@ -8,11 +8,13 @@ export const revalidate = 60; // Revalidate every 60 seconds
 
 async function getShopData() {
   try {
+    const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+    const url = (path: string) => (base ? `${base}${path}` : path);
     const [schoolsRes, productsRes, readingPlanRes, categoriesRes] = await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/schools`, { next: { revalidate: 60 } }),
-        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`, { next: { revalidate: 60 } }),
-        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/reading-plan`, { next: { revalidate: 60 } }),
-        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories`, { next: { revalidate: 60 } })
+        fetch(url('/api/schools'), { next: { revalidate: 60 } }),
+        fetch(url('/api/products'), { next: { revalidate: 60 } }),
+        fetch(url('/api/reading-plan'), { next: { revalidate: 60 } }),
+        fetch(url('/api/categories'), { next: { revalidate: 60 } })
     ]);
 
     if (!schoolsRes.ok) throw new Error('Failed to fetch schools');

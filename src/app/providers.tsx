@@ -12,11 +12,13 @@ async function getInitialData(): Promise<{
   initialCategories: Category[];
 }> {
   try {
+    const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+    const url = (path: string) => (base ? `${base}${path}` : path);
     const [schoolsRes, productsRes, readingPlanRes, categoriesRes] = await Promise.all([
-      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/schools`, { cache: 'no-store' }),
-      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`, { cache: 'no-store' }),
-      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/reading-plan`, { cache: 'no-store' }),
-      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories`, { cache: 'no-store' }),
+      fetch(url('/api/schools'), { cache: 'no-store' }),
+      fetch(url('/api/products'), { cache: 'no-store' }),
+      fetch(url('/api/reading-plan'), { cache: 'no-store' }),
+      fetch(url('/api/categories'), { cache: 'no-store' }),
     ]);
 
     const initialSchools = schoolsRes.ok ? await schoolsRes.json() : [];

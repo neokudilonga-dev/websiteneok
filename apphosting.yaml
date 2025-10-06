@@ -5,3 +5,24 @@ runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
   maxInstances: 1
+
+# Environment variables and secrets for runtime
+# Manage secrets in Cloud Secret Manager, then grant backend access via:
+#   firebase apphosting:secrets:grantaccess --backend websiteneok --secret FIREBASE_PRIVATE_KEY
+#   firebase apphosting:secrets:grantaccess --backend websiteneok --secret FIREBASE_CLIENT_EMAIL
+env:
+  - variable: FIREBASE_PROJECT_ID
+    value: biblioangola
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: FIREBASE_CLIENT_EMAIL
+    secret: FIREBASE_CLIENT_EMAIL
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: FIREBASE_PRIVATE_KEY
+    secret: FIREBASE_PRIVATE_KEY
+    availability:
+      - BUILD
+      - RUNTIME

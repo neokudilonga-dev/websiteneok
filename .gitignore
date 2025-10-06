@@ -43,3 +43,6 @@ next-env.d.ts
 # firebase
 firebase-debug.log
 firestore-debug.log
+
+# secrets (do not commit service account keys)
+biblioangola-firebase-adminsdk-fbsvc-bd35d7af0a.json
