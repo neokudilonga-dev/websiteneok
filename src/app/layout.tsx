@@ -10,6 +10,10 @@ export const metadata: Metadata = {
   description: "A sua fonte de livros e jogos escolares.",
 };
 
+// Mark root layout dynamic to avoid prerendering issues in build pipelines
+// when fetching data from internal route handlers.
+export const dynamic = 'force-dynamic';
+
 async function getInitialData(): Promise<{
   initialSchools: School[];
   initialProducts: Product[];
@@ -20,10 +24,10 @@ async function getInitialData(): Promise<{
     const base = process.env.NEXT_PUBLIC_BASE_URL || '';
     const url = (path: string) => (base ? `${base}${path}` : path);
     const [schoolsRes, productsRes, readingPlanRes, categoriesRes] = await Promise.all([
-      fetch(url('/api/schools'), { cache: 'no-store' }),
-      fetch(url('/api/products'), { cache: 'no-store' }),
-      fetch(url('/api/reading-plan'), { cache: 'no-store' }),
-      fetch(url('/api/categories'), { cache: 'no-store' }),
+      fetch(url('/api/schools'), { next: { revalidate: 60 } }),
+      fetch(url('/api/products'), { next: { revalidate: 60 } }),
+      fetch(url('/api/reading-plan'), { next: { revalidate: 60 } }),
+      fetch(url('/api/categories'), { next: { revalidate: 60 } }),
     ]);
 
     const initialSchools = schoolsRes.ok ? await schoolsRes.json() : [];

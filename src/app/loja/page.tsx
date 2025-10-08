@@ -4,7 +4,8 @@ import { ShopPageContent } from '@/components/shop-page-content';
 import Header from '@/components/header';
 import { DataProvider } from '@/context/data-context';
 
-export const revalidate = 60; // Revalidate every 60 seconds
+// Avoid prerendering Loja at build time; fetch data on request.
+export const dynamic = 'force-dynamic';
 
 async function getShopData() {
   try {
