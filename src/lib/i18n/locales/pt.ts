@@ -218,6 +218,7 @@ export const pt = {
     add_new_book: 'Adicionar Novo Livro',
     not_in_plan: 'Não no plano',
     filter_by_school: 'Filtrar por Escola',
+    add_to_reading_plan: 'Adicionar ao Plano de Leitura',
   },
   games_page: {
     title: 'Jogos e Outros',

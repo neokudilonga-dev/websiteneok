@@ -216,6 +216,7 @@ export const en = {
     add_new_book: 'Add New Book',
     not_in_plan: 'Not in plan',
     filter_by_school: 'Filter by School',
+    add_to_reading_plan: 'Add to Reading Plan',
   },
   games_page: {
     title: 'Games and Others',
