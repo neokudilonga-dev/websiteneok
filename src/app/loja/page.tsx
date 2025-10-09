@@ -1,5 +1,6 @@
 
 import { Suspense } from 'react';
+import { headers } from 'next/headers';
 import { ShopPageContent } from '@/components/shop-page-content';
 import Header from '@/components/header';
 import { DataProvider } from '@/context/data-context';
@@ -8,32 +9,55 @@ import { DataProvider } from '@/context/data-context';
 export const dynamic = 'force-dynamic';
 
 async function getShopData() {
-  try {
-    const base = process.env.NEXT_PUBLIC_BASE_URL || '';
-    const url = (path: string) => (base ? `${base}${path}` : path);
-    const [schoolsRes, productsRes, readingPlanRes, categoriesRes] = await Promise.all([
-        fetch(url('/api/schools'), { next: { revalidate: 60 } }),
-        fetch(url('/api/products'), { next: { revalidate: 60 } }),
-        fetch(url('/api/reading-plan'), { next: { revalidate: 60 } }),
-        fetch(url('/api/categories'), { next: { revalidate: 60 } })
-    ]);
+  // Build absolute URLs using the current request headers to ensure
+  // server-side fetch hits the correct origin in all environments.
+  const hdrs = headers();
+  const host = hdrs.get('x-forwarded-host') || hdrs.get('host') || '';
+  const proto = hdrs.get('x-forwarded-proto') || 'https';
+  const origin = host ? `${proto}://${host}` : '';
+  const url = (path: string) => (origin ? `${origin}${path}` : path);
 
-    if (!schoolsRes.ok) throw new Error('Failed to fetch schools');
-    if (!productsRes.ok) throw new Error('Failed to fetch products');
-    if (!readingPlanRes.ok) throw new Error('Failed to fetch reading plan');
-    if (!categoriesRes.ok) throw new Error('Failed to fetch categories');
+  // Fetch all resources in parallel, but do not fail the whole page
+  // if one endpoint has an issue. Prefer fresh data without caching.
+  const requests = [
+    fetch(url('/api/schools'), { cache: 'no-store' }),
+    fetch(url('/api/products'), { cache: 'no-store' }),
+    fetch(url('/api/reading-plan'), { cache: 'no-store' }),
+    fetch(url('/api/categories'), { cache: 'no-store' }),
+  ];
 
-    const schoolsData = await schoolsRes.json();
-    const productsData = await productsRes.json();
-    const readingPlanData = await readingPlanRes.json();
-    const categoriesData = await categoriesRes.json();
-    
-    return { schoolsData, productsData, readingPlanData, categoriesData };
+  const [schoolsRes, productsRes, readingPlanRes, categoriesRes] = await Promise.allSettled(requests);
 
-  } catch (error) {
-      console.error("Error fetching shop data:", error);
-      return { schoolsData: [], productsData: [], readingPlanData: [], categoriesData: [] };
-  }
+  const safeJson = async (res: Response | null, label: string) => {
+    try {
+      if (res && res.ok) return await res.json();
+      const status = res ? res.status : 'no-response';
+      console.warn(`[loja] ${label} fetch not ok`, status);
+      return [];
+    } catch (err) {
+      console.error(`[loja] ${label} parse error`, err);
+      return [];
+    }
+  };
+
+  const schoolsData = await safeJson(
+    schoolsRes.status === 'fulfilled' ? schoolsRes.value : null,
+    'schools'
+  );
+  const productsData = await safeJson(
+    productsRes.status === 'fulfilled' ? productsRes.value : null,
+    'products'
+  );
+  const readingPlanData = await safeJson(
+    readingPlanRes.status === 'fulfilled' ? readingPlanRes.value : null,
+    'reading-plan'
+  );
+  const categoriesData = await safeJson(
+    categoriesRes.status === 'fulfilled' ? categoriesRes.value : null,
+    'categories'
+  );
+
+  return { schoolsData, productsData, readingPlanData, categoriesData };
 }
 
 function ShopPageLoading() {
