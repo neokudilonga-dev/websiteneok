@@ -111,6 +111,8 @@ export async function POST(request: Request) {
         } else {
           // Add new product if no ID is provided
           const productRef = doc(productsCollection);
+          // Assign the document ID to the product data
+          productData.id = productRef.id;
           batch.set(productRef, productData);
           importResults.push({ status: "added", message: "Product added successfully", data: productData });
         }
