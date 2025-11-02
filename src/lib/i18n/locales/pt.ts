@@ -175,6 +175,7 @@ export const pt = {
     errors: {
       student_info_required: 'O nome do aluno e a classe são obrigatórios para itens do plano de leitura.',
       address_required: 'A morada é obrigatória para entrega ao domicílio.',
+      multicaixa_unavailable_for_delivery: 'Pagamento com Multicaixa não está disponível para entregas.',
     },
     toast: {
       cart_empty_title: 'Carrinho Vazio',

@@ -173,6 +173,7 @@ export const en = {
     errors: {
       student_info_required: 'Student name and class are required for reading plan items.',
       address_required: 'Address is required for home delivery.',
+      multicaixa_unavailable_for_delivery: 'Payment with Multicaixa is not available for deliveries.',
     },
     toast: {
       cart_empty_title: 'Empty Cart',

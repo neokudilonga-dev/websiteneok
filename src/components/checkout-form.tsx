@@ -87,6 +87,14 @@ export default function CheckoutForm() {
     }, {
         message: t('checkout_form.errors.address_required'),
         path: ["deliveryAddress"],
+    }).refine(data => {
+        if (["tala-morro","fora-tala","outras"].includes(data.deliveryOption) && data.paymentMethod === "multicaixa") {
+            return false;
+        }
+        return true;
+    }, {
+        message: t('checkout_form.errors.multicaixa_unavailable_for_delivery'),
+        path: ["paymentMethod"],
     });
 
     type CheckoutFormValues = z.infer<typeof conditionalCheckoutSchema>;
@@ -105,6 +113,8 @@ export default function CheckoutForm() {
     });
 
     const deliveryOption = form.watch("deliveryOption");
+
+    const isDelivery = deliveryOption === 'tala-morro' || deliveryOption === 'fora-tala' || deliveryOption === 'outras';
 
     const getDeliveryFee = () => {
         switch (deliveryOption) {
@@ -146,23 +156,22 @@ export default function CheckoutForm() {
         try {
             await addOrder({
                 ...data,
--                paymentMethod: "unspecified", // Add this line
-+                paymentMethod: data.paymentMethod,
-                 deliveryAddress: data.deliveryAddress || null,
-                 items: cartItems,
-                 total: finalTotal,
-                 deliveryFee,
-                 reference: orderReference,
-                 date: new Date().toISOString(),
-                 schoolId: schoolInCart?.id,
-                 schoolName: schoolName
+                paymentMethod: data.paymentMethod,
+                deliveryAddress: data.deliveryAddress || null,
+                items: cartItems,
+                total: finalTotal,
+                deliveryFee,
+                reference: orderReference,
+                date: new Date().toISOString(),
+                schoolId: schoolInCart?.id,
+                schoolName: schoolName
             });
 
             clearCart();
             const urlParams = new URLSearchParams();
             urlParams.set("ref", orderReference);
-+            urlParams.set("payment", data.paymentMethod);
-             router.push(`/order-confirmation?${urlParams.toString()}`);
+            urlParams.set("payment", data.paymentMethod);
+            router.push(`/order-confirmation?${urlParams.toString()}`);
 
             toast({
                 title: t('checkout_form.toast.order_submitted_title'),
@@ -308,10 +317,12 @@ export default function CheckoutForm() {
                                             <FormControl><RadioGroupItem value="numerario" /></FormControl>
                                             <FormLabel className="font-normal">{t('checkout_form.payment_method_1')}</FormLabel>
                                         </FormItem>
-                                        <FormItem className="flex items-center space-x-3 space-y-0">
-                                            <FormControl><RadioGroupItem value="multicaixa" /></FormControl>
-                                            <FormLabel className="font-normal">{t('checkout_form.payment_method_2')}</FormLabel>
-                                        </FormItem>
+                                        {!isDelivery && (
+                                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                                <FormControl><RadioGroupItem value="multicaixa" /></FormControl>
+                                                <FormLabel className="font-normal">{t('checkout_form.payment_method_2')}</FormLabel>
+                                            </FormItem>
+                                        )}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl><RadioGroupItem value="transferencia" /></FormControl>
                                             <FormLabel className="font-normal">{t('checkout_form.payment_method_3')}</FormLabel>
