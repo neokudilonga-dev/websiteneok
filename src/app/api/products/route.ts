@@ -20,38 +20,27 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const product: Product = await request.json();
+    const body = await request.json();
+    const product: Product = body.product;
+    const incomingReadingPlan: ReadingPlanItem[] = Array.isArray(body.readingPlan)
+      ? body.readingPlan
+      : (product?.readingPlan || []);
 
-    if (!product.name || !product.category || !product.publisher || !product.price || !product.image || product.image.length === 0) {
+    if (!product || !product.name || !product.category || !product.price || !product.image || (Array.isArray(product.image) ? product.image.length === 0 : !product.image)) {
       return NextResponse.json({ message: 'Missing required product fields' }, { status: 400 });
-    }
-
-    // Validate image sizes
-    if (product.image) {
-      const imagesToValidate = Array.isArray(product.image) ? product.image : [product.image];
-      for (const _image of imagesToValidate) {
-        // Assuming image is a string (URL) here, so width/height check might not be directly applicable
-        // If image objects with width/height are expected, the Product type needs to be updated.
-        // For now, I'll remove the width/height check as it's not compatible with string URLs.
-        // if (image.width > 1000 || image.height > 1000) {
-        //   return NextResponse.json({ message: 'Image dimensions cannot exceed 1000x1000 pixels' }, { status: 400 });
-        // }
-      }
     }
 
     // Generate a new UUID for the product
     const productId = uuidv4();
     product.id = productId;
 
-    // Add reading plans if they exist
-    if (product.readingPlan && product.readingPlan.length > 0) {
+    // Persist reading plan entries if provided
+    if (incomingReadingPlan && incomingReadingPlan.length > 0) {
       const batch = firestore.batch();
-      product.readingPlan.forEach((plan: ReadingPlanItem) => {
-        if (!plan.id) {
-          throw new Error("Reading plan item ID is missing.");
-        }
-        const planRef = firestore.collection('readingPlans').doc(plan.id);
-        batch.set(planRef, plan);
+      incomingReadingPlan.forEach((plan: ReadingPlanItem) => {
+        const planId = plan.id || uuidv4();
+        const planRef = firestore.collection('readingPlan').doc(planId);
+        batch.set(planRef, { ...plan, id: planId, productId: productId });
       });
       await batch.commit();
     }

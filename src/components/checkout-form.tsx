@@ -39,16 +39,16 @@ const checkoutSchema = z.object({
     "levantamento-local",
   ]),
   deliveryAddress: z.string().optional(),
+  paymentMethod: z.enum(["numerario", "multicaixa", "transferencia"]),
 });
 
 
 export default function CheckoutForm() {
     const router = useRouter();
     const { toast } = useToast();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const { cartItems, cartTotal, clearCart } = useCart();
     const { readingPlan, schools, addOrder } = useData();
-    const { language } = useLanguage();
 
     const readingPlanProductIdsInCart = useMemo(() => {
         const readingPlanProductIds = new Set(readingPlan.map(item => item.productId));
@@ -72,13 +72,13 @@ export default function CheckoutForm() {
 
 
     const conditionalCheckoutSchema = checkoutSchema.refine(data => {
-        if (requiresStudentInfo) {
+        if (data.deliveryOption === 'levantamento') {
             return !!data.studentName && !!data.classAndGrade;
         }
         return true;
     }, {
         message: t('checkout_form.errors.student_info_required'),
-        path: ["studentName"], // You can choose which field to show the error on
+        path: ["studentName"],
     }).refine(data => {
         if (data.deliveryOption !== 'levantamento' && data.deliveryOption !== 'levantamento-local' && !data.deliveryAddress) {
             return false;
@@ -146,21 +146,23 @@ export default function CheckoutForm() {
         try {
             await addOrder({
                 ...data,
-                paymentMethod: "unspecified", // Add this line
-                deliveryAddress: data.deliveryAddress || null,
-                items: cartItems,
-                total: finalTotal,
-                deliveryFee,
-                reference: orderReference,
-                date: new Date().toISOString(),
-                schoolId: schoolInCart?.id,
-                schoolName: schoolName
+-                paymentMethod: "unspecified", // Add this line
++                paymentMethod: data.paymentMethod,
+                 deliveryAddress: data.deliveryAddress || null,
+                 items: cartItems,
+                 total: finalTotal,
+                 deliveryFee,
+                 reference: orderReference,
+                 date: new Date().toISOString(),
+                 schoolId: schoolInCart?.id,
+                 schoolName: schoolName
             });
 
             clearCart();
             const urlParams = new URLSearchParams();
             urlParams.set("ref", orderReference);
-            router.push(`/order-confirmation?${urlParams.toString()}`);
++            urlParams.set("payment", data.paymentMethod);
+             router.push(`/order-confirmation?${urlParams.toString()}`);
 
             toast({
                 title: t('checkout_form.toast.order_submitted_title'),
@@ -177,8 +179,62 @@ export default function CheckoutForm() {
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 <div className="space-y-4 rounded-lg border bg-card p-6">
+                    <h3 className="text-xl font-semibold">{t('checkout_form.delivery_options')}</h3>
+                    <FormField
+                        control={form.control}
+                        name="deliveryOption"
+                        render={({ field }) => (
+                            <FormItem className="space-y-3">
+                                <FormControl>
+                                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex flex-col space-y-2">
+                                        <FormItem className="flex items-center space-x-3 space-y-0">
+                                            <FormControl><RadioGroupItem value="tala-morro" /></FormControl>
+                                            <FormLabel className="font-normal">{t('checkout_form.delivery_option_1')}</FormLabel>
+                                        </FormItem>
+                                        <FormItem className="flex items-center space-x-3 space-y-0">
+                                            <FormControl><RadioGroupItem value="fora-tala" /></FormControl>
+                                            <FormLabel className="font-normal">{t('checkout_form.delivery_option_2')}</FormLabel>
+                                        </FormItem>
+                                        <FormItem className="flex items-center space-x-3 space-y-0">
+                                            <FormControl><RadioGroupItem value="outras" /></FormControl>
+                                            <FormLabel className="font-normal">{t('checkout_form.delivery_option_3')}</FormLabel>
+                                        </FormItem>
+                                        {allowPickupAtSchool && (
+                                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                                <FormControl><RadioGroupItem value="levantamento" /></FormControl>
+                                                <FormLabel className="font-normal">{t('checkout_form.delivery_option_4')}</FormLabel>
+                                            </FormItem>
+                                        )}
+                                        {allowPickupAtLocation && (
+                                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                                <FormControl><RadioGroupItem value="levantamento-local" /></FormControl>
+                                                <FormLabel className="font-normal">{t('checkout_form.delivery_option_5')}</FormLabel>
+                                            </FormItem>
+                                        )}
+                                    </RadioGroup>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    {deliveryOption !== 'levantamento' && deliveryOption !== 'levantamento-local' && (
+                         <FormField
+                            control={form.control}
+                            name="deliveryAddress"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t('checkout_form.delivery_address')}</FormLabel>
+                                    <FormControl><Textarea {...field} /></FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    )}
+                </div>
+
+                <div className="space-y-4 rounded-lg border bg-card p-6">
                      <h3 className="text-xl font-semibold">{t('checkout_form.contact_details')}</h3>
-                     { requiresStudentInfo && (
+                     { deliveryOption === 'levantamento' && (
                         <>
                              <FormField
                                 control={form.control}
@@ -239,63 +295,61 @@ export default function CheckoutForm() {
                     />
                 </div>
 
-                <div className="space-y-4 rounded-lg border bg-card p-6">
-                    <h3 className="text-xl font-semibold">{t('checkout_form.delivery_options')}</h3>
+                 <div className="space-y-4 rounded-lg border bg-card p-6">
+                    <h3 className="text-xl font-semibold">{t('checkout_form.payment_method')}</h3>
                     <FormField
                         control={form.control}
-                        name="deliveryOption"
+                        name="paymentMethod"
                         render={({ field }) => (
                             <FormItem className="space-y-3">
                                 <FormControl>
                                     <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex flex-col space-y-2">
                                         <FormItem className="flex items-center space-x-3 space-y-0">
-                                            <FormControl><RadioGroupItem value="tala-morro" /></FormControl>
-                                            <FormLabel className="font-normal">{t('checkout_form.delivery_option_1')}</FormLabel>
+                                            <FormControl><RadioGroupItem value="numerario" /></FormControl>
+                                            <FormLabel className="font-normal">{t('checkout_form.payment_method_1')}</FormLabel>
                                         </FormItem>
                                         <FormItem className="flex items-center space-x-3 space-y-0">
-                                            <FormControl><RadioGroupItem value="fora-tala" /></FormControl>
-                                            <FormLabel className="font-normal">{t('checkout_form.delivery_option_2')}</FormLabel>
+                                            <FormControl><RadioGroupItem value="multicaixa" /></FormControl>
+                                            <FormLabel className="font-normal">{t('checkout_form.payment_method_2')}</FormLabel>
                                         </FormItem>
                                         <FormItem className="flex items-center space-x-3 space-y-0">
-                                            <FormControl><RadioGroupItem value="outras" /></FormControl>
-                                            <FormLabel className="font-normal">{t('checkout_form.delivery_option_3')}</FormLabel>
+                                            <FormControl><RadioGroupItem value="transferencia" /></FormControl>
+                                            <FormLabel className="font-normal">{t('checkout_form.payment_method_3')}</FormLabel>
                                         </FormItem>
-                                        {allowPickupAtSchool && (
-                                            <FormItem className="flex items-center space-x-3 space-y-0">
-                                                <FormControl><RadioGroupItem value="levantamento" /></FormControl>
-                                                <FormLabel className="font-normal">{t('checkout_form.delivery_option_4')}</FormLabel>
-                                            </FormItem>
-                                        )}
-                                        {allowPickupAtLocation && (
-                                            <FormItem className="flex items-center space-x-3 space-y-0">
-                                                <FormControl><RadioGroupItem value="levantamento-local" /></FormControl>
-                                                <FormLabel className="font-normal">{t('checkout_form.delivery_option_5')}</FormLabel>
-                                            </FormItem>
-                                        )}
                                     </RadioGroup>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
-                    {deliveryOption !== 'levantamento' && deliveryOption !== 'levantamento-local' && (
-                         <FormField
-                            control={form.control}
-                            name="deliveryAddress"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>{t('checkout_form.delivery_address')}</FormLabel>
-                                    <FormControl><Textarea {...field} /></FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    )}
-                </div>
+                 </div>
 
-                 <div className="space-y-4 rounded-lg border bg-card p-6">
-                    <h3 className="text-xl font-semibold">{t('checkout_form.payment_method')}</h3>
-                     
+                <div className="space-y-4 rounded-lg border bg-card p-6">
+                    <h3 className="text-xl font-semibold">{t('checkout_page.order_summary')}</h3>
+                    <div className="space-y-2">
+                        {cartItems.map((item) => (
+                            <div key={item.id} className="flex justify-between">
+                                <span>{getDisplayName(item.name, language)}</span>
+                                <span>{item.quantity} x {item.price.toLocaleString("pt-PT")} AOA</span>
+                            </div>
+                        ))}
+                        <div className="border-t pt-2 mt-2">
+                            <div className="flex justify-between">
+                                <span>{t('checkout_page.subtotal')}</span>
+                                <span>{cartTotal.toLocaleString("pt-PT")} AOA</span>
+                            </div>
+                            {deliveryFee > 0 && (
+                                <div className="flex justify-between">
+                                    <span>{t('checkout_form.delivery_options')}</span>
+                                    <span>{deliveryFee.toLocaleString("pt-PT")} AOA</span>
+                                </div>
+                            )}
+                            <div className="flex justify-between font-bold mt-2">
+                                <span>Total</span>
+                                <span>{finalTotal.toLocaleString("pt-PT")} AOA</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <Button type="submit" size="lg" className="w-full">

@@ -26,9 +26,12 @@ export async function GET() {
             const data = doc.data();
             schools.push({
                 id: doc.id,
-                name: typeof data.name === 'object' ? data.name.en : data.name,
-                description: typeof data.description === 'object' ? data.description.en : data.description,
-                abbreviation: data.abbreviation || '', // Provide a default empty string if not present
+                name: typeof data.name === 'object' ? data.name : data.name,
+                description: typeof data.description === 'object' ? data.description : data.description,
+                abbreviation: data.abbreviation || '',
+                allowPickup: !!data.allowPickup,
+                allowPickupAtLocation: !!data.allowPickupAtLocation,
+                hasRecommendedPlan: !!data.hasRecommendedPlan,
             });
         });
 

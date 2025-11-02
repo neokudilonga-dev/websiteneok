@@ -3,6 +3,7 @@ import { firestore } from '@/lib/firebase-admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { Product, ReadingPlanItem } from '@/lib/types';
 import { deleteImageFromFirebase } from '@/lib/firebase';
+import { v4 as uuidv4 } from 'uuid'
 
 export async function PUT(
   request: NextRequest,
@@ -10,7 +11,8 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const updatedProduct: Product = await request.json();
+    const body = await request.json();
+    const updatedProduct: Product = body.product;
 
     if (!id) {
       return NextResponse.json({ message: 'Product ID is required' }, { status: 400 });
@@ -23,15 +25,13 @@ export async function PUT(
       return NextResponse.json({ message: 'Product not found' }, { status: 404 });
     }
 
-    // Update reading plans if they exist
-    if (updatedProduct.readingPlan && updatedProduct.readingPlan.length > 0) {
+    // Update reading plans if provided
+    if (updatedProduct?.readingPlan && updatedProduct.readingPlan.length > 0) {
       const batch = firestore.batch();
       updatedProduct.readingPlan.forEach((plan: ReadingPlanItem) => {
-        if (!plan.id) {
-          throw new Error("Reading plan item ID is missing.");
-        }
-        const planRef = firestore.collection('readingPlans').doc(plan.id);
-        batch.set(planRef, plan);
+        const planId = plan.id || uuidv4();
+        const planRef = firestore.collection('readingPlan').doc(planId);
+        batch.set(planRef, { ...plan, id: planId, productId: id });
       });
       await batch.commit();
     }

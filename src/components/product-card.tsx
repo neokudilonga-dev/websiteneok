@@ -16,6 +16,7 @@ import type { Product } from "@/lib/types";
 import { useCart } from "@/context/cart-context";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { useLanguage } from "@/context/language-context";
+import { normalizeImageUrl } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
@@ -35,8 +36,8 @@ export default function ProductCard({ product, productBadgeRenderer }: ProductCa
     : (typeof product.description === 'object' ? (product.description?.[language] || product.description?.pt || '') : '');
 
   const displayImage = Array.isArray(product.image)
-    ? product.image[0] || 'https://placehold.co/600x400.png'
-    : product.image || 'https://placehold.co/600x400.png';
+    ? normalizeImageUrl(product.image[0])
+    : normalizeImageUrl(product.image);
   const isOutOfStock = product.stockStatus === 'out_of_stock';
 
   return (
@@ -47,12 +48,12 @@ export default function ProductCard({ product, productBadgeRenderer }: ProductCa
             <CarouselContent>
               {product.image.map((img: string, index: number) => (
                  <CarouselItem key={index}>
-                    <div className="aspect-video overflow-hidden">
+                    <div className="aspect-video overflow-hidden relative">
                       <Image
                         alt={`${displayName} image ${index + 1}`}
                         className="h-full w-full object-cover"
                         height="400"
-                        src={img}
+                        src={normalizeImageUrl(img)}
                         width="600"
                         data-ai-hint={product.dataAiHint}
                       />
@@ -68,7 +69,7 @@ export default function ProductCard({ product, productBadgeRenderer }: ProductCa
             )}
           </Carousel>
         ) : (
-           <div className="aspect-video overflow-hidden">
+           <div className="aspect-video overflow-hidden relative">
             <Image
               alt={`${displayName || ''} image ${0 + 1}`}
               className="object-cover"

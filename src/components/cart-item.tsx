@@ -8,6 +8,7 @@ import type { CartItem as CartItemType } from "@/lib/types";
 import { Minus, Plus, X } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
 import { getDisplayName } from "@/lib/utils";
+import { normalizeImageUrl } from "@/lib/utils";
 
 interface CartItemProps {
   item: CartItemType;
@@ -24,7 +25,8 @@ export default function CartItem({ item, isKitItem = false }: CartItemProps) {
     updateQuantity(item.id, item.quantity + change);
   };
   
-  const displayImage = item.type === 'book' ? (typeof item.image === 'string' ? item.image : (Array.isArray(item.image) && item.image.length > 0 ? item.image[0] : 'https://placehold.co/600x400.png')) : (typeof item.image === 'string' ? item.image : (Array.isArray(item.image) && item.image.length > 0 ? item.image[0] : 'https://placehold.co/600x400.png'));
+  const rawImage = typeof item.image === 'string' ? item.image : (Array.isArray(item.image) && item.image.length > 0 ? item.image[0] : undefined);
+  const displayImage = normalizeImageUrl(rawImage);
 
   return (
     <div className="flex items-start gap-4">
