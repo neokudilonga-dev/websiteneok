@@ -32,6 +32,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
 import { getDisplayName } from "@/lib/utils";
+import { ImageUpload } from "@/components/admin/image-upload";
 
 interface AddEditGameSheetProps {
   isOpen: boolean;
@@ -46,7 +47,7 @@ const readingPlanItemSchema = z.object({
 });
 
 
-const gameFormSchema = z.object({
+const gameBaseSchema = z.object({
   name: z.union([
     z.string().min(1, "O nome é obrigatório."),
     z.object({
@@ -64,10 +65,18 @@ const gameFormSchema = z.object({
   price: z.coerce.number().min(0, "O preço deve ser um número positivo."),
   stock: z.coerce.number().min(0, "O stock deve ser um número positivo."),
   stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out']),
+  image: z.union([z.string(), z.array(z.string())]).optional(),
   readingPlan: z.array(readingPlanItemSchema).optional(),
 });
 
-type GameFormValues = z.infer<typeof gameFormSchema>;
+const gameCreateSchema = gameBaseSchema.extend({
+  image: z.union([
+    z.string().min(1, "A imagem é obrigatória."),
+    z.array(z.string()).min(1, "A imagem é obrigatória."),
+  ]),
+});
+
+type GameFormValues = z.infer<typeof gameBaseSchema>;
 
 export function AddEditGameSheet({
   isOpen,
@@ -80,13 +89,14 @@ export function AddEditGameSheet({
   const [isSaving, setIsSaving] = useState(false);
 
   const form = useForm<GameFormValues>({
-    resolver: zodResolver(gameFormSchema),
+    resolver: zodResolver(gameBaseSchema),
     defaultValues: {
       name: "",
       description: "",
       price: 0,
       stock: 0,
       stockStatus: "in_stock",
+      image: [],
       readingPlan: [],
     },
   });
@@ -107,6 +117,7 @@ export function AddEditGameSheet({
           price: game.price,
           stock: game.stock,
           stockStatus: game.stockStatus || 'in_stock',
+          image: game.image || [],
           readingPlan: readingPlan,
         });
       } else {
@@ -116,6 +127,7 @@ export function AddEditGameSheet({
           price: 0,
           stock: 0,
           stockStatus: "in_stock",
+          image: [],
           readingPlan: [],
         });
       }
@@ -125,6 +137,18 @@ export function AddEditGameSheet({
   const onSubmit = async (data: GameFormValues) => {
     setAsyncError(null);
     setIsSaving(true);
+
+    // Enforce image required only on create
+    if (!game) {
+      try {
+        gameCreateSchema.parse(data as any);
+      } catch (e) {
+        form.setError('image' as any, { type: 'manual', message: "A imagem é obrigatória." });
+        setIsSaving(false);
+        return;
+      }
+    }
+
     const productData: Product = {
       id: game?.id || (typeof data.name === 'string' ? data.name : data.name?.pt || "") || "", // Ensure ID is string
       type: "game",
@@ -133,6 +157,7 @@ export function AddEditGameSheet({
       price: data.price,
       stock: data.stock,
       stockStatus: data.stockStatus,
+      image: (data as any).image,
     };
     const readingPlanData = data.readingPlan || [];
     try {
@@ -273,6 +298,16 @@ export function AddEditGameSheet({
                         </FormItem>
                       </RadioGroup>
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <ImageUpload label="Imagens" value={field.value as any} onChange={field.onChange as any} folder="games" multiple />
                     <FormMessage />
                   </FormItem>
                 )}

@@ -32,6 +32,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
 import { getDisplayName } from "@/lib/utils";
+import { ImageUpload } from "@/components/admin/image-upload";
 
 const readingPlanItemSchema = z.object({
   id: z.string().optional(),
@@ -41,7 +42,7 @@ const readingPlanItemSchema = z.object({
   status: z.enum(["mandatory", "recommended"]),
 });
 
-const bookFormSchema = z.object({
+const bookBaseSchema = z.object({
   name: z.union([
     z.string().min(3, "O nome deve ter pelo menos 3 caracteres."),
     z.object({
@@ -61,10 +62,18 @@ const bookFormSchema = z.object({
   category: z.string().min(1, "A categoria é obrigatória."),
   publisher: z.string().optional(),
   stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out']),
+  image: z.union([z.string(), z.array(z.string())]).optional(),
   readingPlan: z.array(readingPlanItemSchema).optional(),
 });
 
-type BookFormValues = z.infer<typeof bookFormSchema>;
+const bookCreateSchema = bookBaseSchema.extend({
+  image: z.union([
+    z.string().min(1, "A imagem é obrigatória."),
+    z.array(z.string()).min(1, "A imagem é obrigatória."),
+  ]),
+});
+
+type BookFormValues = z.infer<typeof bookBaseSchema>;
 
 interface AddEditBookSheetProps {
   book?: Product;
@@ -82,7 +91,7 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
   const bookCategories = useMemo(() => categories.filter(c => c.type === 'book'), [categories]);
 
   const form = useForm<BookFormValues>({
-    resolver: zodResolver(bookFormSchema),
+    resolver: zodResolver(bookBaseSchema),
     defaultValues: {
       name: { pt: "", en: "" },
       description: "",
@@ -91,6 +100,7 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
       category: "",
       publisher: "",
       stockStatus: 'in_stock',
+      image: "",
       readingPlan: [],
     },
   });
@@ -134,6 +144,7 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
           category: book.category,
           publisher: book.publisher,
           stockStatus: book.stockStatus || 'in_stock',
+          image: book.image,
           readingPlan: bookReadingPlan
         });
       } else {
@@ -151,10 +162,21 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
     }
   }, [book, form, isOpen, readingPlan, categories.length, setCategories]);
 
-  const onSubmit = async (data: z.infer<typeof bookFormSchema>) => {
+  const onSubmit = async (data: BookFormValues) => {
     console.log("onSubmit called with data:", data);
     setAsyncError(null);
     setIsSaving(true);
+
+    // Enforce image required only on create
+    if (!book) {
+      try {
+        bookCreateSchema.parse(data as any);
+      } catch (e) {
+        form.setError('image' as any, { type: 'manual', message: "A imagem é obrigatória." });
+        setIsSaving(false);
+        return;
+      }
+    }
 
     try {
       const productData: Product = {
@@ -167,6 +189,7 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
         category: data.category,
         publisher: data.publisher,
         stockStatus: data.stockStatus,
+        image: data.image,
         readingPlan: data.readingPlan?.map((rp) => ({
           id: rp.id || "",
           productId: rp.productId || "",
@@ -369,6 +392,16 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
                       </FormItem>
                     </RadioGroup>
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="image"
+              render={({ field }) => (
+                <FormItem>
+                  <ImageUpload label="Imagem" value={field.value} onChange={field.onChange} folder="books" multiple={false} />
                   <FormMessage />
                 </FormItem>
               )}
