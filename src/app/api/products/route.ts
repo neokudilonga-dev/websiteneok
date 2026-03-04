@@ -61,7 +61,8 @@ export async function POST(request: NextRequest) {
       'image', 
       'status', 
       'stockStatus', 
-      'dataAiHint'
+      'dataAiHint',
+      'storagePlace'
     ];
     
     allowedFields.forEach(field => {

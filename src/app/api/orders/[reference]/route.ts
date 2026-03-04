@@ -10,24 +10,28 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ reference: string }> }
 ) {
+  let reference: string | undefined;
   try {
-    const { reference } = await params;
-    const { paymentStatus, deliveryStatus } = await request.json(); // Expect partial update
+    ({ reference } = await params);
+    const { paymentStatus, deliveryStatus, deliveryDate } = await request.json(); // Expect partial update
 
-    console.log(`[API Orders] PUT - Updating order ${reference}:`, { paymentStatus, deliveryStatus });
+    console.log(`[API Orders] PUT - Updating order ${reference}:`, { paymentStatus, deliveryStatus, deliveryDate });
 
     if (!reference) {
       return NextResponse.json({ message: 'Order reference is required' }, { status: 400 });
     }
 
     const orderRef = firestore.collection('orders').doc(reference);
-    const updateData: { paymentStatus?: string; deliveryStatus?: string; updatedAt?: string } = {};
+    const updateData: { paymentStatus?: string; deliveryStatus?: string; deliveryDate?: string; updatedAt?: string } = {};
 
     if (paymentStatus) {
       updateData.paymentStatus = paymentStatus;
     }
     if (deliveryStatus) {
       updateData.deliveryStatus = deliveryStatus;
+    }
+    if (deliveryDate !== undefined) {
+      updateData.deliveryDate = deliveryDate;
     }
 
     if (Object.keys(updateData).length === 0) {
@@ -43,7 +47,7 @@ export async function PUT(
 
     return NextResponse.json({ message: 'Order updated successfully' }, { status: 200 });
   } catch (error) {
-    console.error(`[API Orders] PUT - Error updating order ${reference}:`, error);
+    console.error(`[API Orders] PUT - Error updating order ${reference ?? ''}:`, error);
     return NextResponse.json({ message: 'Error updating order', error: String(error) }, { status: 500 });
   }
 }
@@ -52,8 +56,9 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ reference: string }> }
 ) {
+  let reference: string | undefined;
   try {
-    const { reference } = await params;
+    ({ reference } = await params);
     console.log(`[API Orders] DELETE - Deleting order ${reference}`);
 
     if (!reference) {
@@ -67,7 +72,7 @@ export async function DELETE(
 
     return NextResponse.json({ message: 'Order deleted successfully' }, { status: 200 });
   } catch (error) {
-    console.error(`[API Orders] DELETE - Error deleting order ${reference}:`, error);
+    console.error(`[API Orders] DELETE - Error deleting order ${reference ?? ''}:`, error);
     return NextResponse.json({ message: 'Error deleting order', error: String(error) }, { status: 500 });
   }
 }

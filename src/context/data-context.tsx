@@ -52,6 +52,7 @@ interface DataContextType {
   addOrder: (order: Omit<Order, 'paymentStatus' | 'deliveryStatus'>) => Promise<void>;
   updateOrderPaymentStatus: (orderReference: string, status: PaymentStatus) => Promise<void>;
   updateOrderDeliveryStatus: (orderReference: string, status: DeliveryStatus) => Promise<void>;
+  updateOrderDeliveryDate: (orderReference: string, date: string) => Promise<void>;
   deleteOrder: (orderReference: string) => Promise<void>;
 
 
@@ -568,6 +569,26 @@ export const DataProvider = ({
         setLoading(false);
     }
   }
+
+  const updateOrderDeliveryDate = async (orderReference: string, date: string) => {
+    setLoading(true);
+     try {
+      const response = await fetch(`/api/orders/${orderReference}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ deliveryDate: date }),
+      });
+      if (!response.ok) throw new Error('Failed to update delivery date');
+      
+      setOrders(prev => prev.map(o => o.reference === orderReference ? { ...o, deliveryDate: date } : o));
+      toast({ title: "Delivery Date Updated" });
+    } catch (error) {
+      console.error(error);
+      toast({ title: "Error", description: "Could not update delivery date.", variant: "destructive" });
+    } finally {
+        setLoading(false);
+    }
+  }
   const deleteOrder = async (orderReference: string) => {
     setLoading(true);
     try {
@@ -597,7 +618,7 @@ export const DataProvider = ({
         readingPlan, setReadingPlan,
         categories, setCategories, addCategory, updateCategory, deleteCategory,
         publishers, setPublishers, addPublisher, updatePublisher, deletePublisher,
-        orders, setOrders, submitOrder, addOrder, updateOrderPaymentStatus, updateOrderDeliveryStatus, deleteOrder,
+        orders, setOrders, submitOrder, addOrder, updateOrderPaymentStatus, updateOrderDeliveryStatus, updateOrderDeliveryDate, deleteOrder,
       }}
     >
       {children}

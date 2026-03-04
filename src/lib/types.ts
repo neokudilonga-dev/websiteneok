@@ -23,6 +23,7 @@ export const ProductSchema = z.object({
   stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out']).optional(),
   status: z.enum(["mandatory", "recommended", "didactic_aids"]).optional(),
   highlight: z.boolean().optional(),
+  storagePlace: z.string().length(3).regex(/^[A-Za-z]\d{2}$/, 'Must be Letter + 2 numbers').optional(),
 });
 
 export const ReadingPlanItemSchema = z.object({
@@ -80,6 +81,7 @@ export interface Product {
   stockStatus?: 'in_stock' | 'out_of_stock' | 'sold_out';
   status?: "mandatory" | "recommended" | "didactic_aids";
   highlight?: boolean;
+  storagePlace?: string;
   readingPlan?: ReadingPlanItem[];
 }
 
@@ -97,6 +99,7 @@ export interface Order {
   reference: string;
   date: string;
   createdAt?: string;
+  language?: 'pt' | 'en';
   studentName?: string;
   studentClass?: string;
   guardianName: string;
@@ -110,6 +113,7 @@ export interface Order {
   deliveryFee: number;
   paymentStatus: PaymentStatus;
   deliveryStatus: DeliveryStatus;
+  deliveryDate?: string;
   schoolId?: string;
   schoolName?: string;
   paymentProof?: string;

@@ -77,6 +77,7 @@ const gameBaseSchema = z.object({
   price: z.coerce.number().min(0, "O preço deve ser um número positivo."),
   stock: z.coerce.number().min(0, "O stock deve ser um número positivo."),
   stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out']),
+  storagePlace: z.string().length(3).regex(/^[A-Za-z]\d{2}$/, 'Must be Letter + 2 numbers').optional().or(z.literal('')),
   image: z.union([z.string(), z.array(z.string())]).optional(),
   readingPlan: z.array(readingPlanItemSchema).optional(),
 });
@@ -113,6 +114,7 @@ export function AddEditGameSheet({
       price: 0,
       stock: 0,
       stockStatus: "in_stock",
+      storagePlace: "",
       image: [],
       readingPlan: [],
     },
@@ -134,6 +136,7 @@ export function AddEditGameSheet({
           price: game.price,
           stock: game.stock,
           stockStatus: game.stockStatus || 'in_stock',
+          storagePlace: game.storagePlace || "",
           image: game.image || [],
           readingPlan: gameReadingPlan as any,
         });
@@ -144,6 +147,7 @@ export function AddEditGameSheet({
           price: 0,
           stock: 0,
           stockStatus: "in_stock",
+          storagePlace: "",
           image: [],
           readingPlan: [],
         });
@@ -152,7 +156,7 @@ export function AddEditGameSheet({
   }, [game, form, isOpen, gameReadingPlan, language]);
 
   const mapGradeToCycle = (grade: string | number, status: string) => {
-    if (status !== 'outros' && status !== 'didactic_aids') return grade;
+    if (status !== 'didactic_aids') return grade;
     const g = String(grade).replace(/[^0-9]/g, '');
     const n = parseInt(g);
     if (n === 1) return '1-4';
@@ -211,6 +215,7 @@ export function AddEditGameSheet({
       price: data.price,
       stock: data.stock,
       stockStatus: data.stockStatus,
+      storagePlace: data.storagePlace,
       image: (data as any).image,
       readingPlan: data.readingPlan?.map((rp: any) => ({
         id: rp.id || "",
@@ -365,6 +370,19 @@ export function AddEditGameSheet({
               />
               <FormField
                 control={form.control}
+                name="storagePlace"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('common.storage_place')}</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: A01" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="image"
                 render={({ field }) => (
                   <FormItem>
@@ -416,7 +434,7 @@ export function AddEditGameSheet({
                               onChange={(e) => {
                                 const val = e.target.value;
                                 const status = form.getValues(`readingPlan.${index}.status`);
-                                if (status === 'outros' || status === 'didactic_aids') {
+                                if (status === 'didactic_aids') {
                                   // Only allow 1, 2, 3 for didactic_aids
                                   if (/^[1-3]?$/.test(val)) {
                                     field.onChange(val);
@@ -444,7 +462,7 @@ export function AddEditGameSheet({
                             onValueChange={(val) => {
                               field.onChange(val);
                               // If switching to didactic_aids, clear or validate grade
-                              if (val === 'outros' || val === 'didactic_aids') {
+                              if (val === 'didactic_aids') {
                                 const currentGrade = form.getValues(`readingPlan.${index}.grade`);
                                 if (!/^[1-3]$/.test(String(currentGrade))) {
                                   form.setValue(`readingPlan.${index}.grade`, "");

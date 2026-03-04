@@ -80,7 +80,11 @@ export const getCachedOrders = unstable_cache(
       });
 
       // Ordenação manual se necessário
-      orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      orders.sort((a, b) => {
+        const bDate = (b.createdAt || (b as any).date) as string;
+        const aDate = (a.createdAt || (a as any).date) as string;
+        return new Date(bDate).getTime() - new Date(aDate).getTime();
+      });
 
       console.log(`[Server Cache] Successfully fetched ${orders.length} orders from Firestore`);
       return orders;

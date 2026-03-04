@@ -22,8 +22,8 @@ export async function POST(request: NextRequest) {
     // Add document to 'mail' collection to trigger 'Trigger Email from Firestore' extension
     try {
       console.log("[API Orders] POST - Triggering email via 'mail' collection");
-      
-      const isPT = order.language === 'pt';
+      const language = order.language === 'en' ? 'en' : 'pt';
+      const isPT = language === 'pt';
       
       const emailContent = {
         to: `${order.guardianName} <${order.email}>`,
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
                   ${order.items.map(item => {
                     const itemName = typeof item.name === 'string' 
                       ? item.name 
-                      : (item.name[order.language] || item.name.pt || item.name.en || 'Item');
+                      : (item.name?.[language] || item.name?.pt || item.name?.en || 'Item');
                     return `
                       <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
                         <strong>${itemName}</strong><br>

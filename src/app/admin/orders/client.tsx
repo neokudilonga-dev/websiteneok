@@ -59,7 +59,7 @@ interface OrdersPageClientProps {
 }
 
 export default function OrdersPageClient({ initialOrders, initialSchools }: OrdersPageClientProps) {
-  const { orders, schools, updateOrderPaymentStatus, updateOrderDeliveryStatus, setOrders, setSchools, deleteOrder } = useData();
+  const { orders, schools, updateOrderPaymentStatus, updateOrderDeliveryStatus, updateOrderDeliveryDate, setOrders, setSchools, deleteOrder } = useData();
   const { t, language } = useLanguage();
 
   useEffect(() => {
@@ -131,6 +131,10 @@ export default function OrdersPageClient({ initialOrders, initialSchools }: Orde
   
   const handleDeliveryStatusChange = (orderReference: string, newStatus: DeliveryStatus) => {
     updateOrderDeliveryStatus(orderReference, newStatus);
+  };
+
+  const handleDeliveryDateChange = (orderReference: string, newDate: string) => {
+    updateOrderDeliveryDate(orderReference, newDate);
   };
 
   const getSchoolName = (schoolId: string | undefined) => {
@@ -382,6 +386,7 @@ export default function OrdersPageClient({ initialOrders, initialSchools }: Orde
                 <TableHead>{t('common.total')}</TableHead>
                 <TableHead>{t('orders_page.payment_status')}</TableHead>
                 <TableHead>{t('orders_page.delivery_status')}</TableHead>
+                <TableHead>{t('common.delivery_date')}</TableHead>
                 <TableHead className="text-right">
                   <span className="sr-only">{t('common.actions')}</span>
                 </TableHead>
@@ -447,6 +452,14 @@ export default function OrdersPageClient({ initialOrders, initialSchools }: Orde
                             ))}
                         </DropdownMenuContent>
                     </DropdownMenu>
+                  </TableCell>
+                  <TableCell>
+                    <Input 
+                      type="date" 
+                      className="w-[150px]" 
+                      value={order.deliveryDate || ""} 
+                      onChange={(e) => handleDeliveryDateChange(order.reference, e.target.value)}
+                    />
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>

@@ -79,6 +79,7 @@ const bookBaseSchema = z.object({
   publisher: z.string().optional(),
   author: z.string().optional(),
   stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out']),
+  storagePlace: z.string().length(3).regex(/^[A-Za-z]\d{2}$/, 'Must be Letter + 2 numbers').optional().or(z.literal('')),
   image: z.union([z.string(), z.array(z.string())]).optional(),
   readingPlan: z.array(readingPlanItemSchema).optional(),
 });
@@ -118,6 +119,7 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
       publisher: "",
       author: "",
       stockStatus: 'in_stock',
+      storagePlace: "",
       image: [],
       readingPlan: [],
     },
@@ -179,6 +181,7 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
           publisher: book.publisher,
           author: book.author || "",
           stockStatus: book.stockStatus || 'in_stock',
+          storagePlace: book.storagePlace || "",
           image: book.image,
           readingPlan: bookReadingPlan
         });
@@ -192,6 +195,7 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
           publisher: "",
           author: "",
           stockStatus: "in_stock",
+          storagePlace: "",
           readingPlan: [],
         });
       }
@@ -499,6 +503,19 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
                         </FormLabel>
                       </FormItem>
                     </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="storagePlace"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('common.storage_place')}</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ex: A01" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

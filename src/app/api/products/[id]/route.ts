@@ -75,7 +75,8 @@ export async function PUT(
       'category', 
       'publisher', 
       'author', 
-      'status'
+      'status',
+      'storagePlace'
     ];
 
     allowedFields.forEach(field => {
