@@ -226,6 +226,7 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
                 <TableHead>{t('common.status')}</TableHead>
                 <TableHead>{t('common.stock')}</TableHead>
                 <TableHead>{t('common.price')}</TableHead>
+                <TableHead className="hidden md:table-cell">{t('common.storage_place')}</TableHead>
                 <TableHead className="hidden md:table-cell">{t('common.reading_plan')}</TableHead>
                 <TableHead>
                   <span className="sr-only">{t('common.actions')}</span>
@@ -257,6 +258,9 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
                     {product.stock || 0}
                    </TableCell>
                   <TableCell>{(product.price || 0).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}</TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    {product.storagePlace ? <Badge variant="outline">{product.storagePlace.toUpperCase()}</Badge> : '—'}
+                  </TableCell>
                   <TableCell className="hidden md:table-cell">
                     <div className="flex flex-wrap gap-1">
                       {getBookReadingPlan(product.id).length > 0 ? (

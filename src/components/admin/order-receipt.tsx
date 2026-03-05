@@ -188,6 +188,83 @@ export function OrderReceiptSheet({
                   <p className="mt-1 text-xs">{t('receipt.date_line')}</p>
                 </div>
               </div>
+              <div className="my-6 border-t border-dashed"></div>
+              <div className="text-center">
+                <NeokudilongaLogo className="h-12 mx-auto" />
+              </div>
+              <table className="w-full text-sm border-collapse">
+                <tbody>
+                  <tr className="border-b">
+                    <td className="font-bold p-2 border border-black">{t('receipt.school')}</td>
+                    <td className="p-2 border border-black">{order.schoolName || 'N/A'}</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="font-bold p-2 border border-black">{t('receipt.student_name')}</td>
+                    <td className="p-2 border border-black">{order.studentName}</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="font-bold p-2 border border-black">{t('receipt.guardian_name')}</td>
+                    <td className="p-2 border border-black">{order.guardianName}</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="font-bold p-2 border border-black">{t('receipt.reference')}</td>
+                    <td className="p-2 border border-black">{order.reference}</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="font-bold p-2 border border-black">{t('receipt.phone')}</td>
+                    <td className="p-2 border border-black">{order.phone}</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="font-bold p-2 border border-black">{t('receipt.delivery_address')}</td>
+                    <td className="p-2 border border-black">{order.deliveryAddress || "N/A"}</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="font-bold p-2 border border-black">{t('receipt.payment_method')}</td>
+                    <td className="p-2 border border-black">{paymentMethodLabel()}</td>
+                  </tr>
+                  {order.preferredDeliveryTime && (
+                    <tr className="border-b">
+                      <td className="font-bold p-2 border border-black">{t('checkout_form.preferred_delivery_time')}</td>
+                      <td className="p-2 border border-black">{preferredTimeLabel()}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                    <tr className="border-b">
+                        <th className="font-bold p-2 border border-black text-left">{t('receipt.order')}:</th>
+                        <th className="font-bold p-2 border border-black text-right">{t('receipt.price_kz')}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {order.items.map(item => (
+                        <tr key={`${item.id}-copy`} className="border-b">
+                            <td className="p-2 border border-black">{getDisplayName(item.name, language)}</td>
+                            <td className="p-2 border border-black text-right">{item.price.toLocaleString('pt-PT')}Kz</td>
+                        </tr>
+                    ))}
+                    <tr className="border-b">
+                        <td className="p-2 border border-black">{t('receipt.home_delivery')}</td>
+                        <td className="p-2 border border-black text-right">{order.deliveryFee.toLocaleString('pt-PT')}Kz</td>
+                    </tr>
+                    <tr className="border-b font-bold text-base">
+                        <td className="p-2 border border-black">{t('receipt.total')}</td>
+                        <td className="p-2 border border-black text-right">{order.total.toLocaleString('pt-PT')}Kz</td>
+                    </tr>
+                </tbody>
+              </table>
+              <p className="text-center text-xs pt-4">----------------------------------</p>
+              <div className="grid grid-cols-2 gap-6 pt-4">
+                <div className="text-left">
+                  <div className="h-8 border-b border-black w-full"></div>
+                  <p className="mt-1 text-xs">{t('receipt.signature')}</p>
+                </div>
+                <div className="text-left">
+                  <div className="h-8 border-b border-black w-full"></div>
+                  <p className="mt-1 text-xs">{t('receipt.date_line')}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

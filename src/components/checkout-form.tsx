@@ -37,7 +37,15 @@ const checkoutSchema = z.object({
     "levantamento-local",
   ]),
   deliveryAddress: z.string().optional(),
-  preferredDeliveryTime: z.enum(["morning","afternoon","evening"]).optional(),
+  preferredDeliveryTime: z.enum([
+    "09:00-10:00",
+    "10:00-11:00",
+    "11:00-12:00",
+    "12:00-13:00",
+    "14:00-15:00",
+    "15:00-16:00",
+    "16:00-17:00",
+  ]).optional(),
   paymentMethod: z.enum(["transferencia", "numerario", "multicaixa"], {
     required_error: "Método de pagamento é obrigatório.",
   }),
@@ -331,9 +339,13 @@ export default function CheckoutForm() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="morning">{t("checkout_form.preferred_delivery_time_options.morning")}</SelectItem>
-                      <SelectItem value="afternoon">{t("checkout_form.preferred_delivery_time_options.afternoon")}</SelectItem>
-                      <SelectItem value="evening">{t("checkout_form.preferred_delivery_time_options.evening")}</SelectItem>
+                      <SelectItem value="09:00-10:00">09:00 - 10:00</SelectItem>
+                      <SelectItem value="10:00-11:00">10:00 - 11:00</SelectItem>
+                      <SelectItem value="11:00-12:00">11:00 - 12:00</SelectItem>
+                      <SelectItem value="12:00-13:00">12:00 - 13:00</SelectItem>
+                      <SelectItem value="14:00-15:00">14:00 - 15:00</SelectItem>
+                      <SelectItem value="15:00-16:00">15:00 - 16:00</SelectItem>
+                      <SelectItem value="16:00-17:00">16:00 - 17:00</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

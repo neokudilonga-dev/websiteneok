@@ -218,6 +218,7 @@ export default function GamesPageClient({ initialProducts, initialSchools, initi
                 <TableHead>{t('common.status')}</TableHead>
                 <TableHead>{t('common.stock')}</TableHead>
                 <TableHead>{t('common.price')}</TableHead>
+                <TableHead className="hidden md:table-cell">{t('common.storage_place')}</TableHead>
                 <TableHead className="hidden md:table-cell">{t('games_page.image_count')}</TableHead>
                 <TableHead>
                   <span className="sr-only">{t('common.actions')}</span>
@@ -254,6 +255,9 @@ export default function GamesPageClient({ initialProducts, initialSchools, initi
                       minimumFractionDigits: 0,
                       maximumFractionDigits: 0,
                     })}
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    {product.storagePlace ? <Badge variant="outline">{product.storagePlace.toUpperCase()}</Badge> : '—'}
                   </TableCell>
                   <TableCell className="hidden md:table-cell">
                      <Badge variant="outline">{Array.isArray(product.image) ? product.image.length : (product.image ? 1 : 0)}</Badge>
