@@ -134,7 +134,7 @@ export const pt = {
     saving: 'A guardar...',
     stock_status: 'Estado do Stock',
     storage_place: 'Local de Armazenamento',
-    delivery_date: 'Data de Entrega',
+    delivery_date: 'Data de Entrega (Prevista)',
   },
   stock_status: {
     in_stock: 'Em Stock',
@@ -231,7 +231,7 @@ export const pt = {
     status_payment: 'Estado do Pagamento',
     status_delivery: 'Estado da Entrega',
     paid_date: 'Data de Pagamento',
-    delivered_date: 'Data de Entrega',
+    delivered_date: 'Data de Entrega (Efetiva)',
     delivery_date: 'Data de Entrega prevista',
     items: 'Itens da Encomenda',
   },
