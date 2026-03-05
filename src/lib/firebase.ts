@@ -45,19 +45,19 @@ if (typeof window !== 'undefined') {
 
 async function deleteImageFromFirebase(imageUrl: string) {
     if (!imageUrl || !imageUrl.includes("firebasestorage.googleapis.com")) {
-        console.warn("Invalid Firebase Storage URL, skipping deletion:", imageUrl);
+        // Invalid Firebase Storage URL, skipping deletion
         return;
     }
 
     try {
         const imageRef = ref(storage, imageUrl);
         await deleteObject(imageRef);
-        console.log("Image deleted successfully from Firebase Storage:", imageUrl);
+        // Image deleted successfully from Firebase Storage
     } catch (error: any) {
         console.error("Error deleting image from Firebase Storage:", imageUrl, error);
         // Handle cases where the file might not exist, or other errors
         if (error.code === 'storage/object-not-found') {
-            console.warn("Image not found in Firebase Storage, might have been deleted already:", imageUrl);
+            // Image not found in Firebase Storage, might have been deleted already
         } else {
             throw error; // Re-throw other unexpected errors
         }

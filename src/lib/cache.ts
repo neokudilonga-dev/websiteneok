@@ -14,12 +14,18 @@ const DEFAULT_TTL = 1000 * 60 * 30; // 30 minutos por defeito para dados estáti
 interface CacheStats {
   hits: number;
   misses: number;
+  hitRate?: number;
 }
 
 const getStats = (): CacheStats => {
   if (typeof window === 'undefined') return { hits: 0, misses: 0 };
   const raw = localStorage.getItem('nk_cache_stats');
-  return raw ? JSON.parse(raw) : { hits: 0, misses: 0 };
+  const stats = raw ? JSON.parse(raw) : { hits: 0, misses: 0 };
+  const total = stats.hits + stats.misses;
+  return {
+    ...stats,
+    hitRate: total > 0 ? stats.hits / total : 0
+  };
 };
 
 const updateStats = (type: 'hit' | 'miss') => {
@@ -56,9 +62,9 @@ export const cache = {
     
     try {
       localStorage.setItem(`nk_cache_${key}`, JSON.stringify(item));
-      console.debug(`[Cache] Gravado: ${key} (Expira em: ${ttl / 1000 / 60}m)`);
+      // Gravado: ${key} (Expira em: ${ttl / 1000 / 60}m)
     } catch (e) {
-      console.warn('[Cache] Erro ao gravar no localStorage:', e);
+      // Erro ao gravar no localStorage
     }
   },
 
@@ -79,16 +85,14 @@ export const cache = {
       
       if (isExpired) {
         updateStats('miss');
-        console.debug(`[Cache] Expirado: ${key}`);
         localStorage.removeItem(`nk_cache_${key}`);
         return null;
       }
       
       updateStats('hit');
-      console.debug(`[Cache] Hit: ${key}`);
       return item.data;
     } catch (e) {
-      console.warn('[Cache] Erro ao processar item do cache:', e);
+      // Erro ao processar item do cache
       updateStats('miss');
       return null;
     }
@@ -97,7 +101,7 @@ export const cache = {
   invalidate: (key: string): void => {
     if (typeof window === 'undefined') return;
     localStorage.removeItem(`nk_cache_${key}`);
-    console.debug(`[Cache] Invalidado: ${key}`);
+    // Cache Invalidated: ${key}
   },
 
   clear: (): void => {
@@ -105,6 +109,6 @@ export const cache = {
     Object.keys(localStorage)
       .filter(key => key.startsWith('nk_cache_'))
       .forEach(key => localStorage.removeItem(key));
-    console.debug('[Cache] Limpeza total concluída');
+    // Cache Cleared
   }
 };

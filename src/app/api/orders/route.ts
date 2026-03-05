@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     }
     
     const order = validationResult.data;
-    console.log("[API Orders] POST - Creating order:", order.reference);
+    // Creating order: ${order.reference}
     
     const orderRef = firestore.collection('orders').doc(order.reference);
     await orderRef.set({
