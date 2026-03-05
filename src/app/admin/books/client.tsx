@@ -237,7 +237,7 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
               {filteredProducts.map((product) => (
                 <TableRow key={product.id}>
                   <TableCell className="hidden sm:table-cell">
-                    <img 
+                    <Image 
                       alt={getDisplayName(product.name, language)}
                       className="aspect-[3/4] rounded-md object-contain bg-muted/30"
                       height={64}

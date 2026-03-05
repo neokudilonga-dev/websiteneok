@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 
 const Header = dynamic(() => import("@/components/header"), {
   ssr: false,
@@ -133,11 +134,11 @@ export default function LandingPage() {
               <span>{t('contact_page.whatsapp_number')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <img src="/email-icon.svg" alt="Email" className="h-5 w-5" />
+              <Image src="/email-icon.svg" alt="Email" width={20} height={20} />
               <span>{t('contact_page.email_address')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <img src="/location-icon.svg" alt="Location" className="h-5 w-5" />
+              <Image src="/location-icon.svg" alt="Location" width={20} height={20} />
               <span>{t('contact_page.address')}</span>
             </div>
           </div>

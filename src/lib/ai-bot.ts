@@ -3,7 +3,6 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { 
   getCachedProducts, 
   getCachedSchools, 
-  getCachedCategories,
   getCachedOrders
 } from "./admin-cache";
 import { getDisplayName } from "./utils";
@@ -35,10 +34,9 @@ async function logChat(userPhone: string, query: string, response: string, messa
 export async function processClientQuery(query: string, userPhone: string, messageId?: string) {
   try {
     // 1. Fetch website data for context
-    const [products, schools, categories, orders] = await Promise.all([
+    const [products, schools, orders] = await Promise.all([
       getCachedProducts(),
       getCachedSchools(),
-      getCachedCategories(),
       getCachedOrders()
     ]);
 

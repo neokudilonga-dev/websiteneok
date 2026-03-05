@@ -1,13 +1,24 @@
-
 import { firestore } from '@/lib/firebase-admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { Order } from '@/lib/types';
 import { revalidateTag } from 'next/cache';
 import { getCachedOrders } from '@/lib/admin-cache';
+import { orderSchema } from '@/lib/validation/orders';
 
 export async function POST(request: NextRequest) {
   try {
-    const order: Order = await request.json();
+    const body = await request.json();
+    
+    // Validate input data
+    const validationResult = orderSchema.safeParse(body);
+    if (!validationResult.success) {
+      return NextResponse.json({ 
+        message: 'Invalid order data', 
+        errors: validationResult.error.errors 
+      }, { status: 400 });
+    }
+    
+    const order = validationResult.data;
     console.log("[API Orders] POST - Creating order:", order.reference);
     
     const orderRef = firestore.collection('orders').doc(order.reference);

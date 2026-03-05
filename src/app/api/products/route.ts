@@ -11,7 +11,10 @@ export async function GET() {
     // Client-facing filtering: exclude sold_out and omit publisher
     const filteredProducts = products
       .filter(p => p.stockStatus !== 'sold_out')
-      .map(({ publisher, ...rest }) => rest);
+      .map((product) => {
+        const { publisher, ...rest } = product;
+        return rest;
+      });
       
     return NextResponse.json(filteredProducts, { status: 200 });
   } catch (error) {

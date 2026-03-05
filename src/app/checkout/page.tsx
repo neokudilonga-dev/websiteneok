@@ -1,7 +1,6 @@
 
 import { Suspense } from 'react';
 import Header from "@/components/header";
-import CheckoutClient from "./client";
 import { getCachedSchools, getCachedReadingPlan } from '@/lib/admin-cache';
 import CheckoutPageContent from "./client-wrapper";
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { GoogleAuthProvider, onAuthStateChanged, signInWithRedirect, getRedirectResult, signInWithPopup } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,6 @@ import { NeokudilongaLogo } from "@/components/logo";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const { toast } = useToast();
 
   const handleLoginSuccess = useCallback(async (idToken: string) => {

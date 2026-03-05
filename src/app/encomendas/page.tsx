@@ -56,7 +56,7 @@ export default function TrackOrderPage() {
     };
     
     // Translation key mapping
-    const labelKey = type === 'payment' ? `payment_method_${status}` : status;
+    // const labelKey = type === 'payment' ? `payment_method_${status}` : status;
     
     return (
       <Badge variant={variants[status] || "outline"}>

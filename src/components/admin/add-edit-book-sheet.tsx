@@ -252,7 +252,7 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
     if (!book) {
       try {
         bookCreateSchema.parse(data as any);
-      } catch (e) {
+      } catch {
         form.setError('image' as any, { type: 'manual', message: "A imagem é obrigatória." });
         setIsSaving(false);
         return;

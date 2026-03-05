@@ -200,7 +200,7 @@ export function AddEditGameSheet({
     if (!game) {
       try {
         gameCreateSchema.parse(data as any);
-      } catch (e) {
+      } catch {
         form.setError('image' as any, { type: 'manual', message: "A imagem é obrigatória." });
         setIsSaving(false);
         return;

@@ -2,16 +2,12 @@
 "use client";
 
 import { useCart } from "@/context/cart-context";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import Image from "next/image";
 import { useLanguage } from "@/context/language-context";
-import { getDisplayName } from "@/lib/utils";
 import CheckoutForm from "@/components/checkout-form";
 
 export default function CheckoutClient() {
   const { cartItems, cartTotal } = useCart();
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   return (
     <main className="flex-1 bg-muted/20">

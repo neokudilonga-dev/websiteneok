@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { firestore } from "@/lib/firebase-admin";
 import { ProductSchema } from "@/lib/types";
-import { Query } from "firebase-admin/firestore";
 import * as XLSX from "xlsx";
 import { revalidateTag } from "next/cache";
 

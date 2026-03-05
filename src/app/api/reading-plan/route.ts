@@ -1,7 +1,5 @@
 
 import { NextResponse } from 'next/server';
-import { firestore } from '@/lib/firebase-admin';
-import type { ReadingPlanItem } from '@/lib/types';
 import { getCachedReadingPlan } from '@/lib/admin-cache';
 
 export const dynamic = 'force-dynamic';

@@ -1,8 +1,7 @@
-
 import { firestore, auth } from '@/lib/firebase-admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidateTag } from 'next/cache';
-import { Order } from '@/lib/types';
+import { orderUpdateSchema } from '@/lib/validation/orders';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,9 +13,19 @@ export async function PUT(
   try {
     ({ reference } = await params);
     const body = await request.json();
-    const { paymentStatus, deliveryStatus, deliveryDate, guardianName, phone, deliveryAddress, studentName, studentClass, items, total, deliveryOption, paymentMethod, schoolId, schoolName, preferredDeliveryTime } = body;
+    
+    // Validate input data
+    const validationResult = orderUpdateSchema.safeParse(body);
+    if (!validationResult.success) {
+      return NextResponse.json({ 
+        message: 'Invalid order data', 
+        errors: validationResult.error.errors 
+      }, { status: 400 });
+    }
+    
+    const updateData = validationResult.data;
 
-    console.log(`[API Orders] PUT - Updating order ${reference}:`, { paymentStatus, deliveryStatus, deliveryDate });
+    console.log(`[API Orders] PUT - Updating order ${reference}:`, updateData);
 
     if (!reference) {
       return NextResponse.json({ message: 'Order reference is required' }, { status: 400 });
@@ -25,37 +34,37 @@ export async function PUT(
     const orderRef = firestore.collection('orders').doc(reference);
     const existingSnap = await orderRef.get();
     const existing = existingSnap.exists ? (existingSnap.data() as any) : {};
-    const updateData: Record<string, any> = {};
+    const finalUpdateData: Record<string, any> = {};
 
-    if (paymentStatus) {
-      updateData.paymentStatus = paymentStatus;
-      if (paymentStatus === 'paid' && existing.paymentStatus !== 'paid') {
-        updateData.paidAt = new Date().toISOString();
+    if (updateData.paymentStatus) {
+      finalUpdateData.paymentStatus = updateData.paymentStatus;
+      if (updateData.paymentStatus === 'paid' && existing.paymentStatus !== 'paid') {
+        finalUpdateData.paidAt = new Date().toISOString();
       }
     }
-    if (deliveryStatus) {
-      updateData.deliveryStatus = deliveryStatus;
-      if (deliveryStatus === 'delivered' && existing.deliveryStatus !== 'delivered') {
-        updateData.deliveredAt = new Date().toISOString();
+    if (updateData.deliveryStatus) {
+      finalUpdateData.deliveryStatus = updateData.deliveryStatus;
+      if (updateData.deliveryStatus === 'delivered' && existing.deliveryStatus !== 'delivered') {
+        finalUpdateData.deliveredAt = new Date().toISOString();
       }
     }
-    if (deliveryDate !== undefined) {
-      updateData.deliveryDate = deliveryDate;
+    if (updateData.deliveryDate !== undefined) {
+      finalUpdateData.deliveryDate = updateData.deliveryDate;
     }
 
     const ownerEditable: Record<string, any> = {};
-    if (guardianName !== undefined) ownerEditable.guardianName = guardianName;
-    if (phone !== undefined) ownerEditable.phone = phone;
-    if (deliveryAddress !== undefined) ownerEditable.deliveryAddress = deliveryAddress;
-    if (studentName !== undefined) ownerEditable.studentName = studentName;
-    if (studentClass !== undefined) ownerEditable.studentClass = studentClass;
-    if (items !== undefined) ownerEditable.items = items;
-    if (total !== undefined) ownerEditable.total = total;
-    if (deliveryOption !== undefined) ownerEditable.deliveryOption = deliveryOption;
-    if (paymentMethod !== undefined) ownerEditable.paymentMethod = paymentMethod;
-    if (schoolId !== undefined) ownerEditable.schoolId = schoolId;
-    if (schoolName !== undefined) ownerEditable.schoolName = schoolName;
-    if (preferredDeliveryTime !== undefined) ownerEditable.preferredDeliveryTime = preferredDeliveryTime;
+    if (updateData.guardianName !== undefined) ownerEditable.guardianName = updateData.guardianName;
+    if (updateData.phone !== undefined) ownerEditable.phone = updateData.phone;
+    if (updateData.deliveryAddress !== undefined) ownerEditable.deliveryAddress = updateData.deliveryAddress;
+    if (updateData.studentName !== undefined) ownerEditable.studentName = updateData.studentName;
+    if (updateData.studentClass !== undefined) ownerEditable.studentClass = updateData.studentClass;
+    if (updateData.items !== undefined) ownerEditable.items = updateData.items;
+    if (updateData.total !== undefined) ownerEditable.total = updateData.total;
+    if (updateData.deliveryOption !== undefined) ownerEditable.deliveryOption = updateData.deliveryOption;
+    if (updateData.paymentMethod !== undefined) ownerEditable.paymentMethod = updateData.paymentMethod;
+    if (updateData.schoolId !== undefined) ownerEditable.schoolId = updateData.schoolId;
+    if (updateData.schoolName !== undefined) ownerEditable.schoolName = updateData.schoolName;
+    if (updateData.preferredDeliveryTime !== undefined) ownerEditable.preferredDeliveryTime = updateData.preferredDeliveryTime;
 
     if (Object.keys(ownerEditable).length > 0) {
       const sessionCookie = request.cookies.get('session')?.value || '';
@@ -68,7 +77,7 @@ export async function PUT(
         return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
       }
       const before = existing || {};
-      Object.assign(updateData, ownerEditable);
+      Object.assign(finalUpdateData, ownerEditable);
       const changed: Record<string, { before: any; after: any }> = {};
       Object.keys(ownerEditable).forEach((k) => {
         changed[k] = { before: (before as any)[k], after: (ownerEditable as any)[k] };
@@ -80,13 +89,13 @@ export async function PUT(
       });
     }
 
-    if (Object.keys(updateData).length === 0) {
+    if (Object.keys(finalUpdateData).length === 0) {
       return NextResponse.json({ message: 'No valid fields provided for update' }, { status: 400 });
     }
 
-    updateData.updatedAt = new Date().toISOString();
+    finalUpdateData.updatedAt = new Date().toISOString();
 
-    await orderRef.update(updateData);
+    await orderRef.update(finalUpdateData);
     console.log(`[API Orders] PUT - Order ${reference} updated successfully`);
     
     revalidateTag('orders');

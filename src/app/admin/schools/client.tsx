@@ -36,7 +36,7 @@ interface SchoolsPageClientProps {
 }
 
 export default function SchoolsPageClient({ initialSchools }: SchoolsPageClientProps) {
-  const { schools, addSchool, updateSchool, deleteSchool, setSchools, saveSchoolOrder } = useData();
+  const { addSchool, updateSchool, deleteSchool, setSchools, saveSchoolOrder } = useData();
   const { t, language } = useLanguage();
 
   const [localSchools, setLocalSchools] = useState<School[]>(initialSchools);
