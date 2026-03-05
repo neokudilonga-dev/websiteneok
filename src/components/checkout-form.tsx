@@ -1,19 +1,18 @@
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
-import React, { useState, useEffect, useContext, useMemo } from "react";
-import { CartContext, useCart } from "@/context/cart-context";
-import { DataContext, useData } from "@/context/data-context";
-import { LanguageContext, useLanguage } from "@/context/language-context";
+import React, { useEffect, useMemo } from "react";
+import { useCart } from "@/context/cart-context";
+import { useData } from "@/context/data-context";
+import { useLanguage } from "@/context/language-context";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CartItem, Product, ReadingPlanItem, School } from "@/lib/types";
-import { getDisplayName, cn } from "@/lib/utils";
+import { CartItem, ReadingPlanItem, School } from "@/lib/types";
+import { cn } from "@/lib/utils";
 import {
   Form,
   FormControl,
