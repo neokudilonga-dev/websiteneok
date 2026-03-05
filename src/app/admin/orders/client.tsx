@@ -41,7 +41,8 @@ import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import {
+import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { 
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -50,7 +51,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
 
 interface OrdersPageClientProps {
@@ -59,8 +60,9 @@ interface OrdersPageClientProps {
 }
 
 export default function OrdersPageClient({ initialOrders, initialSchools }: OrdersPageClientProps) {
-  const { orders, schools, updateOrderPaymentStatus, updateOrderDeliveryStatus, updateOrderDeliveryDate, setOrders, setSchools, deleteOrder } = useData();
+  const { orders, schools, updateOrderPaymentStatus, updateOrderDeliveryStatus, updateOrderDeliveryDate, updateOrderDetails, setOrders, setSchools, deleteOrder } = useData();
   const { t, language } = useLanguage();
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     setOrders(initialOrders);
@@ -68,9 +70,32 @@ export default function OrdersPageClient({ initialOrders, initialSchools }: Orde
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialOrders, initialSchools]);
 
+  useEffect(() => {
+    const checkRole = async () => {
+      try {
+        const res = await fetch('/api/auth/verify', { credentials: 'include' });
+        const data = await res.json();
+        setIsOwner(!!data?.isAuthenticated && data?.role === 'owner');
+      } catch {
+        setIsOwner(false);
+      }
+    };
+    checkRole();
+  }, []);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isReceiptOpen, setReceiptOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
+  const [isEditOpen, setEditOpen] = useState(false);
+  const [editOrderRef, setEditOrderRef] = useState<string | null>(null);
+  const [editGuardianName, setEditGuardianName] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [editDeliveryAddress, setEditDeliveryAddress] = useState<string | null>(null);
+  const [editStudentName, setEditStudentName] = useState("");
+  const [editStudentClass, setEditStudentClass] = useState("");
+  const [editItems, setEditItems] = useState<Array<{ name: any; quantity: number; price: number }>>([]);
+  const [isHistoryOpen, setHistoryOpen] = useState(false);
+  const [historyRef, setHistoryRef] = useState<string | null>(null);
+  const [historyEntries, setHistoryEntries] = useState<Array<any>>([]);
   
   const [searchQuery, setSearchQuery] = useState("");
   const [schoolFilter, setSchoolFilter] = useState("all");
@@ -78,6 +103,7 @@ export default function OrdersPageClient({ initialOrders, initialSchools }: Orde
 
   const handleDeleteOrder = async () => {
     if (orderToDelete) {
+      if (!isOwner) return;
       await deleteOrder(orderToDelete.reference);
       setOrderToDelete(null);
     }
@@ -135,6 +161,58 @@ export default function OrdersPageClient({ initialOrders, initialSchools }: Orde
 
   const handleDeliveryDateChange = (orderReference: string, newDate: string) => {
     updateOrderDeliveryDate(orderReference, newDate);
+  };
+
+  const openEdit = (order: Order) => {
+    if (!isOwner) return;
+    setEditOrderRef(order.reference);
+    setEditGuardianName(order.guardianName || "");
+    setEditPhone(order.phone || "");
+    setEditDeliveryAddress(order.deliveryAddress ?? null);
+    setEditStudentName(order.studentName || "");
+    setEditStudentClass(order.studentClass || "");
+    setEditItems((order.items || []).map(i => ({ name: i.name, quantity: i.quantity, price: i.price })));
+    setEditOpen(true);
+  };
+
+  const saveEdit = async () => {
+    if (!isOwner || !editOrderRef) return;
+    const updatedTotal = (editItems || []).reduce((sum, it) => sum + (Number(it.price) || 0) * (Number(it.quantity) || 0), 0) + (selectedOrder?.deliveryFee || 0);
+    await updateOrderDetails(editOrderRef, {
+      guardianName: editGuardianName,
+      phone: editPhone,
+      deliveryAddress: editDeliveryAddress,
+      studentName: editStudentName,
+      studentClass: editStudentClass,
+      items: editItems.map(it => ({ ...it })) as any,
+      total: updatedTotal,
+    });
+    setEditOpen(false);
+  };
+
+  const openHistory = async (order: Order) => {
+    if (!isOwner) return;
+    setHistoryRef(order.reference);
+    try {
+      const res = await fetch(`/api/orders/${order.reference}/edits`, { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        setHistoryEntries(data);
+      } else {
+        setHistoryEntries([]);
+      }
+    } catch {
+      setHistoryEntries([]);
+    }
+    setHistoryOpen(true);
+  };
+
+  const formatPreferredTime = (v?: string | null) => {
+    if (!v) return '—';
+    if (v === 'morning') return t('checkout_form.preferred_delivery_time_options.morning');
+    if (v === 'afternoon') return t('checkout_form.preferred_delivery_time_options.afternoon');
+    if (v === 'evening') return t('checkout_form.preferred_delivery_time_options.evening');
+    return v;
   };
 
   const getSchoolName = (schoolId: string | undefined) => {
@@ -385,8 +463,11 @@ export default function OrdersPageClient({ initialOrders, initialSchools }: Orde
                 <TableHead>{t('common.date')}</TableHead>
                 <TableHead>{t('common.total')}</TableHead>
                 <TableHead>{t('orders_page.payment_status')}</TableHead>
+                <TableHead>{t('orders_page.paid_date') ?? 'Paid Date'}</TableHead>
                 <TableHead>{t('orders_page.delivery_status')}</TableHead>
+                <TableHead>{t('orders_page.delivered_date') ?? 'Delivered Date'}</TableHead>
                 <TableHead>{t('common.delivery_date')}</TableHead>
+                <TableHead>{t('checkout_form.preferred_delivery_time')}</TableHead>
                 <TableHead className="text-right">
                   <span className="sr-only">{t('common.actions')}</span>
                 </TableHead>
@@ -436,6 +517,7 @@ export default function OrdersPageClient({ initialOrders, initialSchools }: Orde
                         </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
+                  <TableCell>{order.paidAt ? new Date(order.paidAt).toLocaleDateString(language) : '—'}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -453,6 +535,7 @@ export default function OrdersPageClient({ initialOrders, initialSchools }: Orde
                         </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
+                  <TableCell>{order.deliveredAt ? new Date(order.deliveredAt).toLocaleDateString(language) : '—'}</TableCell>
                   <TableCell>
                     <Input 
                       type="date" 
@@ -461,6 +544,7 @@ export default function OrdersPageClient({ initialOrders, initialSchools }: Orde
                       onChange={(e) => handleDeliveryDateChange(order.reference, e.target.value)}
                     />
                   </TableCell>
+                  <TableCell>{formatPreferredTime((order as any).preferredDeliveryTime)}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -474,10 +558,24 @@ export default function OrdersPageClient({ initialOrders, initialSchools }: Orde
                         <DropdownMenuItem onClick={() => viewReceipt(order)}>
                           {t('orders_page.view_receipt')}
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => setOrderToDelete(order)} className="text-red-600">
-                          {t('common.delete')}
-                        </DropdownMenuItem>
+                        {isOwner && (
+                          <DropdownMenuItem onClick={() => openHistory(order)}>
+                            {t('orders_page.view_history') ?? 'View History'}
+                          </DropdownMenuItem>
+                        )}
+                        {isOwner && (
+                          <DropdownMenuItem onClick={() => openEdit(order)}>
+                            {t('common.edit')}
+                          </DropdownMenuItem>
+                        )}
+                        {isOwner && (
+                          <>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => setOrderToDelete(order)} className="text-red-600">
+                              {t('common.delete')}
+                            </DropdownMenuItem>
+                          </>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -495,6 +593,7 @@ export default function OrdersPageClient({ initialOrders, initialSchools }: Orde
           order={selectedOrder}
         />
       )}
+      {isOwner && (
       <AlertDialog open={!!orderToDelete} onOpenChange={() => setOrderToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -511,6 +610,97 @@ export default function OrdersPageClient({ initialOrders, initialSchools }: Orde
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      )}
+      {isOwner && (
+        <Sheet open={isEditOpen} onOpenChange={setEditOpen}>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>{t('common.edit')}</SheetTitle>
+            </SheetHeader>
+            <div className="flex flex-col gap-4 py-4">
+              <div>
+                <label className="text-sm">{t('receipt.guardian_name')}</label>
+                <Input value={editGuardianName} onChange={(e) => setEditGuardianName(e.target.value)} />
+              </div>
+              <div>
+                <label className="text-sm">{t('receipt.phone')}</label>
+                <Input value={editPhone} onChange={(e) => setEditPhone(e.target.value)} />
+              </div>
+              <div>
+                <label className="text-sm">{t('receipt.delivery_address')}</label>
+                <Input value={editDeliveryAddress ?? ""} onChange={(e) => setEditDeliveryAddress(e.target.value || null)} />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-sm">{t('receipt.student_name')}</label>
+                  <Input value={editStudentName} onChange={(e) => setEditStudentName(e.target.value)} />
+                </div>
+                <div>
+                  <label className="text-sm">{t('checkout_form.class_and_grade')}</label>
+                  <Input value={editStudentClass} onChange={(e) => setEditStudentClass(e.target.value)} />
+                </div>
+              </div>
+              <div className="border rounded-md p-3">
+                <div className="text-sm font-medium mb-2">{t('track_order_page.items')}</div>
+                <div className="grid grid-cols-4 gap-2 text-xs font-medium">
+                  <div className="col-span-2">{t('common.name')}</div>
+                  <div>{t('cart.quantity')}</div>
+                  <div>{t('receipt.price_kz')}</div>
+                </div>
+                {editItems.map((it, idx) => (
+                  <div key={idx} className="grid grid-cols-4 gap-2 items-center mt-2">
+                    <div className="col-span-2 text-xs truncate">{typeof it.name === 'string' ? it.name : (it.name?.pt || it.name?.en || '')}</div>
+                    <Input type="number" value={String(it.quantity)} onChange={(e) => {
+                      const v = Number(e.target.value || 0);
+                      setEditItems(prev => prev.map((p, i) => i === idx ? { ...p, quantity: v } : p));
+                    }} />
+                    <Input type="number" value={String(it.price)} onChange={(e) => {
+                      const v = Number(e.target.value || 0);
+                      setEditItems(prev => prev.map((p, i) => i === idx ? { ...p, price: v } : p));
+                    }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <SheetFooter>
+              <Button variant="outline" onClick={() => setEditOpen(false)}>{t('common.cancel')}</Button>
+              <Button onClick={saveEdit}>{t('common.save_changes')}</Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      )}
+      {isOwner && (
+        <Sheet open={isHistoryOpen} onOpenChange={setHistoryOpen}>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>{t('orders_page.view_history') ?? 'Edit History'}</SheetTitle>
+            </SheetHeader>
+            <div className="py-4 space-y-4">
+              {historyEntries.length === 0 ? (
+                <div className="text-sm text-muted-foreground">—</div>
+              ) : (
+                historyEntries.map((e, idx) => (
+                  <div key={e.id || idx} className="rounded border p-3 text-xs">
+                    <div className="flex justify-between">
+                      <span>{new Date(e.timestamp).toLocaleString()}</span>
+                      <span>{e.editorEmail}</span>
+                    </div>
+                    <div className="mt-2 grid gap-1">
+                      {Object.keys(e.changes || {}).map((k) => (
+                        <div key={k} className="grid grid-cols-3 gap-2">
+                          <div className="font-medium">{k}</div>
+                          <div className="truncate">{JSON.stringify(e.changes[k]?.before)}</div>
+                          <div className="truncate">{JSON.stringify(e.changes[k]?.after)}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </SheetContent>
+        </Sheet>
+      )}
     </>
   );
 }

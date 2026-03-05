@@ -185,6 +185,12 @@ export const en = {
     payment_method_numerario: 'Cash payment',
     payment_method_multicaixa: 'Payment with Multicaixa (not available for deliveries)',
     payment_method_transferencia: 'Payment by bank transfer or deposit',
+    preferred_delivery_time: 'Preferred Delivery Time',
+    preferred_delivery_time_options: {
+      morning: 'Morning',
+      afternoon: 'Afternoon',
+      evening: 'Evening'
+    },
     errors: {
       student_info_required: 'Student name and class are required for reading plan items.',
       address_required: 'Address is required for home delivery.',
@@ -206,6 +212,7 @@ export const en = {
     payment_pending_description: 'To confirm your order, please make the payment by bank transfer to the IBAN below and send the proof of payment to one of our contacts.',
     next_steps_message: 'You will receive an automatic email confirming your order. Later, you will be contacted via WhatsApp for the next steps.',
     back_to_shop: 'Back to Shop',
+    delivery_cost_note: 'Delivery cost is charged per trip.',
   },
   track_order_page: {
     title: 'Track Order Status',
@@ -220,6 +227,8 @@ export const en = {
     order_details: 'Order Details',
     status_payment: 'Payment Status',
     status_delivery: 'Delivery Status',
+    paid_date: 'Paid Date',
+    delivered_date: 'Delivered Date',
     delivery_date: 'Estimated Delivery Date',
     items: 'Order Items',
   },
@@ -330,6 +339,9 @@ export const en = {
     payment_status: 'Payment Status',
     delivery_status: 'Delivery Status',
     view_receipt: 'View Receipt',
+    view_history: 'View History',
+    paid_date: 'Paid Date',
+    delivered_date: 'Delivered Date',
     confirm_delete_title: 'Delete Order',
     confirm_delete_description: 'Are you sure you want to delete order {{orderRef}}?',
   },
@@ -359,6 +371,8 @@ export const en = {
     price_kz: 'PRICE:Kz',
     home_delivery: 'Home Delivery',
     total: 'TOTAL',
+    signature: 'Customer Signature',
+    date_line: 'Date',
     print: 'Print',
     download_pdf: 'Download PDF',
   },

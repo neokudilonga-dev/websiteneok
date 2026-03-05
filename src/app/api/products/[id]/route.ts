@@ -1,5 +1,5 @@
 
-import { firestore } from '@/lib/firebase-admin';
+import { firestore, auth } from '@/lib/firebase-admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { Product, ReadingPlanItem } from '@/lib/types';
 import { deleteImageFromFirebase } from '@/lib/firebase';
@@ -110,6 +110,17 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Enforce owner-only permission for deleting products
+    const sessionCookie = request.cookies.get('session')?.value || '';
+    if (!sessionCookie) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+    const decoded = await auth.verifySessionCookie(sessionCookie, true);
+    const email = (decoded as any).email || '';
+    if (email !== 'neokudilonga@gmail.com') {
+      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    }
+
     const { id } = await params;
 
     if (!id) {

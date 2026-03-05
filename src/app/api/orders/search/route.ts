@@ -38,10 +38,13 @@ export async function GET(request: NextRequest) {
       date: orderData.date,
       createdAt: orderData.createdAt,
       paymentStatus: orderData.paymentStatus,
+      paidAt: orderData.paidAt,
       deliveryStatus: orderData.deliveryStatus,
+      deliveredAt: orderData.deliveredAt,
       deliveryDate: orderData.deliveryDate,
       total: orderData.total,
       guardianName: orderData.guardianName,
+      preferredDeliveryTime: orderData.preferredDeliveryTime,
       items: orderData.items.map((item: any) => ({
         name: item.name,
         quantity: item.quantity,

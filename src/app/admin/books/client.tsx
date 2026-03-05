@@ -60,6 +60,7 @@ interface BooksPageClientProps {
 export default function BooksPageClient({ initialProducts, initialReadingPlan, initialSchools, initialPublishers }: BooksPageClientProps) {
   const { products, readingPlan, schools, publishers, setProducts, setReadingPlan, setSchools, setPublishers, deleteProduct } = useData();
   const { t, language } = useLanguage();
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     setProducts(initialProducts);
@@ -68,6 +69,18 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
     setPublishers(initialPublishers);
   }, [initialProducts, initialReadingPlan, initialSchools, initialPublishers, setProducts, setReadingPlan, setSchools, setPublishers]);
 
+  useEffect(() => {
+    const checkRole = async () => {
+      try {
+        const res = await fetch('/api/auth/verify', { credentials: 'include' });
+        const data = await res.json();
+        setIsOwner(!!data?.isAuthenticated && data?.role === 'owner');
+      } catch {
+        setIsOwner(false);
+      }
+    };
+    checkRole();
+  }, []);
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [isImportSheetOpen, setImportSheetOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Product | undefined>(
@@ -112,6 +125,7 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
   };
 
   const handleDeleteBook = (book: Product) => {
+    if (!isOwner) return;
     const images = Array.isArray(book.image) ? book.image : (book.image ? [book.image] : []);
     if (images.length > 0) {
       setBookToDelete(book);
@@ -273,12 +287,14 @@ export default function BooksPageClient({ initialProducts, initialReadingPlan, i
                         <DropdownMenuItem onClick={() => handleEditBook(product)}>
                           {t('common.edit')}
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="text-destructive"
-                          onClick={() => handleDeleteBook(product)}
-                        >
-                          {t('common.delete')}
-                        </DropdownMenuItem>
+                        {isOwner && (
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={() => handleDeleteBook(product)}
+                          >
+                            {t('common.delete')}
+                          </DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

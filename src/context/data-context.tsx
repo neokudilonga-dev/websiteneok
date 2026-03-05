@@ -53,6 +53,7 @@ interface DataContextType {
   updateOrderPaymentStatus: (orderReference: string, status: PaymentStatus) => Promise<void>;
   updateOrderDeliveryStatus: (orderReference: string, status: DeliveryStatus) => Promise<void>;
   updateOrderDeliveryDate: (orderReference: string, date: string) => Promise<void>;
+  updateOrderDetails: (orderReference: string, data: Partial<Order>) => Promise<void>;
   deleteOrder: (orderReference: string) => Promise<void>;
 
 
@@ -540,8 +541,10 @@ export const DataProvider = ({
         body: JSON.stringify({ paymentStatus: status }),
       });
       if (!response.ok) throw new Error('Failed to update payment status');
-      
-      setOrders(prev => prev.map(o => o.reference === orderReference ? { ...o, paymentStatus: status } : o));
+      setOrders(prev => prev.map(o => {
+        if (o.reference !== orderReference) return o;
+        return { ...o, paymentStatus: status, paidAt: status === 'paid' ? new Date().toISOString() : o.paidAt };
+      }));
       toast({ title: "Payment Status Updated" });
     } catch (error) {
       console.error(error);
@@ -559,8 +562,10 @@ export const DataProvider = ({
         body: JSON.stringify({ deliveryStatus: status }),
       });
       if (!response.ok) throw new Error('Failed to update delivery status');
-      
-      setOrders(prev => prev.map(o => o.reference === orderReference ? { ...o, deliveryStatus: status } : o));
+      setOrders(prev => prev.map(o => {
+        if (o.reference !== orderReference) return o;
+        return { ...o, deliveryStatus: status, deliveredAt: status === 'delivered' ? new Date().toISOString() : o.deliveredAt };
+      }));
       toast({ title: "Delivery Status Updated" });
     } catch (error) {
       console.error(error);
@@ -589,6 +594,25 @@ export const DataProvider = ({
         setLoading(false);
     }
   }
+  const updateOrderDetails = async (orderReference: string, data: Partial<Order>) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/orders/${orderReference}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error('Failed to update order');
+      setOrders(prev => prev.map(o => o.reference === orderReference ? { ...o, ...data } : o));
+      toast({ title: "Order Updated" });
+    } catch (error) {
+      console.error(error);
+      toast({ title: "Error", description: "Could not update order.", variant: "destructive" });
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
   const deleteOrder = async (orderReference: string) => {
     setLoading(true);
     try {
@@ -619,6 +643,7 @@ export const DataProvider = ({
         categories, setCategories, addCategory, updateCategory, deleteCategory,
         publishers, setPublishers, addPublisher, updatePublisher, deletePublisher,
         orders, setOrders, submitOrder, addOrder, updateOrderPaymentStatus, updateOrderDeliveryStatus, updateOrderDeliveryDate, deleteOrder,
+        updateOrderDetails,
       }}
     >
       {children}

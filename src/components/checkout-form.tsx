@@ -37,6 +37,7 @@ const checkoutSchema = z.object({
     "levantamento-local",
   ]),
   deliveryAddress: z.string().optional(),
+  preferredDeliveryTime: z.enum(["morning","afternoon","evening"]).optional(),
   paymentMethod: z.enum(["transferencia", "numerario", "multicaixa"], {
     required_error: "Método de pagamento é obrigatório.",
   }),
@@ -109,6 +110,7 @@ export default function CheckoutForm() {
       email: "",
       deliveryOption: "delivery",
       deliveryAddress: "",
+      preferredDeliveryTime: undefined,
       paymentMethod: "transferencia",
     },
   });
@@ -164,6 +166,7 @@ export default function CheckoutForm() {
         ...data,
         paymentMethod: data.paymentMethod, // Use the selected payment method
         deliveryAddress: data.deliveryOption === "delivery" ? (data.deliveryAddress ?? "") : null,
+        preferredDeliveryTime: data.deliveryOption === "delivery" ? (data.preferredDeliveryTime ?? null) : null,
         items: cartItems,
         total: finalTotal,
         deliveryFee,
@@ -309,6 +312,30 @@ export default function CheckoutForm() {
                 <FormItem>
                   <FormLabel>{t("checkout_form.delivery_address")}</FormLabel>
                   <FormControl><Textarea {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+          {deliveryOption === "delivery" && (
+            <FormField
+              control={form.control}
+              name="preferredDeliveryTime"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("checkout_form.preferred_delivery_time")}</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="w-full sm:w-[240px]">
+                        <SelectValue placeholder={t("checkout_form.preferred_delivery_time")} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="morning">{t("checkout_form.preferred_delivery_time_options.morning")}</SelectItem>
+                      <SelectItem value="afternoon">{t("checkout_form.preferred_delivery_time_options.afternoon")}</SelectItem>
+                      <SelectItem value="evening">{t("checkout_form.preferred_delivery_time_options.evening")}</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

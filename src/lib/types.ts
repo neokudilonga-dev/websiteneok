@@ -100,6 +100,8 @@ export interface Order {
   date: string;
   createdAt?: string;
   language?: 'pt' | 'en';
+  paidAt?: string;
+  deliveredAt?: string;
   studentName?: string;
   studentClass?: string;
   guardianName: string;
@@ -107,6 +109,7 @@ export interface Order {
   email: string;
   deliveryOption: string;
   deliveryAddress: string | null;
+  preferredDeliveryTime?: string | null;
   paymentMethod: string;
   items: CartItem[];
   total: number;

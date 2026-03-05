@@ -11,18 +11,20 @@ export async function GET(request: NextRequest) {
 
     const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
 
-    // Enforce admin allowlist during verification so middleware rejects non-admin users
-    const allowedAdmins = [
-      'neokudilonga@gmail.com',
+    // Enforce admin allowlist and compute role
+    const ownerEmail = 'neokudilonga@gmail.com';
+    const allowedAdmins = new Set([
+      ownerEmail,
       'anaruimelo@gmail.com',
       'joaonfmelo@gmail.com',
-    ];
-    const email = (decodedClaims as any).email || '';
-    if (!allowedAdmins.includes(email)) {
+    ]);
+    const email: string = (decodedClaims as any).email || '';
+    if (!allowedAdmins.has(email)) {
       return NextResponse.json({ isAuthenticated: false }, { status: 200 });
     }
+    const role = email === ownerEmail ? 'owner' : 'editor';
 
-    return NextResponse.json({ isAuthenticated: true, uid: decodedClaims.uid }, { status: 200 });
+    return NextResponse.json({ isAuthenticated: true, uid: decodedClaims.uid, role, email }, { status: 200 });
   } catch (error) {
     console.error('Error verifying session cookie:', error);
     return NextResponse.json({ isAuthenticated: false }, { status: 200 });

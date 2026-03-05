@@ -29,6 +29,9 @@ function ConfirmationContent() {
           <p className="text-muted-foreground">
               {t('order_confirmation.order_success_message_start')} <span className="font-bold text-primary">{orderRef}</span> {t('order_confirmation.order_success_message_end')}
           </p>
+          <p className="text-sm text-muted-foreground">
+              {t('order_confirmation.delivery_cost_note')}
+          </p>
           
           {paymentMethod === 'transferencia' ? (
                <div className="rounded-lg border border-yellow-300 bg-yellow-50 p-4 text-left text-yellow-800">

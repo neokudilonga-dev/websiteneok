@@ -127,6 +127,11 @@ export default function TrackOrderPage() {
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">{t('track_order_page.status_payment')}</p>
                         <div className="mt-1">{getStatusBadge(order.paymentStatus, 'payment')}</div>
+                        {order.paidAt && (
+                          <p className="mt-2 text-xs text-muted-foreground">
+                            {t('track_order_page.paid_date') ?? 'Paid Date'}: {new Date(order.paidAt).toLocaleDateString()}
+                          </p>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
@@ -134,6 +139,11 @@ export default function TrackOrderPage() {
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">{t('track_order_page.status_delivery')}</p>
                         <div className="mt-1">{getStatusBadge(order.deliveryStatus, 'delivery')}</div>
+                        {order.deliveredAt && (
+                          <p className="mt-2 text-xs text-muted-foreground">
+                            {t('track_order_page.delivered_date') ?? 'Delivered Date'}: {new Date(order.deliveredAt).toLocaleDateString()}
+                          </p>
+                        )}
                       </div>
                     </div>
                     {order.deliveryDate && (

@@ -56,6 +56,7 @@ interface GamesPageClientProps {
 export default function GamesPageClient({ initialProducts, initialSchools, initialReadingPlan }: GamesPageClientProps) {
   const { products, setProducts, deleteProduct, schools, setSchools, readingPlan, setReadingPlan } = useData();
   const { t, language } = useLanguage();
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     setProducts(initialProducts);
@@ -63,6 +64,18 @@ export default function GamesPageClient({ initialProducts, initialSchools, initi
     setReadingPlan(initialReadingPlan);
   }, [initialProducts, initialSchools, initialReadingPlan, setProducts, setSchools, setReadingPlan]);
 
+  useEffect(() => {
+    const checkRole = async () => {
+      try {
+        const res = await fetch('/api/auth/verify', { credentials: 'include' });
+        const data = await res.json();
+        setIsOwner(!!data?.isAuthenticated && data?.role === 'owner');
+      } catch {
+        setIsOwner(false);
+      }
+    };
+    checkRole();
+  }, []);
 
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [isImportSheetOpen, setImportSheetOpen] = useState(false);
@@ -88,6 +101,7 @@ export default function GamesPageClient({ initialProducts, initialSchools, initi
   };
 
   const handleDeleteGame = (game: Product) => {
+    if (!isOwner) return;
     const images = Array.isArray(game.image) ? game.image : (game.image ? [game.image] : []);
     if (images.length > 0) {
       setGameToDelete(game);
@@ -263,12 +277,14 @@ export default function GamesPageClient({ initialProducts, initialSchools, initi
                         >
                           {t('common.edit')}
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="text-destructive"
-                          onClick={() => handleDeleteGame(product)}
-                        >
-                          {t('common.delete')}
-                        </DropdownMenuItem>
+                        {isOwner && (
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={() => handleDeleteGame(product)}
+                          >
+                            {t('common.delete')}
+                          </DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -287,6 +303,7 @@ export default function GamesPageClient({ initialProducts, initialSchools, initi
         isOpen={isImportSheetOpen}
         setIsOpen={setImportSheetOpen}
       />
+      {isOwner && (
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -303,6 +320,7 @@ export default function GamesPageClient({ initialProducts, initialSchools, initi
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      )}
     </>
   );
 }

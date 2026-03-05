@@ -38,6 +38,14 @@ export function OrderReceiptSheet({
     if (order.paymentMethod === 'numerario') return t('checkout_form.payment_method_1');
     return order.paymentMethod;
   };
+  const preferredTimeLabel = () => {
+    const v = order.preferredDeliveryTime;
+    if (!v) return '';
+    if (v === 'morning') return t('checkout_form.preferred_delivery_time_options.morning');
+    if (v === 'afternoon') return t('checkout_form.preferred_delivery_time_options.afternoon');
+    if (v === 'evening') return t('checkout_form.preferred_delivery_time_options.evening');
+    return String(v);
+  };
 
   const handlePrint = () => {
     const printWindow = window.open('', '', 'height=600,width=800');
@@ -136,6 +144,12 @@ export function OrderReceiptSheet({
                     <td className="font-bold p-2 border border-black">{t('receipt.payment_method')}</td>
                     <td className="p-2 border border-black">{paymentMethodLabel()}</td>
                   </tr>
+              {order.preferredDeliveryTime && (
+                <tr className="border-b">
+                  <td className="font-bold p-2 border border-black">{t('checkout_form.preferred_delivery_time')}</td>
+                  <td className="p-2 border border-black">{preferredTimeLabel()}</td>
+                </tr>
+              )}
                 </tbody>
               </table>
 
@@ -164,6 +178,16 @@ export function OrderReceiptSheet({
                 </tbody>
               </table>
               <p className="text-center text-xs pt-4">----------------------------------</p>
+              <div className="grid grid-cols-2 gap-6 pt-4">
+                <div className="text-left">
+                  <div className="h-8 border-b border-black w-full"></div>
+                  <p className="mt-1 text-xs">{t('receipt.signature')}</p>
+                </div>
+                <div className="text-left">
+                  <div className="h-8 border-b border-black w-full"></div>
+                  <p className="mt-1 text-xs">{t('receipt.date_line')}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
