@@ -133,12 +133,14 @@ export default function LoginPage() {
   }, [auth, handleLoginSuccess, toast]);
 
   const handleGoogleSignIn = async () => {
+    console.log('[login] handleGoogleSignIn called');
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
     setLoading(true);
     try {
-      console.log("Trying signInWithPopup...");
+      console.log("[login] Trying signInWithPopup...");
       const result = await signInWithPopup(auth, provider);
+      console.log("[login] signInWithPopup result:", result);
       if (result?.user) {
         console.log("signInWithPopup: User found.", result.user.email);
         const email = result.user.email || "";

@@ -1,33 +1,13 @@
 {
-  "apphosting": [
-    {
-      "backendId": "websiteneok",
-      "rootDir": ".",
-      "ignore": [
-        "firebase.json",
-        "**/node_modules/**",
-        "**/.git/**",
-        "playwright-report/**",
-        "test-results/**",
-        "functions/**"
-      ],
-      "alwaysDeployFromSource": true
-    },
-    {
-      "backendId": "testing-server",
-      "rootDir": ".",
-      "ignore": [
-        "firebase.json",
-        "**/node_modules/**",
-        "**/.git/**",
-        "playwright-report/**",
-        "test-results/**",
-        "functions/**"
-      ],
-      "alwaysDeployFromSource": true
-    }
-  ],
-  "functions": {
-    "source": "functions"
+  "hosting": {
+    "public": ".next",
+    "ignore": [
+      "firebase.json",
+      "**/node_modules/**",
+      "**/.git/**",
+      "playwright-report/**",
+      "test-results/**",
+      "functions/**"
+    ]
   }
 }
