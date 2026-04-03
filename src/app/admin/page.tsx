@@ -4,12 +4,13 @@ import AdminDashboardClient from "./client-dashboard";
 import { getCachedProducts, getCachedOrders, getCachedSchools } from "@/lib/admin-cache";
 
 async function getDashboardData() {
+    console.log('[AdminDashboard] Fetching dashboard data...');
     const [products, orders, schools] = await Promise.all([
         getCachedProducts(),
         getCachedOrders(),
         getCachedSchools()
     ]);
-
+    console.log(`[AdminDashboard] Data fetched: ${products.length} products, ${orders.length} orders, ${schools.length} schools`);
     return { products, orders, schools };
 }
 

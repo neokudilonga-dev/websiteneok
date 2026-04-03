@@ -6,9 +6,12 @@ import type { Product, ReadingPlanItem, School, Category, Order } from "@/lib/ty
 // Helper function to handle Firestore operations safely
 async function safeFirestoreOperation<T>(operation: () => Promise<T[]>): Promise<T[]> {
   try {
-    return await operation();
+    console.log('[admin-cache] Starting Firestore operation...');
+    const result = await operation();
+    console.log(`[admin-cache] Firestore operation returned ${result.length} items`);
+    return result;
   } catch (error) {
-    console.error('Firestore operation failed:', error);
+    console.error('[admin-cache] Firestore operation failed:', error);
     return [];
   }
 }
