@@ -419,7 +419,7 @@ export const AddEditBookSheet: React.FC<AddEditBookSheetProps> = ({ book, isOpen
                     </FormControl>
                     <SelectContent>
                       {bookCategories.map((category) => (
-                        <SelectItem key={getDisplayName(category.name, language)} value={typeof category.name === 'string' ? category.name : category.name.pt}>
+                        <SelectItem key={category.id} value={category.id}>
                           {getDisplayName(category.name, language)}
                         </SelectItem>
                       ))}
