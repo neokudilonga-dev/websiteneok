@@ -8,6 +8,11 @@ import { firestore } from '../src/lib/firebase-admin';
 async function migrate() {
   console.log('Starting migration...');
 
+  if (!firestore) {
+    console.error('Firestore not initialized');
+    return;
+  }
+
   // 1. Rename category document if it exists
   const categoriesRef = firestore.collection('categories');
   const outrosCatSnap = await categoriesRef.doc('outros').get();
