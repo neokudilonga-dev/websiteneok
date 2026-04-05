@@ -26,6 +26,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'ID token is required' }, { status: 400 });
     }
 
+    if (!auth) {
+      return NextResponse.json({ message: 'Auth not initialized' }, { status: 500 });
+    }
+
     console.log('[/api/auth/login] - Verifying ID token...');
     const decodedToken = await auth.verifyIdToken(idToken);
     console.log('[/api/auth/login] - ID Token verified successfully for UID:', decodedToken.uid);

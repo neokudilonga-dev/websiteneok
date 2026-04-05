@@ -6,6 +6,10 @@ export async function POST(request: Request) {
   try {
     const orderData = await request.json();
     
+    if (!firestore) {
+      return NextResponse.json({ success: false, error: 'Firestore not initialized' }, { status: 500 });
+    }
+
     const orderRef = firestore.collection('orders').doc();
     const order: Order = {
       ...orderData,
@@ -33,6 +37,10 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
+    if (!firestore) {
+      return NextResponse.json({ success: false, error: 'Firestore not initialized' }, { status: 500 });
+    }
+
     const snapshot = await firestore.collection('orders').orderBy('createdAt', 'desc').get();
     const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order));
     

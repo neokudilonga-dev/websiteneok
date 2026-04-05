@@ -12,6 +12,9 @@ export async function GET(
     if (!sessionCookie) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
+    if (!auth) {
+      return NextResponse.json({ message: 'Auth not initialized' }, { status: 500 });
+    }
     const decoded = await auth.verifySessionCookie(sessionCookie, true);
     const email = (decoded as any).email || '';
     const allowedAdmins = new Set([
@@ -26,6 +29,10 @@ export async function GET(
     const { reference } = await params;
     if (!reference) {
       return NextResponse.json({ message: 'Order reference is required' }, { status: 400 });
+    }
+
+    if (!firestore) {
+      return NextResponse.json({ message: 'Firestore not initialized' }, { status: 500 });
     }
 
     const snap = await firestore

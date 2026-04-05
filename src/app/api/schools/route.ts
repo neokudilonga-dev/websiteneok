@@ -44,6 +44,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'School ID is required' }, { status: 400 });
     }
 
+    if (!firestore) {
+      return NextResponse.json({ error: 'Firestore not initialized' }, { status: 500 });
+    }
+
     const schoolRef = firestore.collection('schools').doc(id);
     await schoolRef.set(schoolDataWithDescription);
 

@@ -16,6 +16,10 @@ export async function GET(request: NextRequest) {
 
     console.log(`[API Orders Search] Searching for order: ${reference} with email: ${email}`);
 
+    if (!firestore) {
+      return NextResponse.json({ message: 'Firestore not initialized' }, { status: 500 });
+    }
+
     const orderRef = firestore.collection('orders').doc(reference);
     const doc = await orderRef.get();
 

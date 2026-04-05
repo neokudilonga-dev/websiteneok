@@ -15,6 +15,10 @@ export async function DELETE(
       return NextResponse.json({ message: 'Category name is required' }, { status: 400 });
     }
  
+    if (!firestore) {
+      return NextResponse.json({ message: 'Firestore not initialized' }, { status: 500 });
+    }
+
     const categoryRef = firestore.collection('categories').doc(name);
     await categoryRef.delete();
 
@@ -45,6 +49,10 @@ export async function PUT(
       return NextResponse.json({ message: 'Category name (pt/en) is required' }, { status: 400 });
     }
  
+    if (!firestore) {
+      return NextResponse.json({ message: 'Firestore not initialized' }, { status: 500 });
+    }
+
     const currentRef = firestore.collection('categories').doc(name);
     const currentSnap = await currentRef.get();
     if (!currentSnap.exists) {

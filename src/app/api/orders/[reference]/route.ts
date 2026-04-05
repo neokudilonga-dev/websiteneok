@@ -31,6 +31,10 @@ export async function PUT(
       return NextResponse.json({ message: 'Order reference is required' }, { status: 400 });
     }
 
+    if (!firestore) {
+      return NextResponse.json({ message: 'Firestore not initialized' }, { status: 500 });
+    }
+
     const orderRef = firestore.collection('orders').doc(reference);
     const existingSnap = await orderRef.get();
     const existing = existingSnap.exists ? (existingSnap.data() as any) : {};
@@ -70,6 +74,9 @@ export async function PUT(
       const sessionCookie = request.cookies.get('session')?.value || '';
       if (!sessionCookie) {
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+      }
+      if (!auth) {
+        return NextResponse.json({ message: 'Auth not initialized' }, { status: 500 });
       }
       const decoded = await auth.verifySessionCookie(sessionCookie, true);
       const email = (decoded as any).email || '';
@@ -121,6 +128,9 @@ export async function DELETE(
     if (!sessionCookie) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
+    if (!auth) {
+      return NextResponse.json({ message: 'Auth not initialized' }, { status: 500 });
+    }
     const decoded = await auth.verifySessionCookie(sessionCookie, true);
     const email = (decoded as any).email || '';
     if (email !== 'neokudilonga@gmail.com') {
@@ -129,6 +139,10 @@ export async function DELETE(
 
     if (!reference) {
       return NextResponse.json({ message: 'Order reference is required' }, { status: 400 });
+    }
+
+    if (!firestore) {
+      return NextResponse.json({ message: 'Firestore not initialized' }, { status: 500 });
     }
 
     await firestore.collection('orders').doc(reference).delete();

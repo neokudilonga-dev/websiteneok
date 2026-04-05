@@ -10,6 +10,10 @@ export async function PUT(request: Request, context: any) {
     const { id } = context.params;
     const body: School = await request.json();
     
+    if (!firestore) {
+      return NextResponse.json({ error: 'Firestore not initialized' }, { status: 500 });
+    }
+
     const schoolRef = firestore.collection('schools').doc(id);
     // Remove id from body to avoid duplicate keys
     const { id: _bodyId, ...updateData } = body;
@@ -29,6 +33,11 @@ export async function PUT(request: Request, context: any) {
 export async function DELETE(request: Request, context: any) {
     try {
         const { id } = context.params;
+        
+        if (!firestore) {
+          return NextResponse.json({ error: 'Firestore not initialized' }, { status: 500 });
+        }
+
         const schoolRef = firestore.collection('schools').doc(id);
         await schoolRef.delete();
         

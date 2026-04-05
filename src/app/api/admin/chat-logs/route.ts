@@ -10,6 +10,10 @@ export async function GET() {
     // Check if the user is an admin
     await requireAdmin();
 
+    if (!firestore) {
+      return NextResponse.json({ message: 'Firestore not initialized' }, { status: 500 });
+    }
+
     const snapshot = await firestore
       .collection('chatLogs')
       .orderBy('timestamp', 'desc')

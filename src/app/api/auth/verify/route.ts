@@ -9,6 +9,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ isAuthenticated: false }, { status: 200 });
     }
 
+    if (!auth) {
+      return NextResponse.json({ isAuthenticated: false }, { status: 500 });
+    }
+
     const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
 
     // Enforce admin allowlist and compute role

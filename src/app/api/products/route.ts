@@ -41,10 +41,13 @@ export async function POST(request: NextRequest) {
 
     // Persist reading plan entries if provided
     if (incomingReadingPlan && incomingReadingPlan.length > 0) {
+      if (!firestore) {
+        return NextResponse.json({ message: 'Firestore not initialized' }, { status: 500 });
+      }
       const batch = firestore.batch();
       incomingReadingPlan.forEach((plan: ReadingPlanItem) => {
         const planId = plan.id || uuidv4();
-        const planRef = firestore.collection('readingPlan').doc(planId);
+        const planRef = firestore!.collection('readingPlan').doc(planId);
         batch.set(planRef, { ...plan, id: planId, productId: productId });
       });
       await batch.commit();
@@ -76,6 +79,10 @@ export async function POST(request: NextRequest) {
 
     productData.id = productId;
     console.log(`[POST /api/products] Final product data:`, JSON.stringify(productData));
+
+    if (!firestore) {
+      return NextResponse.json({ message: 'Firestore not initialized' }, { status: 500 });
+    }
 
     // Save product to Firestore
     const docRef = firestore.collection('products').doc(productId);

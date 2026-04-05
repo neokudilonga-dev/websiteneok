@@ -21,6 +21,10 @@ export async function POST(request: Request) {
     const sheet = workbook.Sheets[sheetName];
     const jsonData: any[] = XLSX.utils.sheet_to_json(sheet);
 
+    if (!firestore) {
+      return NextResponse.json({ error: "Firestore not initialized" }, { status: 500 });
+    }
+
     const batch = firestore.batch();
     const productsCollection = firestore.collection("products");
 

@@ -18,8 +18,9 @@ async function safeFirestoreOperation<T>(operation: () => Promise<T[]>): Promise
 
 export const getCachedProducts = unstable_cache(
   async () => {
+    if (!firestore) return [];
     return safeFirestoreOperation(async () => {
-      const snapshot = await firestore.collection('products').get();
+      const snapshot = await firestore!.collection('products').get();
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any as Product));
     });
   },
@@ -29,8 +30,9 @@ export const getCachedProducts = unstable_cache(
 
 export const getCachedReadingPlan = unstable_cache(
   async () => {
+    if (!firestore) return [];
     return safeFirestoreOperation(async () => {
-      const snapshot = await firestore.collection('readingPlan').get();
+      const snapshot = await firestore!.collection('readingPlan').get();
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any as ReadingPlanItem));
     });
   },
@@ -40,8 +42,9 @@ export const getCachedReadingPlan = unstable_cache(
 
 export const getCachedSchools = unstable_cache(
   async () => {
+    if (!firestore) return [];
     return safeFirestoreOperation(async () => {
-      const snapshot = await firestore.collection('schools').get();
+      const snapshot = await firestore!.collection('schools').get();
       const schools = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any as School));
       // Ordenar por 'order' (se existir) ou por nome como fallback
       return schools.sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
@@ -53,8 +56,9 @@ export const getCachedSchools = unstable_cache(
 
 export const getCachedCategories = unstable_cache(
   async () => {
+    if (!firestore) return [];
     return safeFirestoreOperation(async () => {
-      const snapshot = await firestore.collection('categories').get();
+      const snapshot = await firestore!.collection('categories').get();
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any as Category));
     });
   },
@@ -64,8 +68,9 @@ export const getCachedCategories = unstable_cache(
 
 export const getCachedPublishers = unstable_cache(
   async () => {
+    if (!firestore) return [];
     return safeFirestoreOperation(async () => {
-      const snapshot = await firestore.collection('publishers').get();
+      const snapshot = await firestore!.collection('publishers').get();
       return snapshot.docs.map(doc => doc.id);
     });
   },
@@ -75,15 +80,16 @@ export const getCachedPublishers = unstable_cache(
 
 export const getCachedOrders = unstable_cache(
   async () => {
+    if (!firestore) return [];
     return safeFirestoreOperation(async () => {
       try {
         // Tentamos buscar ordenado por createdAt
-        let snapshot = await firestore.collection('orders').orderBy('createdAt', 'desc').get();
+        let snapshot = await firestore!.collection('orders').orderBy('createdAt', 'desc').get();
         
         // Se não houver resultados, pode ser que alguns documentos não tenham o campo createdAt
         // e o Firestore os exclui da consulta ordenada. Tentamos buscar todos.
         if (snapshot.empty) {
-          snapshot = await firestore.collection('orders').get();
+          snapshot = await firestore!.collection('orders').get();
         }
         
         const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any as Order));

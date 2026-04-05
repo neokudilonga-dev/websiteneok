@@ -27,6 +27,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Publisher name is required' }, { status: 400 });
     }
 
+    if (!firestore) {
+      return NextResponse.json({ message: 'Firestore not initialized' }, { status: 500 });
+    }
+
     // Use publisher name as doc ID
     const docRef = firestore.collection('publishers').doc(name);
     await docRef.set({ name });

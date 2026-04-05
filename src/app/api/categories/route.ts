@@ -27,6 +27,10 @@ export async function POST(request: NextRequest) {
     }
     const type: 'book' | 'game' = category.type === 'game' ? 'game' : 'book';
 
+    if (!firestore) {
+      return NextResponse.json({ message: 'Firestore not initialized' }, { status: 500 });
+    }
+
     // Use Portuguese name as the document ID to align with existing deletion route
     const docId = category.id && category.id.length > 0 ? category.id : category.name.pt;
     const docRef = firestore.collection('categories').doc(docId);

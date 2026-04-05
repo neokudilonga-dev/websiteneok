@@ -23,6 +23,10 @@ export async function POST(request: Request) {
 
     console.log("Parsed Excel data:", JSON.stringify(jsonData.slice(0, 2)));
 
+    if (!firestore) {
+      return NextResponse.json({ error: "Firestore not initialized" }, { status: 500 });
+    }
+
     const batch = firestore.batch();
     const productsCollection = firestore.collection("products");
 

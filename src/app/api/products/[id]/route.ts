@@ -19,6 +19,10 @@ export async function PUT(
       return NextResponse.json({ message: 'Product ID is required' }, { status: 400 });
     }
 
+    if (!firestore) {
+      return NextResponse.json({ message: 'Firestore not initialized' }, { status: 500 });
+    }
+
     const productRef = firestore.collection('products').doc(id);
     const productDoc = await productRef.get();
 
@@ -45,13 +49,13 @@ export async function PUT(
       const idsToDelete = existingRPIds.filter(id => !incomingRPIds.includes(id));
       console.log(`[PUT /api/products/${id}] Deleting ${idsToDelete.length} removed reading plan items`);
       idsToDelete.forEach(idToDelete => {
-        batch.delete(firestore.collection('readingPlan').doc(idToDelete));
+        batch.delete(firestore!.collection('readingPlan').doc(idToDelete));
       });
 
       // 3. Upsert incoming items
       updatedProduct.readingPlan.forEach((plan: ReadingPlanItem) => {
         const planId = plan.id || uuidv4();
-        const planRef = firestore.collection('readingPlan').doc(planId);
+        const planRef = firestore!.collection('readingPlan').doc(planId);
         // Ensure we don't include the ID in the document data if we want Firestore to use the doc ID
         const { id: _, ...planData } = plan;
         batch.set(planRef, { ...planData, id: planId, productId: id }, { merge: true });
@@ -115,10 +119,17 @@ export async function DELETE(
     if (!sessionCookie) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
+    if (!auth) {
+      return NextResponse.json({ message: 'Auth not initialized' }, { status: 500 });
+    }
     const decoded = await auth.verifySessionCookie(sessionCookie, true);
     const email = (decoded as any).email || '';
     if (email !== 'neokudilonga@gmail.com') {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    }
+
+    if (!firestore) {
+      return NextResponse.json({ message: 'Firestore not initialized' }, { status: 500 });
     }
 
     const { id } = await params;

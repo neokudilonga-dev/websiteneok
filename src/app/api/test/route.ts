@@ -4,7 +4,14 @@ import { firestore } from '@/lib/firebase-admin';
 export async function GET() {
   try {
     console.log('[TEST] Testing Firestore connection...');
-    
+
+    if (!firestore) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Firestore not initialized'
+      }, { status: 500 });
+    }
+
     // Test basic connection
     const snapshot = await firestore.collection('products').limit(1).get();
     console.log(`[TEST] Firestore query returned ${snapshot.size} documents`);

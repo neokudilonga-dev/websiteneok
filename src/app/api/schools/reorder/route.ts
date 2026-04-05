@@ -11,10 +11,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Invalid data format' }, { status: 400 });
     }
 
+    if (!firestore) {
+      return NextResponse.json({ message: 'Firestore not initialized' }, { status: 500 });
+    }
+
     const batch = firestore.batch();
     
     schools.forEach((school: { id: string; order: number }) => {
-      const schoolRef = firestore.collection('schools').doc(school.id);
+      const schoolRef = firestore!.collection('schools').doc(school.id);
       batch.update(schoolRef, { order: school.order });
     });
 

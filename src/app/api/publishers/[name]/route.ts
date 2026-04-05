@@ -16,6 +16,10 @@ export async function DELETE(
       return NextResponse.json({ message: 'Publisher name is required' }, { status: 400 });
     }
 
+    if (!firestore) {
+      return NextResponse.json({ message: 'Firestore not initialized' }, { status: 500 });
+    }
+
     const publisherRef = firestore.collection('publishers').doc(name);
     await publisherRef.delete();
 
@@ -45,6 +49,10 @@ export async function PUT(
       return NextResponse.json({ message: 'New publisher name is required' }, { status: 400 });
     }
  
+    if (!firestore) {
+      return NextResponse.json({ message: 'Firestore not initialized' }, { status: 500 });
+    }
+
     if (nextName === name) {
       await firestore.collection('publishers').doc(name).set({ name: nextName }, { merge: true });
       revalidateTag('publishers');

@@ -15,6 +15,10 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
  */
 async function logChat(userPhone: string, query: string, response: string, messageId?: string) {
   try {
+    if (!firestore) {
+      console.error("Firestore not initialized, cannot log chat");
+      return;
+    }
     await firestore.collection('chatLogs').add({
       userPhone,
       query,
