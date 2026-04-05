@@ -49,61 +49,6 @@ try {
   console.error('[firebase-admin] Fatal initialization error:', error);
 }
 
-// Export with guaranteed non-null values using getters
-export const auth = {
-  get verifyIdToken() {
-    if (!_auth) throw new Error('Firebase Auth not initialized');
-    return _auth.verifyIdToken.bind(_auth);
-  },
-  get createSessionCookie() {
-    if (!_auth) throw new Error('Firebase Auth not initialized');
-    return _auth.createSessionCookie.bind(_auth);
-  },
-  get verifySessionCookie() {
-    if (!_auth) throw new Error('Firebase Auth not initialized');
-    return _auth.verifySessionCookie.bind(_auth);
-  },
-  get getUser() {
-    if (!_auth) throw new Error('Firebase Auth not initialized');
-    return _auth.getUser.bind(_auth);
-  },
-  get deleteUser() {
-    if (!_auth) throw new Error('Firebase Auth not initialized');
-    return _auth.deleteUser.bind(_auth);
-  },
-  get listUsers() {
-    if (!_auth) throw new Error('Firebase Auth not initialized');
-    return _auth.listUsers.bind(_auth);
-  },
-  get createUser() {
-    if (!_auth) throw new Error('Firebase Auth not initialized');
-    return _auth.createUser.bind(_auth);
-  },
-  get updateUser() {
-    if (!_auth) throw new Error('Firebase Auth not initialized');
-    return _auth.updateUser.bind(_auth);
-  },
-} as unknown as Auth;
-
-export const firestore = {
-  get collection() {
-    if (!_firestore) throw new Error('Firebase Firestore not initialized');
-    return _firestore.collection.bind(_firestore);
-  },
-  get doc() {
-    if (!_firestore) throw new Error('Firebase Firestore not initialized');
-    return _firestore.doc.bind(_firestore);
-  },
-  get batch() {
-    if (!_firestore) throw new Error('Firebase Firestore not initialized');
-    return _firestore.batch.bind(_firestore);
-  },
-  get runTransaction() {
-    if (!_firestore) throw new Error('Firebase Firestore not initialized');
-    return _firestore.runTransaction.bind(_firestore);
-  },
-  get settings() {
-    if (!_firestore) throw new Error('Firebase Firestore not initialized');
-    return _firestore.settings.bind(_firestore);
-  },
-} as unknown as Firestore;
+// Export with non-null type assertions - these will throw at runtime if not initialized
+export const auth = _auth as unknown as Auth;
+export const firestore = _firestore as unknown as Firestore;
