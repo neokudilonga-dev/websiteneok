@@ -14,31 +14,30 @@ const serviceAccount = {
 
 let _auth: Auth | null = null;
 let _firestore: Firestore | null = null;
+let _initialized = false;
 
 function ensureInitialized() {
-  if (!_auth || !_firestore) {
+  if (_initialized) return;
+  
+  try {
     if (!getApps().length) {
-      try {
-        console.log('[firebase-admin] Initializing with hardcoded service account');
-        console.log('[firebase-admin] Project ID:', serviceAccount.projectId);
-        console.log('[firebase-admin] Client Email:', serviceAccount.clientEmail);
-        initializeApp({
-          credential: cert(serviceAccount),
-          projectId: serviceAccount.projectId,
-        });
-        console.log('[firebase-admin] Firebase Admin initialized successfully');
-      } catch (error) {
-        console.error('[firebase-admin] Firebase Admin initialization error:', error);
-        console.warn('[firebase-admin] Using mock mode due to initialization error');
-      }
+      console.log('[firebase-admin] Initializing with hardcoded service account');
+      initializeApp({
+        credential: cert(serviceAccount as any),
+        projectId: serviceAccount.projectId,
+      });
+      console.log('[firebase-admin] Firebase Admin initialized successfully');
     }
+    
     if (getApps().length > 0) {
       _auth = getAuth();
       _firestore = getFirestore();
+      _initialized = true;
       console.log('[firebase-admin] Auth and Firestore services initialized');
-    } else {
-      console.error('[firebase-admin] Failed to initialize Firebase - no apps created');
     }
+  } catch (error) {
+    console.error('[firebase-admin] Initialization error (non-fatal for build):', error);
+    // Don't throw during build - let it fail at runtime if needed
   }
 }
 
