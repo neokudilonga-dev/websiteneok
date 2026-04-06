@@ -7,7 +7,7 @@ import path from 'path';
 import { revalidateTag } from "next/cache";
 import { getCachedSchools } from "@/lib/admin-cache";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 const logError = (error: unknown, context: string) => {
   const logFilePath = path.join(process.cwd(), 'src/lib/error.log');

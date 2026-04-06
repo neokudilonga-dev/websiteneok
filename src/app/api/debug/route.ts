@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getCachedProducts, getCachedSchools, getCachedCategories } from '@/lib/admin-cache';
 
+export const dynamic = "force-static";
+
 export async function GET() {
   try {
     console.log('[DEBUG] Testing public data fetch...');

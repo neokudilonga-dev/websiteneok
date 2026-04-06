@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
 
+export const dynamic = "force-static";
+
 export async function GET() {
   try {
     console.log('[TEST] Testing Firestore connection...');

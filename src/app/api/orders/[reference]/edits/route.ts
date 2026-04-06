@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { firestore, auth } from '@/lib/firebase-admin';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
+
+export async function generateStaticParams() {
+  return [];
+}
 
 export async function GET(
   request: NextRequest,

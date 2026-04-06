@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
 import type { Order } from '@/lib/types';
 
+export const dynamic = "force-static";
+
 export async function POST(request: Request) {
   try {
     const orderData = await request.json();

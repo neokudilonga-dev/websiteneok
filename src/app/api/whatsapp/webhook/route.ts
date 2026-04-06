@@ -1,7 +1,8 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { processClientQuery } from "@/lib/ai-bot";
 import { sendWhatsAppMessage, markAsRead } from "@/lib/whatsapp";
+
+export const dynamic = "force-static";
 
 /**
  * WhatsApp Webhook for receiving and responding to messages.

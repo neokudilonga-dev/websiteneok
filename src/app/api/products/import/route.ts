@@ -6,6 +6,8 @@ import { revalidateTag } from 'next/cache';
 
 import { getCachedCategories } from "@/lib/admin-cache";
 
+export const dynamic = "force-static";
+
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();

@@ -5,6 +5,11 @@ import type { School } from '@/lib/types';
 import { revalidateTag } from 'next/cache';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function generateStaticParams() {
+  return [];
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function PUT(request: Request, context: any) {
   try {
     const { id } = context.params;
@@ -60,4 +65,4 @@ export async function DELETE(request: Request, context: any) {
     }
 }
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-static";

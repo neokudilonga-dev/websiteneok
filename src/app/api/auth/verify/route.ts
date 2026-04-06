@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/firebase-admin';
 
+export const dynamic = "force-static";
+
 export async function GET(request: NextRequest) {
   try {
     const sessionCookie = request.cookies.get('session')?.value || '';

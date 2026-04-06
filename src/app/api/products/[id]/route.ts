@@ -6,6 +6,10 @@ import { deleteImageFromFirebase } from '@/lib/firebase';
 import { v4 as uuidv4 } from 'uuid'
 import { revalidateTag } from 'next/cache';
 
+export async function generateStaticParams() {
+  return [];
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -169,4 +173,4 @@ export async function DELETE(
   }
 }
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-static";
