@@ -9,6 +9,8 @@ import { getProductById } from "@/lib/products";
 import { normalizeImageUrl, getDisplayName } from "@/lib/utils";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { ArrowLeft, ShoppingCart } from "lucide-react";
+import { getCachedCategories } from "@/lib/admin-cache";
+import type { Category } from "@/lib/types";
 import AddToCartButton from "./add-to-cart-button";
 
 interface ProductPageProps {
@@ -44,7 +46,19 @@ export const dynamic = "force-dynamic";
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { id } = await params;
-  const product = await getProductById(id);
+  const [product, categories] = await Promise.all([
+    getProductById(id),
+    getCachedCategories()
+  ]);
+  
+  // Helper to get category name by ID
+  const getCategoryName = (categoryId: string | undefined, lang: 'pt' | 'en') => {
+    if (!categoryId) return '';
+    const category = categories.find(c => c.id === categoryId);
+    if (!category) return categoryId;
+    const name = category.name;
+    return typeof name === 'string' ? name : (name?.[lang] || name?.pt || categoryId);
+  };
   
   if (!product) {
     notFound();
@@ -194,24 +208,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   </div>
                 )}
                 
-                {product.publisher && (
-                  <div>
-                    <span className="text-sm text-muted-foreground">Editora:</span>
-                    <p className="font-medium">{product.publisher}</p>
-                  </div>
-                )}
-                
                 {product.category && (
                   <div>
                     <span className="text-sm text-muted-foreground">Categoria:</span>
-                    <p className="font-medium">{product.category}</p>
-                  </div>
-                )}
-                
-                {product.stock !== undefined && (
-                  <div>
-                    <span className="text-sm text-muted-foreground">Stock disponível:</span>
-                    <p className="font-medium">{product.stock} unidades</p>
+                    <p className="font-medium">{getCategoryName(product.category, 'pt')}</p>
                   </div>
                 )}
               </CardContent>
