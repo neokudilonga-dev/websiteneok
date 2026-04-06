@@ -81,6 +81,7 @@ export default function ProductCard({ product, productBadgeRenderer }: ProductCa
               onError={() => setImageError(true)}
             />
           </div>
+        )}
         </Link>
         <div className="absolute top-2 flex w-full justify-end gap-2 pr-2">
             {productBadgeRenderer ? productBadgeRenderer(product) : null}

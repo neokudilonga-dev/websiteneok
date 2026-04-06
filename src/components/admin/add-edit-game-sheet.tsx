@@ -76,7 +76,7 @@ const gameBaseSchema = z.object({
   ]).optional(),
   price: z.coerce.number().min(0, "O preço deve ser um número positivo."),
   stock: z.coerce.number().min(0, "O stock deve ser um número positivo."),
-  stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out']),
+  stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out', 'low_stock']),
   storagePlace: z.string().length(3).regex(/^[A-Za-z]\d{2}$/, 'Must be Letter + 2 numbers').optional().or(z.literal('')),
   image: z.union([z.string(), z.array(z.string())]).optional(),
   readingPlan: z.array(readingPlanItemSchema).optional(),

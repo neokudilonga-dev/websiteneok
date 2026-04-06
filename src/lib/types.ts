@@ -20,7 +20,7 @@ export const ProductSchema = z.object({
   category: z.string().optional(),
   publisher: z.string().optional(),
   author: z.string().optional(),
-  stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out']).optional(),
+  stockStatus: z.enum(['in_stock', 'out_of_stock', 'sold_out', 'low_stock']).optional(),
   status: z.enum(["mandatory", "recommended", "didactic_aids"]).optional(),
   highlight: z.boolean().optional(),
   storagePlace: z.string().length(3).regex(/^[A-Za-z]\d{2}$/, 'Must be Letter + 2 numbers').optional(),
@@ -78,7 +78,7 @@ export interface Product {
   category?: string;
   publisher?: string;
   author?: string;
-  stockStatus?: 'in_stock' | 'out_of_stock' | 'sold_out';
+  stockStatus?: 'in_stock' | 'out_of_stock' | 'sold_out' | 'low_stock';
   status?: "mandatory" | "recommended" | "didactic_aids";
   highlight?: boolean;
   storagePlace?: string;
