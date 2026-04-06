@@ -1,6 +1,8 @@
 
 "use client";
 
+import Link from "next/link";
+
 import {
   Card,
   CardContent,
@@ -43,7 +45,8 @@ export default function ProductCard({ product, productBadgeRenderer }: ProductCa
 
   return (
     <Card className="group flex h-full flex-col overflow-hidden transition-all hover:shadow-lg">
-      <CardHeader className="relative p-0">
+      <CardHeader className="relative p-0 cursor-pointer">
+        <Link href={`/produto/${product.id}`} className="block">
         {Array.isArray(product.image) && product.image.length > 1 ? (
           <Carousel className="w-full">
             <CarouselContent>
@@ -78,20 +81,22 @@ export default function ProductCard({ product, productBadgeRenderer }: ProductCa
               onError={() => setImageError(true)}
             />
           </div>
-        )}
+        </Link>
         <div className="absolute top-2 flex w-full justify-end gap-2 pr-2">
             {productBadgeRenderer ? productBadgeRenderer(product) : null}
             {isOutOfStock && <Badge variant="secondary" className="bg-yellow-500/80 text-black">{t('stock_status.out_of_stock')}</Badge>}
             <Badge
-                className="capitalize"
+                className={product.type === "book" ? "capitalize" : "capitalize bg-teal-600 hover:bg-teal-700"}
                 variant={product.type === "book" ? "secondary" : "default"}
                 >
-                {product.type === 'book' ? t('common.book') : t('common.game')}
+                {product.type === 'book' ? t('common.book') : t('common.game_and_other')}
             </Badge>
         </div>
       </CardHeader>
-      <CardContent className="flex-1 p-4">
-        <CardTitle className="font-headline text-lg">{displayName}</CardTitle>
+      <CardContent className="flex-1 p-4 cursor-pointer">
+        <Link href={`/produto/${product.id}`} className="block hover:text-primary transition-colors">
+          <CardTitle className="font-headline text-lg">{displayName}</CardTitle>
+        </Link>
         <CardDescription className="mt-1 line-clamp-2 text-sm">
           {displayDescription}
         </CardDescription>
