@@ -5,7 +5,7 @@ import type { Category } from '@/lib/types';
 import { revalidateTag } from 'next/cache';
 import { getCachedCategories } from '@/lib/admin-cache';
 
-export const dynamic = "force-static";
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
