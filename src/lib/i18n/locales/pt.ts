@@ -98,7 +98,7 @@ export const pt = {
     add_to_cart: 'Adicionar',
     book: 'Livro',
     game: 'Jogo',
-    game_and_other: 'Jogo e Outros',
+    game_and_other: 'Jogo ou Outro',
     actions: 'Ações',
     edit: 'Editar',
     delete: 'Eliminar',
