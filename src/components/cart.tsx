@@ -39,11 +39,11 @@ export default function Cart() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="default" size="lg" className="relative shrink-0">
-          <ShoppingCart className="mr-2 h-5 w-5" />
+        <Button variant="default" size="icon" className="relative h-9 w-9 shrink-0 sm:h-10 sm:w-auto sm:px-4">
+          <ShoppingCart className="h-5 w-5 sm:mr-2" />
           <span className="hidden sm:inline">{t('header.cart')}</span>
           {cartCount > 0 && (
-            <Badge className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full p-0">
+            <Badge className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-[10px] sm:-right-2 sm:-top-2 sm:h-6 sm:w-6 sm:text-xs">
               {cartCount}
             </Badge>
           )}

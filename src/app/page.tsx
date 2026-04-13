@@ -10,7 +10,7 @@ const Header = dynamic(() => import("@/components/header"), {
 });
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Gamepad2, ShoppingBag } from "lucide-react";
+import { BookOpen, Dice5, ShoppingBag } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
 import { AdminButton } from "@/components/admin-button";
 
@@ -74,7 +74,7 @@ export default function LandingPage() {
               <Card className="transform transition-transform hover:scale-105 shadow-[var(--box-shadow)]">
                 <CardHeader className="items-center text-center">
                      <div className="rounded-full bg-primary/10 p-4 text-primary">
-                        <Gamepad2 className="h-8 w-8" />
+                        <Dice5 className="h-8 w-8" />
                     </div>
                   <CardTitle className="font-headline text-2xl font-semibold">{t('landing.card3_title')}</CardTitle>
                 </CardHeader>
@@ -89,39 +89,6 @@ export default function LandingPage() {
               </Card>
             </div>
           </div>
-        </section>
-        
-         {/* How it works Section */}
-        <section className="bg-muted/40 py-12 sm:py-16 lg:py-24">
-            <div className="container text-center">
-                <h2 className="font-headline text-3xl font-bold sm:text-4xl md:text-5xl">{t('landing.how_it_works_title')}</h2>
-                <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/90">
-                    {t('landing.how_it_works_subtitle')}
-                </p>
-                <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
-                    <div className="flex flex-col items-center gap-4">
-                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg">
-                            <span className="font-bold text-2xl">1</span>
-                        </div>
-                        <h3 className="font-headline text-xl font-semibold">{t('landing.step1_title')}</h3>
-                        <p className="text-foreground/80">{t('landing.step1_description')}</p>
-                    </div>
-                     <div className="flex flex-col items-center gap-4">
-                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg">
-                             <span className="font-bold text-2xl">2</span>
-                        </div>
-                        <h3 className="font-headline text-xl font-semibold">{t('landing.step2_title')}</h3>
-                        <p className="text-foreground/80">{t('landing.step2_description')}</p>
-                    </div>
-                     <div className="flex flex-col items-center gap-4">
-                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg">
-                            <span className="font-bold text-2xl">3</span>
-                        </div>
-                        <h3 className="font-headline text-xl font-semibold">{t('landing.step3_title')}</h3>
-                        <p className="text-foreground/80">{t('landing.step3_description')}</p>
-                    </div>
-                </div>
-            </div>
         </section>
 
       </main>

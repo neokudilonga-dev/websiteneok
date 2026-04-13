@@ -283,7 +283,41 @@ export const ShopPageContent = ({
            </div>
 
           <TabsContent value="planos" className="mt-6">
-              {selectedSchool ? (
+            {/* How it works section - shown only when no school is selected */}
+            {!selectedSchool && (
+              <section className="bg-muted/40 py-8 sm:py-12 lg:py-16 mb-8 rounded-lg">
+                <div className="text-center px-4">
+                  <h2 className="font-headline text-2xl font-bold sm:text-3xl md:text-4xl">{t('landing.how_it_works_title')}</h2>
+                  <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/90">
+                    {t('landing.how_it_works_subtitle')}
+                  </p>
+                  <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-3">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg">
+                        <span className="font-bold text-2xl">1</span>
+                      </div>
+                      <h3 className="font-headline text-xl font-semibold">{t('landing.step1_title')}</h3>
+                      <p className="text-foreground/80">{t('landing.step1_description')}</p>
+                    </div>
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg">
+                        <span className="font-bold text-2xl">2</span>
+                      </div>
+                      <h3 className="font-headline text-xl font-semibold">{t('landing.step2_title')}</h3>
+                      <p className="text-foreground/80">{t('landing.step2_description')}</p>
+                    </div>
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg">
+                        <span className="font-bold text-2xl">3</span>
+                      </div>
+                      <h3 className="font-headline text-xl font-semibold">{t('landing.step3_title')}</h3>
+                      <p className="text-foreground/80">{t('landing.step3_description')}</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
+            {selectedSchool ? (
                   <>
                   <div className="mb-4">
                       <Button variant="outline" onClick={handleGoBackToSchoolSelection}>
