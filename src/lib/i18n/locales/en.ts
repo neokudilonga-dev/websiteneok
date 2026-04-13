@@ -173,7 +173,7 @@ export const en = {
     class_and_grade: 'Class and Grade',
     guardian_name: 'Name of Person Responsible for the Order',
     phone: 'Contact Phone Number',
-    phone_placeholder: 'Ex: 9XX XXX XXX'
+    phone_placeholder: 'Ex: 9XX XXX XXX',
     delivery_options: 'Do you want delivery? (Delivery fee does not apply for orders in Talatona and Morro Bento over 70,000 kwanzas and 80,000 kwanzas for outside Talatona and Morro Bento)',
     delivery_option_1: 'Yes - in Talatona and Morro Bento (urban district) - add 2000 AKZ',
     delivery_option_2: 'Yes - outside Talatona (namely: Luanda Center/ Nova Vida/ Patriota) - add 2500 AKZ',
