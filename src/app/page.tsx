@@ -39,15 +39,15 @@ export default function LandingPage() {
             </div>
             
             <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-              <Card className="hover:shadow-xl">
+              <Card className="flex h-full flex-col hover:shadow-xl">
                 <CardHeader className="items-center text-center">
                     <div className="rounded-full bg-primary/10 p-4 text-primary">
                         <BookOpen className="h-8 w-8" />
                     </div>
                   <CardTitle className="font-headline text-2xl font-semibold">{t('landing.card1_title')}</CardTitle>
                 </CardHeader>
-                <CardContent className="text-center text-base text-foreground/90">
-                  <p>
+                <CardContent className="flex flex-1 flex-col text-center text-base text-foreground/90">
+                  <p className="flex-1">
                     {t('landing.card1_description')}
                   </p>
                     <Button asChild variant="outline" className="mt-6 text-[var(--link-color)] hover:text-[var(--link-hover-color)]">
@@ -55,15 +55,15 @@ export default function LandingPage() {
                     </Button>
                 </CardContent>
               </Card>
-              <Card className="transform transition-transform hover:scale-105 shadow-[var(--box-shadow)]">
+              <Card className="flex h-full flex-col transform transition-transform hover:scale-105 shadow-[var(--box-shadow)]">
                 <CardHeader className="items-center text-center">
                      <div className="rounded-full bg-primary/10 p-4 text-primary">
                         <ShoppingBag className="h-8 w-8" />
                     </div>
                   <CardTitle className="font-headline text-2xl font-semibold">{t('landing.card2_title')}</CardTitle>
                 </CardHeader>
-                <CardContent className="text-center text-base text-foreground/90">
-                  <p>
+                <CardContent className="flex flex-1 flex-col text-center text-base text-foreground/90">
+                  <p className="flex-1">
                     {t('landing.card2_description')}
                   </p>
                     <Button asChild variant="outline" className="mt-6 text-[var(--link-color)] hover:text-[var(--link-hover-color)]">
@@ -71,15 +71,15 @@ export default function LandingPage() {
                     </Button>
                 </CardContent>
               </Card>
-              <Card className="transform transition-transform hover:scale-105 shadow-[var(--box-shadow)]">
+              <Card className="flex h-full flex-col transform transition-transform hover:scale-105 shadow-[var(--box-shadow)]">
                 <CardHeader className="items-center text-center">
                      <div className="rounded-full bg-primary/10 p-4 text-primary">
                         <Dice5 className="h-8 w-8" />
                     </div>
                   <CardTitle className="font-headline text-2xl font-semibold">{t('landing.card3_title')}</CardTitle>
                 </CardHeader>
-                <CardContent className="text-center text-base text-foreground/90">
-                  <p>
+                <CardContent className="flex flex-1 flex-col text-center text-base text-foreground/90">
+                  <p className="flex-1">
                     {t('landing.card3_description')}
                   </p>
                     <Button asChild variant="outline" className="mt-6 text-[var(--link-color)] hover:text-[var(--link-hover-color)]">

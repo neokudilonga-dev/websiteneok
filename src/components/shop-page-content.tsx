@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight, ShoppingCart, Search, ArrowLeft } from "lucide-react";
+import { ChevronRight, ShoppingCart, Search, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 
 import { Input } from "@/components/ui/input";
@@ -68,6 +68,7 @@ export const ShopPageContent = ({
     }
   }, [searchParams, activeTab]);
   const [showIndividual, setShowIndividual] = useState<string | null>(null);
+  const [previewKit, setPreviewKit] = useState<string | null>(null);
   const { addKitToCart } = useCart();
 
   const handleTabChange = (value: string) => {
@@ -387,7 +388,29 @@ export const ShopPageContent = ({
                           <h3 className="font-headline text-2xl font-bold text-blue-900">{t('shop.mandatory_kit', { count: gradeProducts.mandatory.length })}</h3>
                         </div>
                       </div>
-                      <p className="text-blue-800/80 mb-6 flex-grow">{t('shop.buy_all_mandatory')}</p>
+                      <p className="text-blue-800/80 mb-4 flex-grow">{t('shop.buy_all_mandatory')}</p>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full mb-3 border-blue-600 text-blue-700 hover:bg-blue-100"
+                        onClick={() => setPreviewKit(previewKit === `mandatory-${grade}` ? null : `mandatory-${grade}`)}
+                      >
+                        {previewKit === `mandatory-${grade}` ? <EyeOff className="mr-2 h-4 w-4" /> : <Eye className="mr-2 h-4 w-4" />}
+                        {previewKit === `mandatory-${grade}` ? t('shop.hide_kit_contents') : t('shop.view_kit_contents')}
+                      </Button>
+                      {previewKit === `mandatory-${grade}` && (
+                        <div className="mb-4 rounded-lg bg-white/80 p-4">
+                          <p className="mb-2 text-sm font-semibold text-blue-900">{t('shop.kit_contents_title')}:</p>
+                          <ul className="space-y-1 text-sm text-blue-800/80">
+                            {gradeProducts.mandatory.map((book, idx) => (
+                              <li key={idx} className="flex items-start gap-2">
+                                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-blue-600 flex-shrink-0"></span>
+                                <span>{getDisplayName(book.name, language)}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                       <Button size="lg" className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg" onClick={() => addKitToCart(gradeProducts.mandatory, t('shop.mandatory_kit_name', { grade: getGradeDisplayName(grade), school: getDisplayName(selectedSchool.name, language) }))}>
                           <ShoppingCart className="mr-2 h-5 w-5" /> 
                           {t('common.add_for')} {calculateKitPrice(gradeProducts.mandatory).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
@@ -409,13 +432,36 @@ export const ShopPageContent = ({
                           </h3>
                         </div>
                       </div>
-                                              <p className="text-amber-800/80 mb-6 flex-grow">{t('shop.buy_all_for_school_year')}</p>
-                                              <Button size="lg" className="w-full bg-amber-500 hover:bg-amber-600 text-white shadow-lg" onClick={() => addKitToCart([...gradeProducts.mandatory, ...gradeProducts.recommended], t('shop.complete_kit_name', { grade: getGradeDisplayName(grade), school: getDisplayName(selectedSchool.name, language) }))}>
-                                                  <ShoppingCart className="mr-2 h-5 w-5" /> 
-                                                  {t('common.add_for')} {calculateKitPrice([...gradeProducts.mandatory, ...gradeProducts.recommended]).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                                              </Button>
-                                          </div>
-                                      )}
+                      <p className="text-amber-800/80 mb-4 flex-grow">{t('shop.buy_all_for_school_year')}</p>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full mb-3 border-amber-500 text-amber-700 hover:bg-amber-100"
+                        onClick={() => setPreviewKit(previewKit === `complete-${grade}` ? null : `complete-${grade}`)}
+                      >
+                        {previewKit === `complete-${grade}` ? <EyeOff className="mr-2 h-4 w-4" /> : <Eye className="mr-2 h-4 w-4" />}
+                        {previewKit === `complete-${grade}` ? t('shop.hide_kit_contents') : t('shop.view_kit_contents_complete')}
+                      </Button>
+                      {previewKit === `complete-${grade}` && (
+                        <div className="mb-4 rounded-lg bg-white/80 p-4">
+                          <p className="mb-2 text-sm font-semibold text-amber-900">{t('shop.kit_contents_title')}:</p>
+                          <p className="mb-2 text-xs text-amber-700/70">{t('shop.kit_complete_contents_desc')}</p>
+                          <ul className="space-y-1 text-sm text-amber-800/80">
+                            {[...gradeProducts.mandatory, ...gradeProducts.recommended].map((book, idx) => (
+                              <li key={idx} className="flex items-start gap-2">
+                                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-amber-500 flex-shrink-0"></span>
+                                <span>{getDisplayName(book.name, language)}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      <Button size="lg" className="w-full bg-amber-500 hover:bg-amber-600 text-white shadow-lg" onClick={() => addKitToCart([...gradeProducts.mandatory, ...gradeProducts.recommended], t('shop.complete_kit_name', { grade: getGradeDisplayName(grade), school: getDisplayName(selectedSchool.name, language) }))}>
+                          <ShoppingCart className="mr-2 h-5 w-5" /> 
+                          {t('common.add_for')} {calculateKitPrice([...gradeProducts.mandatory, ...gradeProducts.recommended]).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                      </Button>
+                  </div>
+              )}
                                   </div>
 
                                   {showIndividual !== grade && (

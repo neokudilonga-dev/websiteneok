@@ -9,7 +9,7 @@ export const en = {
   },
   landing: {
     hero_title: 'Learning is Fun with Neokudilonga',
-    hero_subtitle: 'Find reading plans from partner educational institutions, books and various games.\n\nYour knowledge journey starts here.',
+    hero_subtitle: 'Find reading plans from partner educational institutions, books and various games. Your knowledge journey starts here!',
     card1_title: 'Reading Plans',
     card1_description: 'Access the lists of mandatory and recommended books for each school and grade level.',
     card1_button: 'View Plans',
@@ -24,7 +24,7 @@ export const en = {
     step1_title: 'Choose the School',
     step1_description: 'Select your student\'s school and class to see the specific reading plan.',
     step2_title: 'Add to Cart',
-    step2_description: 'Add the complete kits or individual books you need to your shopping cart.',
+    step2_description: 'Add the complete kit to buy all books at once, or select individually only the books you need. Choose the option that best suits your needs.',
     step3_title: 'Checkout',
     step3_description: 'Fill in your details, choose the delivery and payment method, and complete your order.',
     footer_rights: 'All rights reserved.',
@@ -55,7 +55,7 @@ export const en = {
     all_books: 'All Books',
     games_and_other_items: 'Games and Other Items',
     select_grade_description: 'Select the grade to see the recommended books.',
-    select_school_description: 'Select the school to see the reading plans.',
+    select_school_description: 'Select the School to see the reading plans.'
     all_books_description: 'Explore all the books available in our catalog.',
     games_description: 'Discover our selection of educational games and other items.',
     default_description: 'Your source for school books and games.',
@@ -69,6 +69,12 @@ export const en = {
     complete_kit: 'Complete Kit ({{count}} items)',
     buy_all_for_school_year: 'Buy the complete kit with all books (Mandatory + Recommended).',
     buy_separately: 'Buy Separately',
+    view_kit_contents: 'View included books',
+    view_kit_contents_complete: 'View all books',
+    kit_contents_title: 'Books included in kit',
+    kit_mandatory_contents_desc: 'This kit contains the following mandatory books:',
+    kit_complete_contents_desc: 'This kit contains the following books (mandatory + recommended):',
+    hide_kit_contents: 'Hide',
     no_books_found_title: 'No books found',
     no_books_found_description: 'There are no reading plan books for this school yet.',
     view_reading_plan: 'View reading plan',
@@ -167,17 +173,17 @@ export const en = {
     class_and_grade: 'Class and Grade',
     guardian_name: 'Name of Person Responsible for the Order',
     phone: 'Contact Phone Number',
-    phone_placeholder: 'With active WhatsApp',
-    delivery_options: 'Delivery Options',
+    phone_placeholder: 'Ex: 9XX XXX XXX'
+    delivery_options: 'Do you want delivery? (Delivery fee does not apply for orders in Talatona and Morro Bento over 70,000 kwanzas and 80,000 kwanzas for outside Talatona and Morro Bento)',
     delivery_option_1: 'Yes - in Talatona and Morro Bento (urban district) - add 2000 AKZ',
-    delivery_option_2: 'Yes - outside Talatona - add 2500 AKZ',
-    delivery_option_3: 'Yes - outside the areas mentioned above - add 4000 AKZ',
-    delivery_option_4: 'No - pickup at the school on a date to be confirmed',
+    delivery_option_2: 'Yes - outside Talatona (namely: Luanda Center/ Nova Vida/ Patriota) - add 2500 AKZ',
+    delivery_option_3: 'Yes - outside the above areas (namely: Viana/Kilamba/Jardim de Rosas and Condominiums adjacent to Via Expressa and non-paved areas) - add 4000 AKZ',
+    delivery_option_4: 'No - pickup at the School on date(s) subject to confirmation by the school',
     delivery_option_5: 'No - pickup at Condomínio BCI 6 Casas, Casa No. 6 (Subject to prior appointment)',
     delivery_address: 'Address (if you chose home delivery)',
     payment_method: 'Payment Method',
     payment_method_1: 'Cash payment',
-    payment_method_2: 'Payment with Multicaixa (not available for deliveries)',
+    payment_method_2: 'Payment with Multicaixa (not available for home deliveries)',
     payment_method_3: 'Payment by bank transfer or deposit',
     cart_total: 'Cart Total',
     delivery_fee: 'Delivery Fee',
@@ -187,9 +193,8 @@ export const en = {
     payment_method_transferencia: 'Payment by bank transfer or deposit',
     preferred_delivery_time: 'Preferred Delivery Time',
     preferred_delivery_time_options: {
-      morning: 'Morning',
-      afternoon: 'Afternoon',
-      evening: 'Evening'
+      morning: '10:00 - 12:00',
+      afternoon: '14:30 - 16:30'
     },
     errors: {
       student_info_required: 'Student name and class are required for reading plan items.',
@@ -199,8 +204,8 @@ export const en = {
     toast: {
       cart_empty_title: 'Empty Cart',
       cart_empty_description: 'You cannot place an order with an empty cart.',
-      order_submitted_title: 'Order Submitted!',
-      order_submitted_description: 'Your order has been sent successfully.',
+      order_submitted_title: 'Order Registered',
+      order_submitted_description: 'Your order has been registered successfully.',
     }
   },
   order_confirmation: {

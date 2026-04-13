@@ -28,22 +28,18 @@ const checkoutSchema = z.object({
   classAndGrade: z.string().optional(),
   phone: z.string().min(9, "O número de telefone é obrigatório."),
   guardianName: z.string().min(1, "O nome do responsável é obrigatório."),
-  email: z.string().email("Por favor, insira um email válido."),
+  email: z.string().email("Por favor, insira um email válido.").optional().or(z.literal("")),
   deliveryOption: z.enum([
     "delivery",
     "pickup",
+    "outside-zones",
     "levantamento",
     "levantamento-local",
   ]),
   deliveryAddress: z.string().optional(),
   preferredDeliveryTime: z.enum([
-    "09:00-10:00",
-    "10:00-11:00",
-    "11:00-12:00",
-    "12:00-13:00",
-    "14:00-15:00",
-    "15:00-16:00",
-    "16:00-17:00",
+    "10:00-12:00",
+    "14:30-16:30",
   ]).optional(),
   paymentMethod: z.enum(["transferencia", "numerario", "multicaixa"], {
     required_error: "Método de pagamento é obrigatório.",
@@ -96,7 +92,7 @@ export default function CheckoutForm() {
     message: t("checkout_form.errors.class_and_grade_required"),
     path: ["classAndGrade"],
   }).refine((data) => {
-    if (data.deliveryOption === "delivery" && !data.deliveryAddress) {
+    if ((data.deliveryOption === "delivery" || data.deliveryOption === "pickup" || data.deliveryOption === "outside-zones") && !data.deliveryAddress) {
       return false;
     }
     return true;
@@ -126,16 +122,18 @@ export default function CheckoutForm() {
   const paymentMethod = form.watch("paymentMethod");
 
   useEffect(() => {
-    if ((deliveryOption === "delivery" || deliveryOption === "pickup") && paymentMethod === "multicaixa") {
+    if ((deliveryOption === "delivery" || deliveryOption === "pickup" || deliveryOption === "outside-zones") && paymentMethod === "multicaixa") {
       form.setValue("paymentMethod", "transferencia");
     }
   }, [deliveryOption, paymentMethod, form]);
 
   const getDeliveryFee = () => {
     switch (deliveryOption) {
-      case "delivery": return 2000; // Assuming 'delivery' is the new 'tala-morro'
-      case "pickup": return 2500; // Assuming 'pickup' is the new 'fora-tala'
-      case "levantamento": return 0; // Pickup at school, no delivery fee
+      case "delivery": return 2000; // Talatona/Morro Bento
+      case "pickup": return 2500; // Fora de Talatona (Centro/Nova Vida/Patriota)
+      case "outside-zones": return 4000; // Viana/Kilamba/Jardim de Rosas
+      case "levantamento": return 0; // Pickup at school
+      case "levantamento-local": return 0; // Pickup at location
       default: return 0;
     }
   };
@@ -172,8 +170,8 @@ export default function CheckoutForm() {
       await submitOrder({
         ...data,
         paymentMethod: data.paymentMethod, // Use the selected payment method
-        deliveryAddress: data.deliveryOption === "delivery" ? (data.deliveryAddress ?? "") : null,
-        preferredDeliveryTime: data.deliveryOption === "delivery" ? (data.preferredDeliveryTime ?? null) : null,
+        deliveryAddress: (data.deliveryOption === "delivery" || data.deliveryOption === "pickup" || data.deliveryOption === "outside-zones") ? (data.deliveryAddress ?? "") : null,
+        preferredDeliveryTime: (data.deliveryOption === "delivery" || data.deliveryOption === "pickup" || data.deliveryOption === "outside-zones") ? (data.preferredDeliveryTime ?? null) : null,
         items: cartItems,
         total: finalTotal,
         deliveryFee,
@@ -257,7 +255,7 @@ export default function CheckoutForm() {
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("checkout_form.phone")}</FormLabel>
+                <FormLabel>{t("checkout_form.phone")} (Com WhatsApp Activo)</FormLabel>
                 <FormControl><Input {...field} placeholder={t("checkout_form.phone_placeholder")} /></FormControl>
                 <FormMessage />
               </FormItem>
@@ -268,7 +266,7 @@ export default function CheckoutForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Email (sem email não receberá comprovativo da efectivação da encomenda)</FormLabel>
                 <FormControl><Input type="email" {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
@@ -293,6 +291,10 @@ export default function CheckoutForm() {
                       <FormControl><RadioGroupItem value="pickup" /></FormControl>
                       <FormLabel className="font-normal">{t("checkout_form.delivery_option_2")}</FormLabel>
                     </FormItem>
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl><RadioGroupItem value="outside-zones" /></FormControl>
+                      <FormLabel className="font-normal">{t("checkout_form.delivery_option_3")}</FormLabel>
+                    </FormItem>
                     {allowPickupAtSchool && (
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl><RadioGroupItem value="levantamento" /></FormControl>
@@ -311,46 +313,41 @@ export default function CheckoutForm() {
               </FormItem>
             )}
           />
-          {deliveryOption === "delivery" && (
-            <FormField
-              control={form.control}
-              name="deliveryAddress"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("checkout_form.delivery_address")}</FormLabel>
-                  <FormControl><Textarea {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
-          {deliveryOption === "delivery" && (
-            <FormField
-              control={form.control}
-              name="preferredDeliveryTime"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("checkout_form.preferred_delivery_time")}</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="w-full sm:w-[240px]">
-                        <SelectValue placeholder={t("checkout_form.preferred_delivery_time")} />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="09:00-10:00">09:00 - 10:00</SelectItem>
-                      <SelectItem value="10:00-11:00">10:00 - 11:00</SelectItem>
-                      <SelectItem value="11:00-12:00">11:00 - 12:00</SelectItem>
-                      <SelectItem value="12:00-13:00">12:00 - 13:00</SelectItem>
-                      <SelectItem value="14:00-15:00">14:00 - 15:00</SelectItem>
-                      <SelectItem value="15:00-16:00">15:00 - 16:00</SelectItem>
-                      <SelectItem value="16:00-17:00">16:00 - 17:00</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          {(deliveryOption === "delivery" || deliveryOption === "pickup" || deliveryOption === "outside-zones") && (
+            <>
+              <FormField
+                control={form.control}
+                name="deliveryAddress"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("checkout_form.delivery_address")}</FormLabel>
+                    <FormControl><Textarea {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="preferredDeliveryTime"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("checkout_form.preferred_delivery_time")}</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="w-full sm:w-[240px]">
+                          <SelectValue placeholder={t("checkout_form.preferred_delivery_time")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="10:00-12:00">10:00 - 12:00</SelectItem>
+                        <SelectItem value="14:30-16:30">14:30 - 16:30</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </>
           )}
         </div>
 
@@ -375,12 +372,12 @@ export default function CheckoutForm() {
                       <FormControl>
                         <RadioGroupItem 
                           value="multicaixa" 
-                          disabled={deliveryOption === "delivery" || deliveryOption === "pickup"}
+                          disabled={deliveryOption === "delivery" || deliveryOption === "pickup" || deliveryOption === "outside-zones"}
                         />
                       </FormControl>
                       <FormLabel className={cn(
                         "font-normal",
-                        (deliveryOption === "delivery" || deliveryOption === "pickup") && "text-muted-foreground line-through"
+                        (deliveryOption === "delivery" || deliveryOption === "pickup" || deliveryOption === "outside-zones") && "text-muted-foreground line-through"
                       )}>
                         {t("checkout_form.payment_method_multicaixa")}
                       </FormLabel>
