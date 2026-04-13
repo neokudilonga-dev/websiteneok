@@ -18,6 +18,12 @@ export const sendOrderConfirmationEmail = functions.firestore
       return null;
     }
 
+    // Skip sending email if no email provided
+    if (!order.email) {
+      console.log("No email provided for order. Skipping confirmation email.");
+      return null;
+    }
+
     // IMPORTANT: You must set GMAIL_EMAIL and GMAIL_PASSWORD in Firebase secrets or env vars.
     // Use: firebase functions:secrets:set GMAIL_EMAIL
     // Use: firebase functions:secrets:set GMAIL_PASSWORD

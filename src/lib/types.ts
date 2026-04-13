@@ -106,7 +106,7 @@ export interface Order {
   studentClass?: string;
   guardianName: string;
   phone: string;
-  email: string;
+  email: string | null;
   deliveryOption: string;
   deliveryAddress: string | null;
   preferredDeliveryTime?: string | null;

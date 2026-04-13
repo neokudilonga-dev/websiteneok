@@ -169,6 +169,7 @@ export default function CheckoutForm() {
     try {
       await submitOrder({
         ...data,
+        email: data.email || null,
         paymentMethod: data.paymentMethod, // Use the selected payment method
         deliveryAddress: (data.deliveryOption === "delivery" || data.deliveryOption === "pickup" || data.deliveryOption === "outside-zones") ? (data.deliveryAddress ?? "") : null,
         preferredDeliveryTime: (data.deliveryOption === "delivery" || data.deliveryOption === "pickup" || data.deliveryOption === "outside-zones") ? (data.preferredDeliveryTime ?? null) : null,
