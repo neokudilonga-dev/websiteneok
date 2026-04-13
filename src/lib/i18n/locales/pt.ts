@@ -175,7 +175,7 @@ export const pt = {
     class_and_grade: 'Classe e Turma',
     guardian_name: 'Nome do/a Responsável pela Encomenda',
     phone: 'Número Telefónico de Contacto',
-    phone_placeholder: 'Ex: 9XX XXX XXX'
+    phone_placeholder: 'Ex: 9XX XXX XXX',
     delivery_options: 'Pretende entrega? (Não se aplica taxa de entrega para encomendas em Talatona e Morro Bento de valor superior a 70 mil kwanzas e 80 mil kwanzas para fora de Talatona e Morro Bento)',
     delivery_option_1: 'Sim - em Talatona e Morro Bento (distrito urbano) - acresce 2000 AKZ',
     delivery_option_2: 'Sim - fora de Talatona (nomeadamente: Centro de Luanda/ Nova Vida/ Patriota) - acresce 2500 AKZ',

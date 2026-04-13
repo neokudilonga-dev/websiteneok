@@ -9,5 +9,8 @@
       "test-results/**",
       "functions/**"
     ]
+  },
+  "functions": {
+    "source": "functions"
   }
 }

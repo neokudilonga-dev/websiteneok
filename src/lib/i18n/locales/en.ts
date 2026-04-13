@@ -55,7 +55,7 @@ export const en = {
     all_books: 'All Books',
     games_and_other_items: 'Games and Other Items',
     select_grade_description: 'Select the grade to see the recommended books.',
-    select_school_description: 'Select the School to see the reading plans.'
+    select_school_description: 'Select the School to see the reading plans.',
     all_books_description: 'Explore all the books available in our catalog.',
     games_description: 'Discover our selection of educational games and other items.',
     default_description: 'Your source for school books and games.',
