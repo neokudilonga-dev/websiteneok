@@ -51,7 +51,7 @@ export default function CheckoutForm() {
   const { toast } = useToast();
   const { t } = useLanguage();
   const { cartItems, cartTotal, clearCart } = useCart();
-  const { readingPlan, schools, submitOrder, loading } = useData();
+  const { readingPlan, schools, submitOrder, loading, deliverySettings, getDeliverySettings } = useData();
   const { language } = useLanguage();
 
   const readingPlanProductIds = useMemo(() => {
@@ -127,14 +127,51 @@ export default function CheckoutForm() {
     }
   }, [deliveryOption, paymentMethod, form]);
 
+  // Load delivery settings on mount
+  useEffect(() => {
+    getDeliverySettings();
+  }, [getDeliverySettings]);
+
   const getDeliveryFee = () => {
+    // Default fees if settings not loaded
+    const defaultFees = {
+      feeTalatona: 2000,
+      feeOutsideTalatona: 2500,
+      feeOutsideZones: 4000,
+      exemptionTalatona: 70000,
+      exemptionOutsideTalatona: 80000,
+    };
+    
+    const settings = deliverySettings ?? defaultFees;
+    
     switch (deliveryOption) {
-      case "delivery": return 2000; // Talatona/Morro Bento
-      case "pickup": return 2500; // Fora de Talatona (Centro/Nova Vida/Patriota)
-      case "outside-zones": return 4000; // Viana/Kilamba/Jardim de Rosas
-      case "levantamento": return 0; // Pickup at school
-      case "levantamento-local": return 0; // Pickup at location
-      default: return 0;
+      case "delivery": {
+        // Talatona/Morro Bento - check exemption
+        const fee = settings.feeTalatona ?? 2000;
+        const exemption = settings.exemptionTalatona ?? 70000;
+        if (exemption > 0 && cartTotal >= exemption) {
+          return 0; // Exempt
+        }
+        return fee;
+      }
+      case "pickup": {
+        // Fora de Talatona - check exemption
+        const fee = settings.feeOutsideTalatona ?? 2500;
+        const exemption = settings.exemptionOutsideTalatona ?? 80000;
+        if (exemption > 0 && cartTotal >= exemption) {
+          return 0; // Exempt
+        }
+        return fee;
+      }
+      case "outside-zones":
+        // Viana/Kilamba - no exemption
+        return settings.feeOutsideZones ?? 4000;
+      case "levantamento":
+        return 0; // Pickup at school - always free
+      case "levantamento-local":
+        return 0; // Pickup at location - always free
+      default:
+        return 0;
     }
   };
 

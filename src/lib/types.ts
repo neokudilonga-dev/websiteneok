@@ -130,3 +130,16 @@ export interface Category {
   };
   type: 'book' | 'game';
 }
+
+export interface DeliverySettings {
+  id: string;
+  // Delivery fees
+  feeTalatona: number;
+  feeOutsideTalatona: number;
+  feeOutsideZones: number;
+  // Exemption thresholds (0 = no exemption)
+  exemptionTalatona: number;
+  exemptionOutsideTalatona: number;
+  // Updated at
+  updatedAt: string;
+}

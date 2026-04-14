@@ -2,7 +2,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
-import type { School, Product, ReadingPlanItem, Order, Category, PaymentStatus, DeliveryStatus } from "@/lib/types";
+import type { School, Product, ReadingPlanItem, Order, Category, PaymentStatus, DeliveryStatus, DeliverySettings } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "./language-context";
 import { cache } from "@/lib/cache";
@@ -56,7 +56,10 @@ interface DataContextType {
   updateOrderDetails: (orderReference: string, data: Partial<Order>) => Promise<void>;
   deleteOrder: (orderReference: string) => Promise<void>;
 
-
+  // Delivery Settings
+  deliverySettings: DeliverySettings | null;
+  getDeliverySettings: () => Promise<DeliverySettings | null>;
+  updateDeliverySettings: (settings: Partial<DeliverySettings>) => Promise<void>;
 }
 
 export const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -88,6 +91,7 @@ export const DataProvider = ({
   const { language } = useLanguage();
   const [publishers, setPublishers] = useState<string[]>(initialPublishers ?? []);
   const [orders, setOrders] = useState<Order[]>(initialOrders ?? []);
+  const [deliverySettings, setDeliverySettings] = useState<DeliverySettings | null>(null);
   const { toast } = useToast();
 
   // Inicializar dados do cache se não houver dados iniciais (SSR)
@@ -631,6 +635,41 @@ export const DataProvider = ({
     }
   }
 
+  // Delivery Settings functions
+  const getDeliverySettings = async (): Promise<DeliverySettings | null> => {
+    try {
+      const response = await fetch('/api/delivery-settings');
+      if (!response.ok) throw new Error('Failed to fetch delivery settings');
+      const settings = await response.json();
+      setDeliverySettings(settings);
+      return settings;
+    } catch (error) {
+      console.error('Error fetching delivery settings:', error);
+      return null;
+    }
+  };
+
+  const updateDeliverySettings = async (settings: Partial<DeliverySettings>) => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/delivery-settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      });
+      if (!response.ok) throw new Error('Failed to update delivery settings');
+      
+      const updatedSettings = await response.json();
+      setDeliverySettings(updatedSettings);
+      toast({ title: "Configurações Atualizadas", description: "As configurações de entrega foram atualizadas com sucesso." });
+    } catch (error) {
+      console.error(error);
+      toast({ title: "Erro", description: "Não foi possível atualizar as configurações.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <DataContext.Provider
       value={{
@@ -644,6 +683,7 @@ export const DataProvider = ({
         publishers, setPublishers, addPublisher, updatePublisher, deletePublisher,
         orders, setOrders, submitOrder, addOrder, updateOrderPaymentStatus, updateOrderDeliveryStatus, updateOrderDeliveryDate, deleteOrder,
         updateOrderDetails,
+        deliverySettings, getDeliverySettings, updateDeliverySettings,
       }}
     >
       {children}

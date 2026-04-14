@@ -12,6 +12,7 @@ import { useLanguage } from "@/context/language-context";
 import { useData } from "@/context/data-context";
 import { useMemo, useEffect } from "react";
 import type { Product, Order, School as SchoolType } from "@/lib/types";
+import { DeliverySettingsPanel } from "@/components/admin/delivery-settings";
 
 interface AdminDashboardClientProps {
     initialProducts: Product[];
@@ -77,6 +78,8 @@ export default function AdminDashboardClient({ initialProducts, initialOrders, i
           </p>
         </CardContent>
       </Card>
+
+      <DeliverySettingsPanel />
     </div>
   );
 }
