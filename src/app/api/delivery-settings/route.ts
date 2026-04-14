@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFirestore } from 'firebase-admin/firestore';
-import { initializeFirebaseAdmin } from '@/lib/firebase-admin';
+import '@/lib/firebase-admin'; // Auto-initializes Firebase Admin
 import type { DeliverySettings } from '@/lib/types';
 
-// Initialize Firebase Admin
-initializeFirebaseAdmin();
 const db = getFirestore();
 
 const DEFAULT_SETTINGS: Omit<DeliverySettings, 'id'> = {
