@@ -186,7 +186,8 @@ export default function CheckoutForm() {
         prefix = school.abbreviation;
       }
     }
-    return `${prefix}-${new Date().getFullYear()}${(Math.random() * 90000 + 10000).toFixed(0)}`;
+    // Short format: PREFIX-XXXX (4 digit random number)
+    return `${prefix}-${Math.floor(Math.random() * 9000 + 1000)}`;
   };
 
   const onSubmit = async (data: CheckoutFormValues) => {

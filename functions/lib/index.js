@@ -181,11 +181,11 @@ exports.sendOrderConfirmationEmail = functions.firestore
             <h4 style="margin-top: 0; color: #1e40af;">${isPT ? 'Instruções de Pagamento' : 'Payment Instructions'}</h4>
             <p style="font-size: 14px; color: #1e40af;">
               ${isPT
-            ? 'Por favor, realize o pagamento por transferência bancária para o IBAN abaixo e envie o comprovativo por WhatsApp ou E-mail.'
-            : 'Please make the payment by bank transfer to the IBAN below and send the proof via WhatsApp or E-mail.'}
+            ? 'Por favor, realize o pagamento por transferência bancária para o IBAN abaixo. Envie o comprovativo por WhatsApp (+244 919 948 887) ou para este email (neokudilonga@gmail.com).'
+            : 'Please make the payment by bank transfer to the IBAN below. Send the proof via WhatsApp (+244 919 948 887) or to this email (neokudilonga@gmail.com).'}
             </p>
             <p style="font-size: 16px; font-weight: bold; color: #1e40af; margin-bottom: 5px;">IBAN: BIC AO06 0051 0000 8030 4996 1512 5</p>
-            <p style="font-size: 14px; color: #1e40af;">Titular: NEOKUDILONGA</p>
+            <p style="font-size: 14px; color: #1e40af;">${isPT ? 'Titular' : 'Account Holder'}: NEOKUDILONGA</p>
           </div>
           ` : ''}
 

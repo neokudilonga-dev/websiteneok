@@ -65,4 +65,4 @@ export async function DELETE(request: Request, context: any) {
     }
 }
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
