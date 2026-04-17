@@ -79,7 +79,9 @@ export default function AdminDashboardClient({ initialProducts, initialOrders, i
         </CardContent>
       </Card>
 
-      <DeliverySettingsPanel />
+      <div className="col-span-full">
+        <DeliverySettingsPanel />
+      </div>
     </div>
   );
 }

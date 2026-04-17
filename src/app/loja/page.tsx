@@ -37,7 +37,13 @@ export default async function LojaPage() {
   return (
     <div className="flex min-h-screen w-full flex-col">
         <Header />
-        <Suspense fallback={<ShopPageLoading />}>
+        <Suspense fallback={
+          <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-4">
+            {[...Array(8)].map((_, i) => (
+              <ShopPageLoading key={i} />
+            ))}
+          </div>
+        }>
             <ShopPageContent 
               initialSchools={schools}
               initialProducts={products}
