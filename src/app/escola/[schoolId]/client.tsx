@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -63,10 +63,31 @@ export default function SchoolReadingPlanClient({
   }, [readingPlan, allProducts]);
 
   const grades = useMemo(() => {
-    return Array.from(productsByGrade.keys()).sort();
+    return Array.from(productsByGrade.keys()).sort((a, b) => {
+      // Try to sort numerically first
+      const numA = parseInt(a);
+      const numB = parseInt(b);
+      if (!isNaN(numA) && !isNaN(numB)) {
+        return numA - numB;
+      }
+      // Fall back to string comparison for non-numeric grades
+      return a.localeCompare(b);
+    });
   }, [productsByGrade]);
 
-  const [selectedGrade, setSelectedGrade] = useState<string>(grades[0] || "");
+  // Scroll to top when page loads
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const [selectedGrade, setSelectedGrade] = useState<string>("");
+
+  // Set default grade when grades are available
+  useEffect(() => {
+    if (grades.length > 0 && !selectedGrade) {
+      setSelectedGrade(grades[0]);
+    }
+  }, [grades, selectedGrade]);
 
   const gradeProducts = selectedGrade ? productsByGrade.get(selectedGrade) : null;
 
@@ -126,7 +147,18 @@ export default function SchoolReadingPlanClient({
           {/* School Header */}
           <div className="mb-8 text-center">
             <div className="inline-flex items-center justify-center p-3 bg-blue-100 rounded-full mb-4">
-              <BookOpen className="h-8 w-8 text-blue-600" />
+              {school.logo ? (
+                <div className="relative h-16 w-16 rounded-full overflow-hidden">
+                  <Image
+                    src={normalizeImageUrl(school.logo)}
+                    alt={schoolName}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              ) : (
+                <BookOpen className="h-8 w-8 text-blue-600" />
+              )}
             </div>
             <h1 className="font-headline text-3xl font-bold text-blue-900 sm:text-4xl">
               {schoolName}
@@ -198,9 +230,9 @@ export default function SchoolReadingPlanClient({
                             onClick={() => setPreviewKit(previewKit === `mandatory-${selectedGrade}` ? null : `mandatory-${selectedGrade}`)}
                           >
                             {previewKit === `mandatory-${selectedGrade}` ? <EyeOff className="mr-2 h-4 w-4" /> : <Eye className="mr-2 h-4 w-4" />}
-                            {previewKit === `mandatory-${selectedGrade}` 
-                              ? (t('shop.hide_kit_contents') || 'Esconder Conteúdo') 
-                              : (t('shop.view_kit_contents') || 'Ver Conteúdo do Kit')}
+                            {previewKit === `mandatory-${selectedGrade}`
+                              ? (t('shop.hide_kit_contents') || 'Esconder Conteúdo')
+                              : (t('shop.view_products') || 'Ver Produtos')}
                           </Button>
 
                           {/* Kit Contents Preview */}
@@ -209,11 +241,19 @@ export default function SchoolReadingPlanClient({
                               <p className="mb-2 text-sm font-semibold text-blue-900">
                                 {t('shop.kit_contents_title') || 'Livros incluídos'}:
                               </p>
-                              <ul className="space-y-2">
+                              <ul className="space-y-3">
                                 {gradeProducts.mandatory.map((book, idx) => (
-                                  <li key={idx} className="flex items-start gap-2 text-sm text-blue-800/80">
-                                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-blue-600 flex-shrink-0"></span>
-                                    <span>{getDisplayName(book.name, language)}</span>
+                                  <li key={idx} className="flex items-center gap-3 text-sm text-blue-800/80">
+                                    <div className="relative h-14 w-12 flex-shrink-0 rounded-md overflow-hidden border border-blue-200 bg-gray-50">
+                                      <Image
+                                        src={normalizeImageUrl(Array.isArray(book.image) ? book.image[0] : book.image) || "/placeholder.svg"}
+                                        alt={getDisplayName(book.name, language)}
+                                        fill
+                                        className="object-cover"
+                                      />
+                                    </div>
+                                    <span className="flex-1">{getDisplayName(book.name, language)}</span>
+                                    <span className="text-xs font-medium text-blue-600">{book.price?.toLocaleString('pt-PT')} Kz</span>
                                   </li>
                                 ))}
                               </ul>
@@ -313,9 +353,9 @@ export default function SchoolReadingPlanClient({
                             onClick={() => setPreviewKit(previewKit === `complete-${selectedGrade}` ? null : `complete-${selectedGrade}`)}
                           >
                             {previewKit === `complete-${selectedGrade}` ? <EyeOff className="mr-2 h-4 w-4" /> : <Eye className="mr-2 h-4 w-4" />}
-                            {previewKit === `complete-${selectedGrade}` 
-                              ? (t('shop.hide_kit_contents') || 'Esconder Conteúdo') 
-                              : (t('shop.view_kit_contents') || 'Ver Conteúdo do Kit')}
+                            {previewKit === `complete-${selectedGrade}`
+                              ? (t('shop.hide_kit_contents') || 'Esconder Conteúdo')
+                              : (t('shop.view_products') || 'Ver Produtos')}
                           </Button>
 
                           {/* Kit Contents Preview */}
@@ -324,14 +364,22 @@ export default function SchoolReadingPlanClient({
                               <p className="mb-2 text-sm font-semibold text-green-900">
                                 {t('shop.kit_contents_title') || 'Livros incluídos'}:
                               </p>
-                              <ul className="space-y-2">
+                              <ul className="space-y-3">
                                 {gradeProducts.complete.map((book, idx) => (
-                                  <li key={idx} className="flex items-start gap-2 text-sm text-green-800/80">
-                                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-green-600 flex-shrink-0"></span>
-                                    <span>{getDisplayName(book.name, language)}</span>
+                                  <li key={idx} className="flex items-center gap-3 text-sm text-green-800/80">
+                                    <div className="relative h-14 w-12 flex-shrink-0 rounded-md overflow-hidden border border-green-200 bg-gray-50">
+                                      <Image
+                                        src={normalizeImageUrl(Array.isArray(book.image) ? book.image[0] : book.image) || "/placeholder.svg"}
+                                        alt={getDisplayName(book.name, language)}
+                                        fill
+                                        className="object-cover"
+                                      />
+                                    </div>
+                                    <span className="flex-1">{getDisplayName(book.name, language)}</span>
                                     {gradeProducts.mandatory.find(b => b.id === book.id) && (
-                                      <Badge variant="outline" className="ml-2 text-xs border-green-300 text-green-700">Obrigatório</Badge>
+                                      <Badge variant="outline" className="text-xs border-green-300 text-green-700">Obrigatório</Badge>
                                     )}
+                                    <span className="text-xs font-medium text-green-600">{book.price?.toLocaleString('pt-PT')} Kz</span>
                                   </li>
                                 ))}
                               </ul>

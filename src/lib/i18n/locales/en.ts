@@ -71,6 +71,7 @@ export const en = {
     buy_separately: 'Buy Separately',
     view_kit_contents: 'View included books',
     view_kit_contents_complete: 'View all books',
+    view_products: 'View products',
     kit_contents_title: 'Books included in kit',
     kit_mandatory_contents_desc: 'This kit contains the following mandatory books:',
     kit_complete_contents_desc: 'This kit contains the following books (mandatory + recommended):',

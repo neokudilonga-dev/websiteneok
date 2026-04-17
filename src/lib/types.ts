@@ -57,6 +57,7 @@ export interface School {
   allowPickupAtLocation?: boolean;
   hasRecommendedPlan?: boolean;
   order?: number;
+  logo?: string;
 }
 
 

@@ -17,7 +17,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
-import { getDisplayName, normalizeSearch } from "@/lib/utils";
+import { getDisplayName, normalizeSearch, normalizeImageUrl } from "@/lib/utils";
+import Image from "next/image";
 import type { School, Product, ReadingPlanItem, Category } from "@/lib/types";
 import { SidebarMenuSkeleton } from "@/components/ui/sidebar";
 
@@ -389,23 +390,31 @@ export const ShopPageContent = ({
                         </div>
                       </div>
                       <p className="text-blue-800/80 mb-4 flex-grow">{t('shop.buy_all_mandatory')}</p>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
+                      <Button
+                        variant="outline"
+                        size="sm"
                         className="w-full mb-3 border-blue-600 text-blue-700 hover:bg-blue-100"
                         onClick={() => setPreviewKit(previewKit === `mandatory-${grade}` ? null : `mandatory-${grade}`)}
                       >
                         {previewKit === `mandatory-${grade}` ? <EyeOff className="mr-2 h-4 w-4" /> : <Eye className="mr-2 h-4 w-4" />}
-                        {previewKit === `mandatory-${grade}` ? t('shop.hide_kit_contents') : t('shop.view_kit_contents')}
+                        {previewKit === `mandatory-${grade}` ? t('shop.hide_kit_contents') : t('shop.view_products')}
                       </Button>
                       {previewKit === `mandatory-${grade}` && (
                         <div className="mb-4 rounded-lg bg-white/80 p-4">
                           <p className="mb-2 text-sm font-semibold text-blue-900">{t('shop.kit_contents_title')}:</p>
-                          <ul className="space-y-1 text-sm text-blue-800/80">
+                          <ul className="space-y-2 text-sm text-blue-800/80">
                             {gradeProducts.mandatory.map((book, idx) => (
-                              <li key={idx} className="flex items-start gap-2">
-                                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-blue-600 flex-shrink-0"></span>
-                                <span>{getDisplayName(book.name, language)}</span>
+                              <li key={idx} className="flex items-center gap-3">
+                                <div className="relative h-12 w-10 flex-shrink-0 rounded-md overflow-hidden border border-blue-200">
+                                  <Image
+                                    src={normalizeImageUrl(Array.isArray(book.image) ? book.image[0] : book.image) || "/placeholder.svg"}
+                                    alt={getDisplayName(book.name, language)}
+                                    fill
+                                    className="object-cover"
+                                  />
+                                </div>
+                                <span className="flex-1">{getDisplayName(book.name, language)}</span>
+                                <span className="text-xs font-medium text-blue-600">{book.price?.toLocaleString('pt-PT')} Kz</span>
                               </li>
                             ))}
                           </ul>
@@ -433,24 +442,32 @@ export const ShopPageContent = ({
                         </div>
                       </div>
                       <p className="text-amber-800/80 mb-4 flex-grow">{t('shop.buy_all_for_school_year')}</p>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
+                      <Button
+                        variant="outline"
+                        size="sm"
                         className="w-full mb-3 border-amber-500 text-amber-700 hover:bg-amber-100"
                         onClick={() => setPreviewKit(previewKit === `complete-${grade}` ? null : `complete-${grade}`)}
                       >
                         {previewKit === `complete-${grade}` ? <EyeOff className="mr-2 h-4 w-4" /> : <Eye className="mr-2 h-4 w-4" />}
-                        {previewKit === `complete-${grade}` ? t('shop.hide_kit_contents') : t('shop.view_kit_contents_complete')}
+                        {previewKit === `complete-${grade}` ? t('shop.hide_kit_contents') : t('shop.view_products')}
                       </Button>
                       {previewKit === `complete-${grade}` && (
                         <div className="mb-4 rounded-lg bg-white/80 p-4">
                           <p className="mb-2 text-sm font-semibold text-amber-900">{t('shop.kit_contents_title')}:</p>
                           <p className="mb-2 text-xs text-amber-700/70">{t('shop.kit_complete_contents_desc')}</p>
-                          <ul className="space-y-1 text-sm text-amber-800/80">
+                          <ul className="space-y-2 text-sm text-amber-800/80">
                             {[...gradeProducts.mandatory, ...gradeProducts.recommended].map((book, idx) => (
-                              <li key={idx} className="flex items-start gap-2">
-                                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-amber-500 flex-shrink-0"></span>
-                                <span>{getDisplayName(book.name, language)}</span>
+                              <li key={idx} className="flex items-center gap-3">
+                                <div className="relative h-12 w-10 flex-shrink-0 rounded-md overflow-hidden border border-amber-200">
+                                  <Image
+                                    src={normalizeImageUrl(Array.isArray(book.image) ? book.image[0] : book.image) || "/placeholder.svg"}
+                                    alt={getDisplayName(book.name, language)}
+                                    fill
+                                    className="object-cover"
+                                  />
+                                </div>
+                                <span className="flex-1">{getDisplayName(book.name, language)}</span>
+                                <span className="text-xs font-medium text-amber-600">{book.price?.toLocaleString('pt-PT')} Kz</span>
                               </li>
                             ))}
                           </ul>
@@ -465,10 +482,14 @@ export const ShopPageContent = ({
                                   </div>
 
                                   {showIndividual !== grade && (
-                                      <div className="text-center mt-6">
-                                          <Button variant="outline" onClick={() => setShowIndividual(grade)}>
+                                      <div className="text-center mt-8">
+                                          <Button
+                                            size="lg"
+                                            className="bg-blue-600 hover:bg-blue-700 text-white shadow-md px-8 py-6 text-lg"
+                                            onClick={() => setShowIndividual(grade)}
+                                          >
                                               {t('shop.buy_separately')}
-                                              <ChevronRight className="ml-2 h-4 w-4" />
+                                              <ChevronRight className="ml-2 h-5 w-5" />
                                           </Button>
                                       </div>
                                   )}
@@ -500,9 +521,19 @@ export const ShopPageContent = ({
                             onClick={() => setSelectedSchool(school)}
                             className="flex flex-col items-center justify-center rounded-lg border bg-secondary p-6 text-center transition-all hover:shadow-lg"
                           >
-                            <h3 className="font-headline text-xl font-semibold tracking-tight">
+                            <h3 className="font-headline text-xl font-semibold tracking-tight mb-3">
                               {getDisplayName(school.name, language)}
                             </h3>
+                            {school.logo && (
+                              <div className="relative h-16 w-16 rounded-full overflow-hidden border-2 border-white shadow-md">
+                                <Image
+                                  src={normalizeImageUrl(school.logo)}
+                                  alt={getDisplayName(school.name, language)}
+                                  fill
+                                  className="object-cover"
+                                />
+                              </div>
+                            )}
                             </button>
                       ))}
                   </div>

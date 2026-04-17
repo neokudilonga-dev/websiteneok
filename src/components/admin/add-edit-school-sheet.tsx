@@ -29,6 +29,7 @@ import type { School } from "@/lib/types";
 import { useEffect, useState } from "react";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
+import { ImageUpload } from "./image-upload";
 
 interface AddEditSchoolSheetProps {
   isOpen: boolean;
@@ -44,6 +45,7 @@ const schoolFormSchema = z.object({
   allowPickup: z.boolean().default(false),
   allowPickupAtLocation: z.boolean().default(false),
   hasRecommendedPlan: z.boolean().default(false),
+  logo: z.string().optional(),
 });
 
 type SchoolFormValues = z.infer<typeof schoolFormSchema>;
@@ -65,6 +67,7 @@ export function AddEditSchoolSheet({
       allowPickup: false,
       allowPickupAtLocation: false,
       hasRecommendedPlan: false,
+      logo: "",
     },
   });
 
@@ -78,6 +81,7 @@ export function AddEditSchoolSheet({
           allowPickup: school.allowPickup || false,
           allowPickupAtLocation: school.allowPickupAtLocation || false,
           hasRecommendedPlan: school.hasRecommendedPlan || false,
+          logo: school.logo || "",
         });
       } else {
         form.reset({ name: "", id: "", abbreviation: "", allowPickup: false, allowPickupAtLocation: false, hasRecommendedPlan: false });
@@ -98,6 +102,7 @@ export function AddEditSchoolSheet({
           allowPickup: data.allowPickup,
           allowPickupAtLocation: data.allowPickupAtLocation,
           hasRecommendedPlan: data.hasRecommendedPlan,
+          logo: data.logo,
         })
       );
       setIsOpen(false);
@@ -170,7 +175,30 @@ export function AddEditSchoolSheet({
                     )}
                 />
                </div>
-              
+
+               {/* Logo Upload */}
+               <FormField
+                control={form.control}
+                name="logo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Logo da Escola (opcional)</FormLabel>
+                    <FormControl>
+                      <ImageUpload
+                        label="Logo da Escola"
+                        value={field.value}
+                        onChange={field.onChange}
+                        folder="schools"
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Imagem que será exibida na página da escola e nos botões de seleção.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
                <FormField
                 control={form.control}
                 name="allowPickup"

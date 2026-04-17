@@ -73,6 +73,7 @@ export const pt = {
     buy_separately: 'Comprar em separado',
     view_kit_contents: 'Ver livros incluídos',
     view_kit_contents_complete: 'Ver todos os livros',
+    view_products: 'Ver produtos',
     kit_contents_title: 'Livros incluídos no kit',
     kit_mandatory_contents_desc: 'Este kit contém os seguintes livros obrigatórios:',
     kit_complete_contents_desc: 'Este kit contém os seguintes livros (obrigatórios + recomendados):',
