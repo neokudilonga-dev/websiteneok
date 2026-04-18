@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -75,19 +75,18 @@ export default function SchoolReadingPlanClient({
     });
   }, [productsByGrade]);
 
-  // Scroll to top when page loads
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
-
   const [selectedGrade, setSelectedGrade] = useState<string>("");
 
-  // Set default grade when grades are available
+  // Scroll to top when page loads - delay to ensure content is rendered
   useEffect(() => {
-    if (grades.length > 0 && !selectedGrade) {
-      setSelectedGrade(grades[0]);
-    }
-  }, [grades, selectedGrade]);
+    // Immediate scroll
+    window.scrollTo(0, 0);
+    // Also scroll after a short delay to handle any late rendering
+    const timer = setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const gradeProducts = selectedGrade ? productsByGrade.get(selectedGrade) : null;
 

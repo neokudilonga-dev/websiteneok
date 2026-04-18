@@ -117,8 +117,15 @@ export function ImageUpload({ label = 'Imagem', value, onChange, multiple = fals
   };
 
   const onPaste = async (e: React.ClipboardEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     const items = e.clipboardData?.items;
-    if (!items || items.length === 0) return;
+    if (!items || items.length === 0) {
+      console.log('Paste event triggered but no items in clipboardData');
+      return;
+    }
+
     const files: File[] = [];
     for (const it of items as any) {
       if (it.kind === 'file') {
@@ -126,16 +133,25 @@ export function ImageUpload({ label = 'Imagem', value, onChange, multiple = fals
         if (f) files.push(f);
       }
     }
+
     if (files.length > 0) {
+      console.log(`Pasted ${files.length} file(s)`);
       const dt = new DataTransfer();
       for (const f of files) {
         dt.items.add(f);
       }
       await handleFiles(dt.files);
+    } else {
+      toast({
+        title: 'Nenhuma imagem encontrada',
+        description: 'Certifique-se de que está a copiar uma imagem e não um link ou texto.',
+        variant: 'destructive',
+      });
     }
   };
   const readClipboard = async () => {
     try {
+      // First try the modern Clipboard API
       const navClip: any = (navigator as any).clipboard;
       if (navClip && typeof navClip.read === 'function') {
         const items = await navClip.read();
@@ -156,7 +172,20 @@ export function ImageUpload({ label = 'Imagem', value, onChange, multiple = fals
           return;
         }
       }
-    } catch {}
+
+      // If modern API fails or returns no files, show instructions
+      toast({
+        title: 'Como colar uma imagem',
+        description: 'Clique na área de upload para a focar, depois pressione Ctrl+V (ou Cmd+V no Mac) para colar a imagem.',
+      });
+    } catch (err) {
+      console.error('Clipboard read error:', err);
+      toast({
+        title: 'Não foi possível aceder à área de transferência',
+        description: 'Tente usar Ctrl+V directamente na área de upload após clicar nela.',
+        variant: 'destructive',
+      });
+    }
   };
   const onDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -194,7 +223,7 @@ export function ImageUpload({ label = 'Imagem', value, onChange, multiple = fals
         className="hidden"
       />
       <div
-        className="rounded-md border bg-muted/30 p-4 text-sm cursor-pointer"
+        className="rounded-md border bg-muted/30 p-4 text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50"
         onPaste={onPaste}
         onDrop={onDrop}
         onDragOver={onDragOver}
@@ -204,8 +233,9 @@ export function ImageUpload({ label = 'Imagem', value, onChange, multiple = fals
             fileInputRef.current?.click();
           }
         }}
+        tabIndex={0}
         role="button"
-        aria-label="Área de upload de imagem"
+        aria-label="Área de upload de imagem. Clique para focar e depois use Ctrl+V para colar."
       >
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex-1">
