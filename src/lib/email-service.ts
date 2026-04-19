@@ -1,8 +1,15 @@
 import { Resend } from 'resend';
 import type { Order } from '@/lib/types';
 
-// Initialize Resend with API key from environment
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend with API key from environment (only on server-side)
+const getResend = () => {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn('RESEND_API_KEY not set');
+    return null;
+  }
+  return new Resend(apiKey);
+};
 
 // From email address - must be a verified domain in Resend
 const FROM_EMAIL = process.env.FROM_EMAIL || 'neokudilonga@gmail.com';
@@ -103,6 +110,11 @@ export async function sendOrderConfirmationEmail(order: Order) {
       </div>
     `;
 
+    const resend = getResend();
+    if (!resend) {
+      return { success: false, error: 'Email service not initialized' };
+    }
+
     const { data, error } = await resend.emails.send({
       from: `Neokudilonga <${FROM_EMAIL}>`,
       to: [order.email],
@@ -167,6 +179,11 @@ export async function sendAdminOrderNotification(order: Order) {
         </p>
       </div>
     `;
+
+    const resend = getResend();
+    if (!resend) {
+      return { success: false, error: 'Email service not initialized' };
+    }
 
     const { data, error } = await resend.emails.send({
       from: `Neokudilonga <${FROM_EMAIL}>`,
