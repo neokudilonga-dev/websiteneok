@@ -20,6 +20,7 @@ import { useLanguage } from "@/context/language-context";
 import { normalizeImageUrl, getDisplayName } from "@/lib/utils";
 import Image from "next/image";
 import { useState } from "react";
+import { ShoppingCart } from "lucide-react";
 
 interface ProductCardProps {
   product: Product;
@@ -102,12 +103,13 @@ export default function ProductCard({ product, productBadgeRenderer }: ProductCa
           {displayDescription}
         </CardDescription>
       </CardContent>
-      <CardFooter className="flex items-center justify-between p-4 pt-0">
-        <p className="text-sm font-semibold">
+      <CardFooter className="flex items-center justify-between p-4 pt-0 gap-2">
+        <p className="text-sm font-semibold truncate">
           {(product.price || 0).toLocaleString('pt-PT', { style: 'currency', currency: 'AOA', minimumFractionDigits: 0, maximumFractionDigits: 0 })}
         </p>
-        <Button onClick={() => addToCart(product)} size="sm">
-          {t('common.add_to_cart')}
+        <Button onClick={() => addToCart(product)} size="sm" className="flex-shrink-0">
+          <ShoppingCart className="h-4 w-4 sm:mr-2" />
+          <span className="hidden sm:inline">{t('common.add_to_cart')}</span>
         </Button>
       </CardFooter>
     </Card>

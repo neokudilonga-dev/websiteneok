@@ -197,10 +197,10 @@ export function DeliverySettingsPanel() {
               </p>
             </div>
 
-            <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-md">
-              <p className="text-sm text-amber-800">
-                <strong>Nota:</strong> As entregas em Viana/Kilamba e zonas adjacentes 
-                não têm isenção de taxa (sempre pagas).
+            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
+              <p className="text-sm text-green-800">
+                <strong>Isenção:</strong> Todas as entregas (incluindo Viana/Kilamba) 
+                têm entrega gratuita acima do valor de isenção definido.
               </p>
             </div>
           </div>

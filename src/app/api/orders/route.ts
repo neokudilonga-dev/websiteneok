@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
 import { firestore } from '@/lib/firebase-admin';
 import type { Order } from '@/lib/types';
+import { sendOrderConfirmationEmail, sendAdminOrderNotification } from '@/lib/email-service';
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   try {
     const orderData = await request.json();
-    
+
     if (!firestore) {
       return NextResponse.json({ success: false, error: 'Firestore not initialized' }, { status: 500 });
     }
@@ -20,13 +21,26 @@ export async function POST(request: Request) {
       deliveryStatus: 'not_delivered',
       createdAt: new Date().toISOString()
     };
-    
+
     await orderRef.set(order);
-    
-    return NextResponse.json({ 
-      success: true, 
+
+    // Send email notifications (non-blocking)
+    try {
+      // Send confirmation to customer if email provided
+      if (order.email) {
+        await sendOrderConfirmationEmail(order);
+      }
+      // Send notification to admin
+      await sendAdminOrderNotification(order);
+    } catch (emailError) {
+      // Log email errors but don't fail the order creation
+      console.error('Error sending order emails:', emailError);
+    }
+
+    return NextResponse.json({
+      success: true,
       reference: orderRef.id,
-      order 
+      order
     });
   } catch (error: any) {
     console.error('Error creating order:', error);

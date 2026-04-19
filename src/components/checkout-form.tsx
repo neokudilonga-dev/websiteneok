@@ -163,9 +163,15 @@ export default function CheckoutForm() {
         }
         return fee;
       }
-      case "outside-zones":
-        // Viana/Kilamba - no exemption
-        return settings.feeOutsideZones ?? 4000;
+      case "outside-zones": {
+        // Viana/Kilamba - check exemption (same threshold as outside Talatona)
+        const fee = settings.feeOutsideZones ?? 4000;
+        const exemption = settings.exemptionOutsideTalatona ?? 80000;
+        if (exemption > 0 && cartTotal >= exemption) {
+          return 0; // Exempt
+        }
+        return fee;
+      }
       case "levantamento":
         return 0; // Pickup at school - always free
       case "levantamento-local":
