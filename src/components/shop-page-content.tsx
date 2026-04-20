@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight, ShoppingCart, Search, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useCart } from "@/context/cart-context";
+import Link from "next/link";
 
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -516,9 +517,9 @@ export const ShopPageContent = ({
               ) : (
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                       {schools.map(school => (
-                           <button
+                           <Link
                             key={school.id}
-                            onClick={() => setSelectedSchool(school)}
+                            href={`/escola/${school.id}`}
                             className="flex flex-col items-center justify-center rounded-lg border bg-secondary p-6 text-center transition-all hover:shadow-lg"
                           >
                             <h3 className="font-headline text-xl font-semibold tracking-tight mb-3">
@@ -534,7 +535,7 @@ export const ShopPageContent = ({
                                 />
                               </div>
                             )}
-                            </button>
+                            </Link>
                       ))}
                   </div>
               )}

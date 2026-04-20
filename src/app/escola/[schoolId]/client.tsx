@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, ArrowLeft, BookOpen, Eye, EyeOff, Check } from "lucide-react";
+import { ShoppingCart, ArrowLeft, BookOpen, Eye, EyeOff, Check, Share2, Copy, CheckCircle2 } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import { useLanguage } from "@/context/language-context";
 import Header from "@/components/header";
@@ -76,6 +76,19 @@ export default function SchoolReadingPlanClient({
   }, [productsByGrade]);
 
   const [selectedGrade, setSelectedGrade] = useState<string>("");
+  const [copied, setCopied] = useState(false);
+
+  // Copy link function
+  const copyLink = async () => {
+    const url = window.location.href;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
 
   // Scroll to top when page loads - delay to ensure content is rendered
   useEffect(() => {
@@ -168,6 +181,24 @@ export default function SchoolReadingPlanClient({
             <p className="mt-1 text-sm text-blue-600/70">
               {t('shop.direct_link_notice') || 'Link directo para pais da'} {schoolName}
             </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={copyLink}
+              className="mt-4 gap-2"
+            >
+              {copied ? (
+                <>
+                  <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  Link Copiado!
+                </>
+              ) : (
+                <>
+                  <Copy className="h-4 w-4" />
+                  Copiar Link para Partilhar
+                </>
+              )}
+            </Button>
           </div>
 
           {/* Grade Selection */}

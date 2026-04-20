@@ -42,27 +42,16 @@ export function ImageUpload({ label = 'Imagem', value, onChange, multiple = fals
 
     // Check if user is authenticated with Firebase client-side
     if (!auth.currentUser) {
-      console.warn("Upload attempted while Firebase auth is not ready. Waiting...");
-      // Optional: you could wait or show a toast
+      console.warn("Upload attempted while Firebase auth is not ready. User:", auth.currentUser);
       toast({
-        title: 'Autenticação em curso',
-        description: 'Aguarde um momento enquanto validamos a sua sessão...',
+        title: 'Erro de Autenticação',
+        description: 'Precisa de estar autenticado para carregar imagens. Recarregue a página ou faça login novamente.',
+        variant: 'destructive',
       });
-      // Try to wait a bit for Firebase to restore session
-      let attempts = 0;
-      while (!auth.currentUser && attempts < 10) {
-        await new Promise(r => setTimeout(r, 500));
-        attempts++;
-      }
-      if (!auth.currentUser) {
-        toast({
-          title: 'Erro de Autenticação',
-          description: 'Não foi possível verificar a sua sessão. Por favor, faça login novamente.',
-          variant: 'destructive',
-        });
-        return;
-      }
+      return;
     }
+
+    console.log(`Starting upload for ${files.length} file(s) to folder: ${folder || 'uploads'}`);
 
     setIsUploading(true);
     setProgress(0);
@@ -97,11 +86,14 @@ export function ImageUpload({ label = 'Imagem', value, onChange, multiple = fals
       }
       
       if (uploaded.length === 0 && filesArray.length > 0) {
+        console.error('All uploads failed. uploadedRaw:', uploadedRaw);
         toast({
           title: 'Falha no upload',
-          description: 'Não foi possível carregar nenhuma imagem. Tente novamente.',
+          description: 'Não foi possível carregar nenhuma imagem. Verifique se tem permissões ou tente um ficheiro menor.',
           variant: 'destructive',
         });
+      } else {
+        console.log(`Successfully uploaded ${uploaded.length} file(s)`);
       }
     } catch (e) {
       console.error(e);
@@ -305,8 +297,10 @@ export function ImageUpload({ label = 'Imagem', value, onChange, multiple = fals
 }
 
 async function uploadToFirebase(file: File, folder?: string, onProgress?: (p: number) => void): Promise<string | null> {
-  const base = folder ? folder.replace(/\/+$/,'') : 'uploads';
+  const base = folder ? folder.replace(/\/+$/, '') : 'uploads';
   const key = `${base}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+  console.log(`Uploading to Firebase Storage path: ${key}`);
+  console.log(`Firebase auth state:`, auth.currentUser?.uid || 'not authenticated');
   const imageRef = ref(storage, key);
   return await new Promise<string | null>((resolve, reject) => {
     const task = uploadBytesResumable(imageRef, file, { contentType: file.type || 'application/octet-stream' });
