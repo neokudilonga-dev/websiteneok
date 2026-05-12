@@ -6,6 +6,7 @@ export const pt = {
     contact: 'Contactos',
     cart: 'Carrinho',
     track_order: 'Consultar Encomenda',
+    language: 'Idioma',
   },
   landing: {
     hero_title: 'Aprender é divertido com a Neokudilonga',
@@ -66,9 +67,9 @@ export const pt = {
     didactic_aids: 'Auxiliares Didáticos',
     essential: 'Essencial',
     most_complete: 'Mais Completo',
-    mandatory_kit: 'Kit Obrigatório ({{count}} items)',
+    mandatory_kit: 'Kit Obrigatório ({{count}} itens)',
     buy_all_mandatory: 'Compre todos os items obrigatórios para o ano letivo.',
-    complete_kit: 'Kit Completo ({{count}} items)',
+    complete_kit: 'Kit Completo ({{count}} itens)',
     buy_all_for_school_year: 'Compre o kit completo com todos os livros (Obrigatórios + Recomendados).',
     buy_separately: 'Comprar em separado',
     view_kit_contents: 'Ver livros incluídos',
@@ -106,7 +107,7 @@ export const pt = {
   },
   grades: {
     reception: 'Iniciação',
-    others: 'Auxiliares Didáticos',
+    others: 'Outros',
     grade: 'ª Classe',
   },
   common: {
@@ -232,7 +233,6 @@ export const pt = {
     payment_pending_description: 'Para confirmar a sua encomenda, por favor realize o pagamento por transferência bancária para o IBAN abaixo e envie o comprovativo para um dos nossos contactos.',
     next_steps_message: 'Receberá um e-mail automático a confirmar o que encomendou. Posteriormente, será contactado/a via WhatsApp para os próximos passos.',
     back_to_shop: 'Voltar à Loja',
-    other_books: 'Outros Livros',
     delivery_cost_note: 'O custo de entrega é calculado por cada deslocação.',
   },
   track_order_page: {
@@ -294,6 +294,8 @@ export const pt = {
     mandatory: 'Obrigatório',
     recommended: 'Recomendado',
     didactic_aids: 'Auxiliares Didáticos',
+    outros: 'Outros',
+    delete_warning: 'Este item tem uma imagem. Eliminá-lo também removerá a imagem do armazenamento. Esta ação não pode ser desfeita.',
   },
   games_page: {
     title: 'Jogos e Outros',

@@ -53,8 +53,8 @@ export default function SchoolReadingPlanClient({
         gradeProducts.optional.push(product);
       }
       
-      // Add to complete list (all books for this grade)
-      if (!gradeProducts.complete.find(p => p.id === product.id)) {
+      // Add to complete list (all books for this grade) - but NOT for 'outros'
+      if (gradeKey !== 'outros' && !gradeProducts.complete.find(p => p.id === product.id)) {
         gradeProducts.complete.push(product);
       }
     });
@@ -124,20 +124,38 @@ export default function SchoolReadingPlanClient({
   };
 
   const getGradeDisplayName = (grade: string) => {
-    if (grade === 'other') return t('shop.other_books');
-    if (grade.includes('1')) return `1º ${t('shop.ano')}`;
-    if (grade.includes('2')) return `2º ${t('shop.ano')}`;
-    if (grade.includes('3')) return `3º ${t('shop.ano')}`;
-    if (grade.includes('4')) return `4º ${t('shop.ano')}`;
-    if (grade.includes('5')) return `5º ${t('shop.ano')}`;
-    if (grade.includes('6')) return `6º ${t('shop.ano')}`;
-    if (grade.includes('7')) return `7º ${t('shop.ano')}`;
-    if (grade.includes('8')) return `8º ${t('shop.ano')}`;
-    if (grade.includes('9')) return `9º ${t('shop.ano')}`;
-    if (grade.includes('10')) return `10º ${t('shop.ano')}`;
-    if (grade.includes('11')) return `11º ${t('shop.ano')}`;
-    if (grade.includes('12')) return `12º ${t('shop.ano')}`;
-    if (grade.includes('13')) return `13º ${t('shop.ano')}`;
+    if (grade.includes('reception')) return t('grades.reception');
+    if (grade.includes('outros')) return t('grades.others');
+    
+    // Use proper English ordinal numbers
+    const getOrdinal = (num: string) => {
+      const n = parseInt(num);
+      if (language === 'pt') {
+        // Portuguese ordinal symbols
+        const ordinals = ['º', 'º', 'º', 'º', 'º', 'º', 'º', 'º', 'º', 'º', 'º', 'º', 'º', 'º', 'º'];
+        return `${n}${ordinals[n - 1] || 'º'} ${t('shop.ano')}`;
+      } else {
+        // English ordinal numbers
+        if (n === 1) return `1st ${t('grades.grade')}`;
+        if (n === 2) return `2nd ${t('grades.grade')}`;
+        if (n === 3) return `3rd ${t('grades.grade')}`;
+        return `${n}th ${t('grades.grade')}`;
+      }
+    };
+    
+    if (grade.includes('1')) return getOrdinal('1');
+    if (grade.includes('2')) return getOrdinal('2');
+    if (grade.includes('3')) return getOrdinal('3');
+    if (grade.includes('4')) return getOrdinal('4');
+    if (grade.includes('5')) return getOrdinal('5');
+    if (grade.includes('6')) return getOrdinal('6');
+    if (grade.includes('7')) return getOrdinal('7');
+    if (grade.includes('8')) return getOrdinal('8');
+    if (grade.includes('9')) return getOrdinal('9');
+    if (grade.includes('10')) return getOrdinal('10');
+    if (grade.includes('11')) return getOrdinal('11');
+    if (grade.includes('12')) return getOrdinal('12');
+    if (grade.includes('13')) return getOrdinal('13');
     return grade;
   };
 
