@@ -260,9 +260,10 @@ export const ShopPageContent = ({
     const lowerGrade = grade ? String(grade).toLowerCase() : "";
     if (lowerGrade === 'iniciação' || lowerGrade === 'reception') return t('grades.reception');
     if (lowerGrade === 'didactic_aids') return t('shop.didactic_aids');
-    if (lowerGrade === '1-4') return "1ª - 4ª Classe (Auxiliares Didáticos)";
-    if (lowerGrade === '5-9') return "5ª - 9ª Classe (Auxiliares Didáticos)";
-    if (lowerGrade === '10-12') return "10ª - 12ª Classe (Auxiliares Didáticos)";
+    if (lowerGrade === 'outros' || lowerGrade === 'others') return t('grades.others');
+    if (lowerGrade === '1-4') return language === 'pt' ? "1ª - 4ª Classe (Auxiliares Didáticos)" : "1st - 4th Grade (Didactic Aids)";
+    if (lowerGrade === '5-9') return language === 'pt' ? "5ª - 9ª Classe (Auxiliares Didáticos)" : "5th - 9th Grade (Didactic Aids)";
+    if (lowerGrade === '10-12') return language === 'pt' ? "10ª - 12ª Classe (Auxiliares Didáticos)" : "10th - 12th Grade (Didactic Aids)";
     return `${grade || ''}${t('grades.grade')}`;
   };
 
@@ -337,6 +338,7 @@ export const ShopPageContent = ({
                         </AccordionTrigger>
                         <AccordionContent>
                            {String(grade).toLowerCase() === 'didactic_aids' || 
+                            String(grade).toLowerCase() === 'outros' ||
                             String(grade).toLowerCase() === '1-4' || 
                             String(grade).toLowerCase() === '5-9' || 
                             String(grade).toLowerCase() === '10-12' || 
@@ -387,7 +389,7 @@ export const ShopPageContent = ({
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex flex-col">
                           <Badge className="w-fit mb-2 bg-blue-600 hover:bg-blue-700 text-white border-none">{t('shop.essential')}</Badge>
-                          <h3 className="font-headline text-2xl font-bold text-blue-900">{t('shop.mandatory_kit', { count: gradeProducts.mandatory.length })}</h3>
+                          <h3 className="font-headline text-2xl font-bold text-blue-900">{t('shop.mandatory_kit').replace('{{count}}', String(gradeProducts.mandatory.length))}</h3>
                         </div>
                       </div>
                       <p className="text-blue-800/80 mb-4 flex-grow">{t('shop.buy_all_mandatory')}</p>
@@ -435,10 +437,7 @@ export const ShopPageContent = ({
                         <div className="flex flex-col">
                           <Badge className="w-fit mb-2 bg-amber-500 hover:bg-amber-600 text-white border-none">Completo</Badge>
                           <h3 className="font-headline text-2xl font-bold text-amber-900">
-                            {t('shop.complete_kit', { 
-                              grade: getGradeDisplayName(grade), 
-                              count: gradeProducts.mandatory.length + gradeProducts.recommended.length 
-                            })}
+                            {t('shop.complete_kit').replace('{{count}}', String(gradeProducts.mandatory.length + gradeProducts.recommended.length))}
                           </h3>
                         </div>
                       </div>

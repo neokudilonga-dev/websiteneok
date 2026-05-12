@@ -143,6 +143,11 @@ export default function SchoolReadingPlanClient({
       }
     };
     
+    // Check for multi-digit numbers first to avoid conflicts
+    if (grade.includes('10')) return getOrdinal('10');
+    if (grade.includes('11')) return getOrdinal('11');
+    if (grade.includes('12')) return getOrdinal('12');
+    if (grade.includes('13')) return getOrdinal('13');
     if (grade.includes('1')) return getOrdinal('1');
     if (grade.includes('2')) return getOrdinal('2');
     if (grade.includes('3')) return getOrdinal('3');
@@ -152,10 +157,6 @@ export default function SchoolReadingPlanClient({
     if (grade.includes('7')) return getOrdinal('7');
     if (grade.includes('8')) return getOrdinal('8');
     if (grade.includes('9')) return getOrdinal('9');
-    if (grade.includes('10')) return getOrdinal('10');
-    if (grade.includes('11')) return getOrdinal('11');
-    if (grade.includes('12')) return getOrdinal('12');
-    if (grade.includes('13')) return getOrdinal('13');
     return grade;
   };
 
@@ -384,7 +385,7 @@ export default function SchoolReadingPlanClient({
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="flex-1">
                           <h3 className="text-lg font-semibold text-green-900">
-                            {t('shop.complete_kit') || 'Kit Completo'} - {getGradeDisplayName(selectedGrade)}
+                            {(t('shop.complete_kit') || 'Kit Completo').replace('{{count}}', String(gradeProducts.complete.length))} - {getGradeDisplayName(selectedGrade)}
                           </h3>
                           <p className="text-green-700/70 text-sm mt-1">
                             {t('shop.buy_all_books') || 'Todos os livros do ano (obrigatórios + opcionais)'}
