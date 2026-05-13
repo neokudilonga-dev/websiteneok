@@ -339,18 +339,8 @@ export const ShopPageContent = ({
                         <AccordionContent>
                            {String(grade).toLowerCase() === 'didactic_aids' || 
                             String(grade).toLowerCase() === 'outros' ||
-                            String(grade).toLowerCase() === '1-4' || 
-                            String(grade).toLowerCase() === '5-9' || 
-                            String(grade).toLowerCase() === '10-12' || 
                             showIndividual === grade ? (
                               <div className="space-y-8">
-                                {(String(grade).toLowerCase() === '1-4' || 
-                                  String(grade).toLowerCase() === '5-9' || 
-                                  String(grade).toLowerCase() === '10-12') && (
-                                  <div className="rounded-md bg-blue-50 p-4 text-sm text-blue-700">
-                                    {t('shop.individual_purchase_only')}
-                                  </div>
-                                )}
                                 
                                 {gradeProducts.mandatory.length > 0 && (
                                   <div className="space-y-4">
