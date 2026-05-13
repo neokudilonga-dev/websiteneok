@@ -64,6 +64,10 @@ export default function SchoolReadingPlanClient({
 
   const grades = useMemo(() => {
     return Array.from(productsByGrade.keys()).sort((a, b) => {
+      // Handle 'outros' specially - always sort last
+      if (a === 'outros' && b !== 'outros') return 1;
+      if (b === 'outros' && a !== 'outros') return -1;
+      
       // Try to sort numerically first
       const numA = parseInt(a);
       const numB = parseInt(b);
@@ -377,15 +381,15 @@ export default function SchoolReadingPlanClient({
                 </div>
               )}
 
-              {/* Complete Kit (All Books) */}
-              {gradeProducts.complete.length > 0 && (
+              {/* Complete Kit (All Books) - only show if there are recommended books */}
+              {gradeProducts.optional.length > 0 && (
                 <div className="mt-8">
                   <Card className="border-green-200 bg-gradient-to-br from-green-50 to-white">
                     <CardContent className="p-6">
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="flex-1">
                           <h3 className="text-lg font-semibold text-green-900">
-                            {(t('shop.complete_kit') || 'Kit Completo').replace('{{count}}', String(gradeProducts.complete.length))} - {getGradeDisplayName(selectedGrade)}
+                            {language === 'pt' ? `Kit Completo (${gradeProducts.complete.length} itens)` : `Complete Kit (${gradeProducts.complete.length} items)`} - {getGradeDisplayName(selectedGrade)}
                           </h3>
                           <p className="text-green-700/70 text-sm mt-1">
                             {t('shop.buy_all_books') || 'Todos os livros do ano (obrigatórios + opcionais)'}
