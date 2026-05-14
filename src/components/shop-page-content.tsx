@@ -140,7 +140,14 @@ export const ShopPageContent = ({
       }
       const product = productsById[item.productId];
       if (product && product.stockStatus !== 'sold_out') {
-        const gradeKey: string = String(item.grade || 'didactic_aids'); 
+        // Group all "didactic_aids" items together as "outros"
+        let gradeKey: string;
+        if (item.status === 'didactic_aids') {
+          gradeKey = 'outros';
+        } else {
+          gradeKey = String(item.grade || 'didactic_aids');
+        }
+        
         if (!grades[gradeKey]) {
           grades[gradeKey] = { mandatory: [], recommended: [], didactic_aids: [], all: [] };
         }
@@ -337,8 +344,7 @@ export const ShopPageContent = ({
                           {getGradeDisplayName(grade)}
                         </AccordionTrigger>
                         <AccordionContent>
-                           {String(grade).toLowerCase() === 'didactic_aids' || 
-                            String(grade).toLowerCase() === 'outros' ||
+                           {String(grade).toLowerCase() === 'outros' ||
                             showIndividual === grade ? (
                               <div className="space-y-8">
                                 
@@ -373,8 +379,8 @@ export const ShopPageContent = ({
                            ) : (
                               <div className="space-y-6">
                                   <div className="grid gap-6 lg:grid-cols-2">
-              {/* Kit Obrigatório */}
-              {gradeProducts.mandatory.length > 0 && (
+              {/* Kit Obrigatório - don't show for 'outros' */}
+              {gradeProducts.mandatory.length > 0 && String(grade).toLowerCase() !== 'outros' && (
                   <div key="mandatory-kit" className="flex flex-col rounded-xl border-2 border-blue-600 bg-blue-50/30 p-6 shadow-sm transition-all hover:shadow-md">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex flex-col">
@@ -420,8 +426,8 @@ export const ShopPageContent = ({
                   </div>
               )}
 
-              {/* Kit Completo (Obrigatórios + Recomendados) */}
-              {gradeProducts.recommended.length > 0 && (
+              {/* Kit Completo (Obrigatórios + Recomendados) - don't show for 'outros' */}
+              {gradeProducts.recommended.length > 0 && String(grade).toLowerCase() !== 'outros' && (
                   <div key="complete-kit" className="flex flex-col rounded-xl border-2 border-amber-500 bg-amber-50/30 p-6 shadow-sm transition-all hover:shadow-md">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex flex-col">

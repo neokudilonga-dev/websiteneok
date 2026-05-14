@@ -40,7 +40,14 @@ export default function SchoolReadingPlanClient({
       const product = allProducts.find((p) => p.id === item.productId);
       if (!product) return;
 
-      const gradeKey = String(item.grade);
+      // Group all "didactic_aids" items together as "outros"
+      let gradeKey: string;
+      if (item.status === 'didactic_aids') {
+        gradeKey = 'outros';
+      } else {
+        gradeKey = String(item.grade);
+      }
+      
       if (!gradeMap.has(gradeKey)) {
         gradeMap.set(gradeKey, { mandatory: [], optional: [], complete: [] });
       }
@@ -53,7 +60,7 @@ export default function SchoolReadingPlanClient({
         gradeProducts.optional.push(product);
       }
       
-      // Add to complete list (all books for this grade) - but NOT for 'outros'
+      // Add to complete list (all books for this grade) - but NOT for 'outros' or 'didactic_aids'
       if (gradeKey !== 'outros' && !gradeProducts.complete.find(p => p.id === product.id)) {
         gradeProducts.complete.push(product);
       }
