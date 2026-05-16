@@ -19,6 +19,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useData } from "@/context/data-context";
 import { useLanguage } from "@/context/language-context";
 import { getDisplayName, normalizeSearch, normalizeImageUrl } from "@/lib/utils";
+import {
+  isDidacticGradeRange,
+  normalizeGradeKey,
+  resolveReadingPlanBucket,
+  sortGradeKeys,
+} from "@/lib/reading-plan-utils";
 import Image from "next/image";
 import type { School, Product, ReadingPlanItem, Category } from "@/lib/types";
 import { SidebarMenuSkeleton } from "@/components/ui/sidebar";
@@ -114,24 +120,6 @@ export const ShopPageContent = ({
     ? (readingPlan || []).filter((item) => item && item.schoolId === selectedSchool.id && item.grade !== undefined && item.grade !== null)
     : [], [selectedSchool, readingPlan]);
 
-  const sortGradeKeys = (a: string, b: string) => {
-    const getOrder = (grade: string | undefined) => {
-        if (!grade) return 999;
-        const lowerGrade = String(grade).toLowerCase();
-        if (lowerGrade === 'iniciação' || lowerGrade === 'reception') return -1;
-        
-        if (lowerGrade === 'outros' || lowerGrade === 'others' || lowerGrade === 'didactic_aids') return 100;
-        
-        if (lowerGrade === '1-4' || lowerGrade === '1st-4th') return 4.5;
-        if (lowerGrade === '5-9' || lowerGrade === '5th-9th') return 9.5;
-        if (lowerGrade === '10-12' || lowerGrade === '10th-12th') return 12.5;
-        
-        const num = parseInt(lowerGrade, 10);
-        return isNaN(num) ? 99 : num;
-    };
-    return getOrder(a) - getOrder(b);
-  };
-
   const productsByGrade = useMemo(() => {
     const grades: { [key: string]: GradeProducts } = {};
     for (const item of schoolReadingPlan) {
@@ -140,16 +128,17 @@ export const ShopPageContent = ({
       }
       const product = productsById[item.productId];
       if (product && product.stockStatus !== 'sold_out') {
-        const gradeKey: string = String(item.grade || 'didactic_aids'); 
+        const gradeKey = normalizeGradeKey(item.grade ?? "didactic_aids");
         if (!grades[gradeKey]) {
           grades[gradeKey] = { mandatory: [], recommended: [], didactic_aids: [], all: [] };
         }
-        if (item.status === 'mandatory') {
-            grades[gradeKey].mandatory.push(product);
-        } else if (item.status === 'recommended') {
-            grades[gradeKey].recommended.push(product);
+        const bucket = resolveReadingPlanBucket(gradeKey, item.status);
+        if (bucket === "mandatory") {
+          grades[gradeKey].mandatory.push(product);
+        } else if (bucket === "recommended") {
+          grades[gradeKey].recommended.push(product);
         } else {
-            grades[gradeKey].didactic_aids.push(product);
+          grades[gradeKey].didactic_aids.push(product);
         }
         grades[gradeKey].all.push(product);
       }
@@ -257,7 +246,7 @@ export const ShopPageContent = ({
   }
 
   const getGradeDisplayName = (grade: string) => {
-    const lowerGrade = grade ? String(grade).toLowerCase() : "";
+    const lowerGrade = normalizeGradeKey(grade);
     if (lowerGrade === 'iniciação' || lowerGrade === 'reception') return t('grades.reception');
     if (lowerGrade === 'didactic_aids') return t('shop.didactic_aids');
     if (lowerGrade === 'outros' || lowerGrade === 'others') return t('grades.others');
@@ -337,7 +326,8 @@ export const ShopPageContent = ({
                           {getGradeDisplayName(grade)}
                         </AccordionTrigger>
                         <AccordionContent>
-                           {String(grade).toLowerCase() === 'outros' ||
+                           {isDidacticGradeRange(grade) ||
+                            String(grade).toLowerCase() === 'outros' ||
                             showIndividual === grade ? (
                               <div className="space-y-8">
                                 
@@ -374,10 +364,7 @@ export const ShopPageContent = ({
                                   <div className="grid gap-6 lg:grid-cols-2">
               {/* Kit Obrigatório - don't show for 'outros' or didactic aids grade ranges */}
               {gradeProducts.mandatory.length > 0 && 
-               String(grade).toLowerCase() !== 'outros' &&
-               String(grade).toLowerCase() !== '1-4' &&
-               String(grade).toLowerCase() !== '5-9' &&
-               String(grade).toLowerCase() !== '10-12' && (
+               !isDidacticGradeRange(grade) && (
                   <div key="mandatory-kit" className="flex flex-col rounded-xl border-2 border-blue-600 bg-blue-50/30 p-6 shadow-sm transition-all hover:shadow-md">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex flex-col">
@@ -425,10 +412,7 @@ export const ShopPageContent = ({
 
               {/* Kit Completo (Obrigatórios + Recomendados) - don't show for 'outros' or didactic aids grade ranges */}
               {gradeProducts.recommended.length > 0 && 
-               String(grade).toLowerCase() !== 'outros' &&
-               String(grade).toLowerCase() !== '1-4' &&
-               String(grade).toLowerCase() !== '5-9' &&
-               String(grade).toLowerCase() !== '10-12' && (
+               !isDidacticGradeRange(grade) && (
                   <div key="complete-kit" className="flex flex-col rounded-xl border-2 border-amber-500 bg-amber-50/30 p-6 shadow-sm transition-all hover:shadow-md">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex flex-col">

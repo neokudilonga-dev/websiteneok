@@ -11,6 +11,12 @@ import { useCart } from "@/context/cart-context";
 import { useLanguage } from "@/context/language-context";
 import Header from "@/components/header";
 import { normalizeImageUrl, getDisplayName } from "@/lib/utils";
+import {
+  isDidacticGradeRange,
+  normalizeGradeKey,
+  resolveReadingPlanBucket,
+  sortGradeKeys,
+} from "@/lib/reading-plan-utils";
 import type { School, Product, ReadingPlanItem, CartItem } from "@/lib/types";
 
 interface GradeProducts {
@@ -18,32 +24,6 @@ interface GradeProducts {
   optional: Product[];
   didactic_aids: Product[];
   complete: Product[];
-}
-
-function isDidacticGradeRange(grade: string): boolean {
-  const lower = String(grade).toLowerCase();
-  return (
-    lower === "1-4" ||
-    lower === "5-9" ||
-    lower === "10-12" ||
-    lower === "outros" ||
-    lower === "others" ||
-    lower === "didactic_aids"
-  );
-}
-
-function sortGradeKeys(a: string, b: string): number {
-  const getOrder = (grade: string) => {
-    const lower = String(grade).toLowerCase();
-    if (lower === "iniciação" || lower === "reception") return -1;
-    if (lower === "outros" || lower === "others" || lower === "didactic_aids") return 100;
-    if (lower === "1-4") return 4.5;
-    if (lower === "5-9") return 9.5;
-    if (lower === "10-12") return 12.5;
-    const num = parseInt(lower, 10);
-    return Number.isNaN(num) ? 99 : num;
-  };
-  return getOrder(a) - getOrder(b);
 }
 
 interface SchoolReadingPlanClientProps {
@@ -73,18 +53,19 @@ export default function SchoolReadingPlanClient({
       const product = allProducts.find((p) => p.id === item.productId);
       if (!product || product.stockStatus === "sold_out") return;
 
-      const gradeKey = String(item.grade);
+      const gradeKey = normalizeGradeKey(item.grade);
       if (!gradeMap.has(gradeKey)) {
         gradeMap.set(gradeKey, { mandatory: [], optional: [], didactic_aids: [], complete: [] });
       }
 
       const gradeProducts = gradeMap.get(gradeKey)!;
+      const bucket = resolveReadingPlanBucket(gradeKey, item.status);
 
-      if (item.status === "mandatory") {
+      if (bucket === "mandatory") {
         gradeProducts.mandatory.push(product);
-      } else if (item.status === "recommended") {
+      } else if (bucket === "recommended") {
         gradeProducts.optional.push(product);
-      } else if (item.status === "didactic_aids") {
+      } else {
         gradeProducts.didactic_aids.push(product);
       }
 
@@ -173,7 +154,7 @@ export default function SchoolReadingPlanClient({
   };
 
   const getGradeDisplayName = (grade: string) => {
-    const lowerGrade = grade ? String(grade).toLowerCase() : "";
+    const lowerGrade = normalizeGradeKey(grade);
     if (lowerGrade === "iniciação" || lowerGrade === "reception") return t("grades.reception");
     if (lowerGrade === "didactic_aids") return t("shop.didactic_aids");
     if (lowerGrade === "outros" || lowerGrade === "others") return t("grades.others");
