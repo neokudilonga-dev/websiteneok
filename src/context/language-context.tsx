@@ -45,20 +45,38 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const t = useCallback((key: string, options?: { [key: string]: string | number }) => {
-    let translation = getNestedValue(translations[language], key);
+    let translationKey = key;
+    if (options && typeof options.count === 'number') {
+      if (options.count === 1) {
+        translationKey = `${key}_one`;
+      } else {
+        translationKey = `${key}_other`;
+      }
+    }
+
+    let translation = getNestedValue(translations[language], translationKey);
+
+    if (translation === undefined || translation === null) {
+      // Fallback to original key if plural form not found
+      translation = getNestedValue(translations[language], key);
+    }
 
     if (translation === undefined || translation === null) {
       // Fallback to Portuguese if translation is not found
+      translation = getNestedValue(translations.pt, translationKey);
+    }
+
+    if (translation === undefined || translation === null) {
       translation = getNestedValue(translations.pt, key);
     }
 
     if (translation === undefined || translation === null) {
-      console.warn(`Translation for key '${key}' not found.`);
+      console.warn(`Translation for key '${key}' (or plural form '${translationKey}') not found.`);
       return key;
     }
 
     if (typeof translation !== 'string') {
-      console.warn(`Translation for key '${key}' is not a string. Returning key.`);
+      console.warn(`Translation for key '${key}' (or plural form '${translationKey}') is not a string. Returning key.`);
       return key;
     }
 

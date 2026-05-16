@@ -140,14 +140,7 @@ export const ShopPageContent = ({
       }
       const product = productsById[item.productId];
       if (product && product.stockStatus !== 'sold_out') {
-        // Group all "didactic_aids" items together as "outros"
-        let gradeKey: string;
-        if (item.status === 'didactic_aids') {
-          gradeKey = 'outros';
-        } else {
-          gradeKey = String(item.grade || 'didactic_aids');
-        }
-        
+        const gradeKey: string = String(item.grade || 'didactic_aids'); 
         if (!grades[gradeKey]) {
           grades[gradeKey] = { mandatory: [], recommended: [], didactic_aids: [], all: [] };
         }
@@ -379,13 +372,17 @@ export const ShopPageContent = ({
                            ) : (
                               <div className="space-y-6">
                                   <div className="grid gap-6 lg:grid-cols-2">
-              {/* Kit Obrigatório - don't show for 'outros' */}
-              {gradeProducts.mandatory.length > 0 && String(grade).toLowerCase() !== 'outros' && (
+              {/* Kit Obrigatório - don't show for 'outros' or didactic aids grade ranges */}
+              {gradeProducts.mandatory.length > 0 && 
+               String(grade).toLowerCase() !== 'outros' &&
+               String(grade).toLowerCase() !== '1-4' &&
+               String(grade).toLowerCase() !== '5-9' &&
+               String(grade).toLowerCase() !== '10-12' && (
                   <div key="mandatory-kit" className="flex flex-col rounded-xl border-2 border-blue-600 bg-blue-50/30 p-6 shadow-sm transition-all hover:shadow-md">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex flex-col">
                           <Badge className="w-fit mb-2 bg-blue-600 hover:bg-blue-700 text-white border-none">{t('shop.essential')}</Badge>
-                          <h3 className="font-headline text-2xl font-bold text-blue-900">{language === 'pt' ? `Kit Obrigatório (${gradeProducts.mandatory.length} itens)` : `Mandatory Kit (${gradeProducts.mandatory.length} items)`}</h3>
+                          <h3 className="font-headline text-2xl font-bold text-blue-900">{t('shop.mandatory_kit', { count: gradeProducts.mandatory.length })}</h3>
                         </div>
                       </div>
                       <p className="text-blue-800/80 mb-4 flex-grow">{t('shop.buy_all_mandatory')}</p>
@@ -426,14 +423,18 @@ export const ShopPageContent = ({
                   </div>
               )}
 
-              {/* Kit Completo (Obrigatórios + Recomendados) - don't show for 'outros' */}
-              {gradeProducts.recommended.length > 0 && String(grade).toLowerCase() !== 'outros' && (
+              {/* Kit Completo (Obrigatórios + Recomendados) - don't show for 'outros' or didactic aids grade ranges */}
+              {gradeProducts.recommended.length > 0 && 
+               String(grade).toLowerCase() !== 'outros' &&
+               String(grade).toLowerCase() !== '1-4' &&
+               String(grade).toLowerCase() !== '5-9' &&
+               String(grade).toLowerCase() !== '10-12' && (
                   <div key="complete-kit" className="flex flex-col rounded-xl border-2 border-amber-500 bg-amber-50/30 p-6 shadow-sm transition-all hover:shadow-md">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex flex-col">
                           <Badge className="w-fit mb-2 bg-amber-500 hover:bg-amber-600 text-white border-none">Completo</Badge>
                           <h3 className="font-headline text-2xl font-bold text-amber-900">
-                            {language === 'pt' ? `Kit Completo (${gradeProducts.mandatory.length + gradeProducts.recommended.length} itens)` : `Complete Kit (${gradeProducts.mandatory.length + gradeProducts.recommended.length} items)`}
+                            {t('shop.complete_kit', { count: gradeProducts.mandatory.length + gradeProducts.recommended.length })}
                           </h3>
                         </div>
                       </div>

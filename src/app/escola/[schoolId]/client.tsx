@@ -13,6 +13,39 @@ import Header from "@/components/header";
 import { normalizeImageUrl, getDisplayName } from "@/lib/utils";
 import type { School, Product, ReadingPlanItem, CartItem } from "@/lib/types";
 
+interface GradeProducts {
+  mandatory: Product[];
+  optional: Product[];
+  didactic_aids: Product[];
+  complete: Product[];
+}
+
+function isDidacticGradeRange(grade: string): boolean {
+  const lower = String(grade).toLowerCase();
+  return (
+    lower === "1-4" ||
+    lower === "5-9" ||
+    lower === "10-12" ||
+    lower === "outros" ||
+    lower === "others" ||
+    lower === "didactic_aids"
+  );
+}
+
+function sortGradeKeys(a: string, b: string): number {
+  const getOrder = (grade: string) => {
+    const lower = String(grade).toLowerCase();
+    if (lower === "iniciação" || lower === "reception") return -1;
+    if (lower === "outros" || lower === "others" || lower === "didactic_aids") return 100;
+    if (lower === "1-4") return 4.5;
+    if (lower === "5-9") return 9.5;
+    if (lower === "10-12") return 12.5;
+    const num = parseInt(lower, 10);
+    return Number.isNaN(num) ? 99 : num;
+  };
+  return getOrder(a) - getOrder(b);
+}
+
 interface SchoolReadingPlanClientProps {
   school: School;
   products: Product[];
@@ -34,56 +67,61 @@ export default function SchoolReadingPlanClient({
 
   // Group products by grade from reading plan
   const productsByGrade = useMemo(() => {
-    const gradeMap = new Map<string, { mandatory: Product[]; optional: Product[]; complete: Product[] }>();
-    
+    const gradeMap = new Map<string, GradeProducts>();
+
     readingPlan.forEach((item) => {
       const product = allProducts.find((p) => p.id === item.productId);
-      if (!product) return;
+      if (!product || product.stockStatus === "sold_out") return;
 
-      // Group all "didactic_aids" items together as "outros"
-      let gradeKey: string;
-      if (item.status === 'didactic_aids') {
-        gradeKey = 'outros';
-      } else {
-        gradeKey = String(item.grade);
-      }
-      
+      const gradeKey = String(item.grade);
       if (!gradeMap.has(gradeKey)) {
-        gradeMap.set(gradeKey, { mandatory: [], optional: [], complete: [] });
+        gradeMap.set(gradeKey, { mandatory: [], optional: [], didactic_aids: [], complete: [] });
       }
 
       const gradeProducts = gradeMap.get(gradeKey)!;
-      
+
       if (item.status === "mandatory") {
         gradeProducts.mandatory.push(product);
       } else if (item.status === "recommended") {
         gradeProducts.optional.push(product);
+      } else if (item.status === "didactic_aids") {
+        gradeProducts.didactic_aids.push(product);
       }
-      
-      // Add to complete list (all books for this grade) - but NOT for 'outros' or 'didactic_aids'
-      if (gradeKey !== 'outros' && !gradeProducts.complete.find(p => p.id === product.id)) {
+
+      // Complete kit = mandatory + recommended only (never didactic aids)
+      if (
+        !isDidacticGradeRange(gradeKey) &&
+        (item.status === "mandatory" || item.status === "recommended") &&
+        !gradeProducts.complete.find((p) => p.id === product.id)
+      ) {
         gradeProducts.complete.push(product);
       }
+    });
+
+    // Deduplicate per grade
+    gradeMap.forEach((gradeProducts) => {
+      const uniq = (arr: Product[]) => {
+        const seen = new Set<string>();
+        return arr.filter((p) => {
+          if (!p?.id || seen.has(p.id)) return false;
+          seen.add(p.id);
+          return true;
+        });
+      };
+      gradeProducts.mandatory = uniq(gradeProducts.mandatory);
+      gradeProducts.optional = uniq(gradeProducts.optional);
+      gradeProducts.didactic_aids = uniq(gradeProducts.didactic_aids);
+      gradeProducts.complete = uniq([
+        ...gradeProducts.mandatory,
+        ...gradeProducts.optional,
+      ]);
     });
 
     return gradeMap;
   }, [readingPlan, allProducts]);
 
   const grades = useMemo(() => {
-    return Array.from(productsByGrade.keys()).sort((a, b) => {
-      // Handle 'outros' specially - always sort last
-      if (a === 'outros' && b !== 'outros') return 1;
-      if (b === 'outros' && a !== 'outros') return -1;
-      
-      // Try to sort numerically first
-      const numA = parseInt(a);
-      const numB = parseInt(b);
-      if (!isNaN(numA) && !isNaN(numB)) {
-        return numA - numB;
-      }
-      // Fall back to string comparison for non-numeric grades
-      return a.localeCompare(b);
-    });
+    return Array.from(productsByGrade.keys()).sort(sortGradeKeys);
   }, [productsByGrade]);
 
   const [selectedGrade, setSelectedGrade] = useState<string>("");
@@ -135,41 +173,38 @@ export default function SchoolReadingPlanClient({
   };
 
   const getGradeDisplayName = (grade: string) => {
-    if (grade.includes('reception')) return t('grades.reception');
-    if (grade.includes('outros')) return t('grades.others');
-    
-    // Use proper English ordinal numbers
-    const getOrdinal = (num: string) => {
-      const n = parseInt(num);
-      if (language === 'pt') {
-        // Portuguese ordinal symbols
-        const ordinals = ['º', 'º', 'º', 'º', 'º', 'º', 'º', 'º', 'º', 'º', 'º', 'º', 'º', 'º', 'º'];
-        return `${n}${ordinals[n - 1] || 'º'} ${t('shop.ano')}`;
-      } else {
-        // English ordinal numbers
-        if (n === 1) return `1st ${t('grades.grade')}`;
-        if (n === 2) return `2nd ${t('grades.grade')}`;
-        if (n === 3) return `3rd ${t('grades.grade')}`;
-        return `${n}th ${t('grades.grade')}`;
+    const lowerGrade = grade ? String(grade).toLowerCase() : "";
+    if (lowerGrade === "iniciação" || lowerGrade === "reception") return t("grades.reception");
+    if (lowerGrade === "didactic_aids") return t("shop.didactic_aids");
+    if (lowerGrade === "outros" || lowerGrade === "others") return t("grades.others");
+    if (lowerGrade === "1-4")
+      return language === "pt"
+        ? "1ª - 4ª Classe (Auxiliares Didáticos)"
+        : "1st - 4th Grade (Didactic Aids)";
+    if (lowerGrade === "5-9")
+      return language === "pt"
+        ? "5ª - 9ª Classe (Auxiliares Didáticos)"
+        : "5th - 9th Grade (Didactic Aids)";
+    if (lowerGrade === "10-12")
+      return language === "pt"
+        ? "10ª - 12ª Classe (Auxiliares Didáticos)"
+        : "10th - 12th Grade (Didactic Aids)";
+
+    const n = parseInt(grade, 10);
+    if (!Number.isNaN(n)) {
+      if (language === "pt") {
+        return `${n}º ${t("shop.ano")}`;
       }
-    };
-    
-    // Check for multi-digit numbers first to avoid conflicts
-    if (grade.includes('10')) return getOrdinal('10');
-    if (grade.includes('11')) return getOrdinal('11');
-    if (grade.includes('12')) return getOrdinal('12');
-    if (grade.includes('13')) return getOrdinal('13');
-    if (grade.includes('1')) return getOrdinal('1');
-    if (grade.includes('2')) return getOrdinal('2');
-    if (grade.includes('3')) return getOrdinal('3');
-    if (grade.includes('4')) return getOrdinal('4');
-    if (grade.includes('5')) return getOrdinal('5');
-    if (grade.includes('6')) return getOrdinal('6');
-    if (grade.includes('7')) return getOrdinal('7');
-    if (grade.includes('8')) return getOrdinal('8');
-    if (grade.includes('9')) return getOrdinal('9');
+      if (n === 1) return `1st ${t("grades.grade")}`;
+      if (n === 2) return `2nd ${t("grades.grade")}`;
+      if (n === 3) return `3rd ${t("grades.grade")}`;
+      return `${n}th ${t("grades.grade")}`;
+    }
     return grade;
   };
+
+  const selectedIsDidacticRange =
+    !!selectedGrade && isDidacticGradeRange(selectedGrade);
 
   return (
     <div className="flex min-h-screen w-full flex-col">
@@ -181,7 +216,7 @@ export default function SchoolReadingPlanClient({
             <Link href="/loja">
               <Button variant="ghost" className="pl-0 text-blue-600 hover:text-blue-800">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                {t('shop.back_to_shop') || 'Voltar à Loja'}
+                {t('order_confirmation.back_to_shop')}
               </Button>
             </Link>
           </div>
@@ -258,8 +293,76 @@ export default function SchoolReadingPlanClient({
           {/* Products by Category */}
           {gradeProducts && (
             <div className="space-y-8">
-              {/* Mandatory Books */}
-              {gradeProducts.mandatory.length > 0 && (
+              {/* Didactic aids — individual purchase only, no kits */}
+              {gradeProducts.didactic_aids.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-semibold text-blue-900">
+                      {t("shop.didactic_aids")}
+                    </h2>
+                    <Badge variant="outline" className="border-blue-300 text-blue-700">
+                      {gradeProducts.didactic_aids.length}{" "}
+                      {t("shop.books") || "itens"}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-blue-700/70 mb-4">
+                    {language === "pt"
+                      ? "Materiais opcionais que podem ser adquiridos separadamente, independentemente do ano."
+                      : "Optional materials available for individual purchase, regardless of grade."}
+                  </p>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                    {gradeProducts.didactic_aids.map((product) => (
+                      <Card
+                        key={product.id}
+                        className="group overflow-hidden border-blue-100 hover:shadow-lg transition-shadow"
+                      >
+                        <Link href={`/produto/${product.id}`}>
+                          <div className="aspect-square overflow-hidden bg-gray-50">
+                            <Image
+                              src={
+                                normalizeImageUrl(
+                                  Array.isArray(product.image)
+                                    ? product.image[0]
+                                    : product.image
+                                ) || "/placeholder.svg"
+                              }
+                              alt={getDisplayName(product.name, language)}
+                              width={200}
+                              height={200}
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+                        </Link>
+                        <CardContent className="p-3">
+                          <Link href={`/produto/${product.id}`}>
+                            <h3 className="text-sm font-medium text-blue-900 line-clamp-2 hover:text-blue-700">
+                              {getDisplayName(product.name, language)}
+                            </h3>
+                          </Link>
+                          <p className="mt-1 text-sm font-semibold text-blue-700">
+                            {product.price.toLocaleString("pt-PT")} Kz
+                          </p>
+                          <Button
+                            size="sm"
+                            className="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white"
+                            onClick={() => addToCartLocal(product)}
+                            disabled={isInCart(product.id)}
+                          >
+                            {isInCart(product.id) ? (
+                              <Check className="h-4 w-4" />
+                            ) : (
+                              <ShoppingCart className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Mandatory Books — not for didactic grade ranges */}
+              {!selectedIsDidacticRange && gradeProducts.mandatory.length > 0 && (
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-blue-900">
@@ -276,7 +379,7 @@ export default function SchoolReadingPlanClient({
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="flex-1">
                           <h3 className="text-lg font-semibold text-blue-900">
-                            {t('shop.mandatory_kit') || 'Kit Obrigatório'} - {getGradeDisplayName(selectedGrade)}
+                            {t('shop.mandatory_kit', { count: gradeProducts.mandatory.length })} - {getGradeDisplayName(selectedGrade)}
                           </h3>
                           <p className="text-blue-700/70 text-sm mt-1">
                             {t('shop.buy_all_mandatory') || 'Compre todos os livros obrigatórios de uma vez'}
@@ -389,14 +492,14 @@ export default function SchoolReadingPlanClient({
               )}
 
               {/* Complete Kit (All Books) - only show if there are recommended books */}
-              {gradeProducts.optional.length > 0 && (
+              {!selectedIsDidacticRange && gradeProducts.optional.length > 0 && (
                 <div className="mt-8">
                   <Card className="border-green-200 bg-gradient-to-br from-green-50 to-white">
                     <CardContent className="p-6">
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="flex-1">
                           <h3 className="text-lg font-semibold text-green-900">
-                            {language === 'pt' ? `Kit Completo (${gradeProducts.complete.length} itens)` : `Complete Kit (${gradeProducts.complete.length} items)`} - {getGradeDisplayName(selectedGrade)}
+                            {t('shop.complete_kit', { count: gradeProducts.complete.length })} - {getGradeDisplayName(selectedGrade)}
                           </h3>
                           <p className="text-green-700/70 text-sm mt-1">
                             {t('shop.buy_all_books') || 'Todos os livros do ano (obrigatórios + opcionais)'}
@@ -475,15 +578,28 @@ export default function SchoolReadingPlanClient({
             </div>
           )}
 
-          {/* No Reading Plan Message */}
-          {(!gradeProducts || gradeProducts.mandatory.length === 0) && (
+          {/* Default Message when no grade is selected */}
+          {!selectedGrade && (
             <div className="text-center py-12">
               <BookOpen className="mx-auto h-12 w-12 text-blue-300" />
               <h3 className="mt-4 text-lg font-medium text-blue-900">
-                {t('shop.no_reading_plan') || 'Nenhum plano de leitura disponível'}
+                {t('shop.no_reading_plan_selected_title')}
               </h3>
               <p className="mt-2 text-blue-700/70">
-                {t('shop.contact_school') || 'Contacte a escola para mais informações'}
+                {t('shop.no_reading_plan_selected_description')}
+              </p>
+            </div>
+          )}
+
+          {/* No Reading Plan Message for selected grade */}
+          {selectedGrade && (!gradeProducts || (gradeProducts.mandatory.length === 0 && gradeProducts.optional.length === 0 && gradeProducts.didactic_aids.length === 0)) && (
+            <div className="text-center py-12">
+              <BookOpen className="mx-auto h-12 w-12 text-blue-300" />
+              <h3 className="mt-4 text-lg font-medium text-blue-900">
+                {t('shop.no_reading_plan')}
+              </h3>
+              <p className="mt-2 text-blue-700/70">
+                {t('shop.contact_school')}
               </p>
             </div>
           )}
